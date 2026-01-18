@@ -28,6 +28,8 @@ jobs:
             # Get changed files
             CHANGED_FILES=$(git diff --name-only HEAD~1)
             echo "Changed files: $CHANGED_FILES"
+            echo "Full diff:" >> $GITHUB_OUTPUT
+            git diff --name-only HEAD~1 >> $GITHUB_OUTPUT
             
             if echo "$CHANGED_FILES" | grep -q "^backend/games"; then
               echo "games=true" >> $GITHUB_OUTPUT
