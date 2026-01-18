@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Character Picker Backend",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
+    "dotenv": "^16.3.1",
+    "axios": "^0.19.0",
+    "body-parser": "^1.15.1",
+    "cache": "^2.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.4.3",
+    "fs-extra": "^8.1.0",
+    "http-auth": "^3.2.4",
+    "pg": "^8.11.3",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {}
+}

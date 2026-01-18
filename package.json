@@ -1,0 +1,30 @@
+{
+  "name": "character-picker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Character Picker Monorepo",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev:frontend",
+    "dev:frontend": "npm -w frontend run serve",
+    "dev:backend": "npm -w backend run start",
+    "build": "npm -w frontend run build",
+    "start": "npm run start --workspaces --if-present",
+    "start:frontend": "npm -w frontend run start",
+    "start:backend": "npm -w backend run start",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "lint": "npm -w frontend run lint",
+    "format": "prettier --write \"**/*.{js,vue,json,css,less,html}\"",
+    "format:check": "prettier --check \"**/*.{js,vue,json,css,less,html}\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}

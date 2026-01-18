@@ -1,0 +1,28 @@
+{
+  "short_name": "RBG",
+  "name": "Random Boardgame",
+  "icons": [
+    {
+      "src": "img/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icons/maskable_icon.png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "img/icons/favicon.ico",
+      "sizes": "72x72 96x96 128x128 256x256"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#e05a47",
+  "theme_color": "#e05a47",
+  "display": "standalone"
+}

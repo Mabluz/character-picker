@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+    <link rel="manifest" href="manifest.json" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <title>Character picker</title>
+    <meta
+      property="og:title"
+      content="Randomize your drafting - randomboardgame.com"
+    />
+    <meta
+      property="og:image"
+      content="http://www.randomboardgame.com/random.jpg"
+    />
+    <meta
+      property="og:description"
+      content="What heroes should we use? Here is the answer!"
+    />
+    <meta property="og:image:width" content="500" />
+    <meta property="og:image:height" content="263" />
+  </head>
+  <body>
+    <script>
+      // Unregister any existing service workers and clear caches
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var registration of registrations) {
+            registration.unregister();
+          }
+        });
+        if ("caches" in window) {
+          caches.keys().then(function(names) {
+            for (var name of names) caches.delete(name);
+          });
+        }
+      }
+    </script>
+    <noscript>
+      <strong
+        >We're sorry but Character Picker doesn't work properly without
+        JavaScript enabled. Please enable it to continue.</strong
+      >
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

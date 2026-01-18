@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: character-picker-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: character_picker
+      POSTGRES_PASSWORD: character_picker_dev
+      POSTGRES_DB: character_picker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
