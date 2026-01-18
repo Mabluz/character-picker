@@ -27,6 +27,9 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
+        env:
+          NODE_ENV: production
+          VUE_APP_BACKEND_SERVER: http://192.168.1.13:3003/api
 
       - name: Upload frontend via SCP
         uses: appleboy/scp-action@v0.1.7
