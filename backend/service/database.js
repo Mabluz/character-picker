@@ -10,7 +10,7 @@ const init = async () => {
     connectionString: process.env.DATABASE_URL
   });
 
-  pool.on("error", (err) => {
+  pool.on("error", err => {
     console.error("Unexpected error on idle client", err);
   });
 
@@ -38,7 +38,7 @@ const runMigrations = async () => {
 
     // Get list of executed migrations
     const result = await client.query("SELECT name FROM migrations");
-    const executedMigrations = new Set(result.rows.map((row) => row.name));
+    const executedMigrations = new Set(result.rows.map(row => row.name));
 
     // Get all migration files
     const migrationsDir = path.join(__dirname, "..", "migrations");
@@ -49,7 +49,7 @@ const runMigrations = async () => {
 
     const files = fs
       .readdirSync(migrationsDir)
-      .filter((f) => f.endsWith(".sql"))
+      .filter(f => f.endsWith(".sql"))
       .sort();
 
     // Run pending migrations
@@ -74,7 +74,7 @@ const autoLoadGames = async () => {
     return;
   }
 
-  const folders = fs.readdirSync(gamesDir).filter((f) => {
+  const folders = fs.readdirSync(gamesDir).filter(f => {
     const folderPath = path.join(gamesDir, f);
     return fs.statSync(folderPath).isDirectory();
   });

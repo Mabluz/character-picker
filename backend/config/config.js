@@ -1,6 +1,6 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const debug = process.env.NODE_ENV !== 'production';
+const debug = process.env.NODE_ENV !== "production";
 
 module.exports = {
   authCodeForMainPush: process.env.AUTH_CODE_FOR_MAIN_PUSH,

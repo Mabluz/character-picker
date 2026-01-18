@@ -30,11 +30,13 @@
     <script>
       // Unregister any existing service workers and clear caches
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (var registration of registrations) {
-            registration.unregister();
-          }
-        });
+        navigator.serviceWorker
+          .getRegistrations()
+          .then(function(registrations) {
+            for (var registration of registrations) {
+              registration.unregister();
+            }
+          });
         if ("caches" in window) {
           caches.keys().then(function(names) {
             for (var name of names) caches.delete(name);

@@ -27,12 +27,10 @@ router.delete("/usergame/:gamename", cors(), async (req, res, next) => {
     if (gameSaved.error) res.status(401);
     return res.json(gameSaved);
   } else
-    return res
-      .status(401)
-      .json({
-        error: "User not logged in. Could not delete game!",
-        deleted: false
-      });
+    return res.status(401).json({
+      error: "User not logged in. Could not delete game!",
+      deleted: false
+    });
   return res.json({});
 });
 

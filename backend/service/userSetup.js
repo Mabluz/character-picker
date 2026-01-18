@@ -70,7 +70,7 @@ let generateUserKey = (user, password) => {
   }
 };
 
-let getUserAccount = async (userEmail) => {
+let getUserAccount = async userEmail => {
   const email = userEmail.toLowerCase().trim();
   const cacheKey = config.userPrefix + email;
   let cachedUser = c.get(cacheKey);
@@ -161,7 +161,7 @@ const resetPassword = async (data, userEmail, userPassword) => {
   };
 };
 
-const preformPasswordReset = async (data) => {
+const preformPasswordReset = async data => {
   const newUserData = data.newUserData;
 
   await database.query(
@@ -177,12 +177,12 @@ const preformPasswordReset = async (data) => {
   };
 };
 
-let clearUserCache = (userEmail) => {
+let clearUserCache = userEmail => {
   const cacheKey = config.userPrefix + userEmail.toLowerCase().trim();
   c.put(cacheKey, false);
 };
 
-let newLogin = async (data) => {
+let newLogin = async data => {
   const token = uuid();
   const tokenTime = new Date().getTime();
 
@@ -200,7 +200,7 @@ let newLogin = async (data) => {
     [data.userId]
   );
 
-  const games = gamesResult.rows.map((row) => row.game_data);
+  const games = gamesResult.rows.map(row => row.game_data);
 
   return {
     answer: {
@@ -240,7 +240,7 @@ const adminGetAllUsers = async (backupData = false) => {
      GROUP BY u.id`
   );
 
-  let users = result.rows.map((row) => ({
+  let users = result.rows.map(row => ({
     userId: row.id,
     email: row.email,
     userKey: backupData ? row.user_key : undefined,
@@ -252,7 +252,7 @@ const adminGetAllUsers = async (backupData = false) => {
   }));
 
   if (!backupData) {
-    users = users.map((user) => {
+    users = users.map(user => {
       delete user.newUserData;
       delete user.token;
       delete user.userKey;

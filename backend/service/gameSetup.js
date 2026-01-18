@@ -21,14 +21,14 @@ let getMainGame = async (gamename = undefined) => {
       "SELECT id, title, background, settings FROM main_games ORDER BY LOWER(title)"
     );
 
-    let games = result.rows.map((row) => ({
+    let games = result.rows.map(row => ({
       id: row.id,
       title: row.background?.title || row.title || row.id.replace(/-/g, " "),
       backgroundUrl: row.background?.thumbnail
         ? config.serverFullUrl + row.background.thumbnail
         : row.background?.url
-          ? config.serverFullUrl + row.background.url
-          : undefined,
+        ? config.serverFullUrl + row.background.url
+        : undefined,
       backgroundOpacity: row.background?.transparent || 0,
       titleColor: row.background?.color || 0
     }));
@@ -118,7 +118,7 @@ let saveUserGame = async (accountInfoWithData, newData) => {
     [accountInfoWithData.userId]
   );
 
-  const data = gamesResult.rows.map((row) => row.game_data);
+  const data = gamesResult.rows.map(row => row.game_data);
 
   return {
     email: accountInfoWithData.email,
@@ -156,7 +156,7 @@ let mainGameSetter = async (id, data) => {
   console.log("CACHE CLEARED!");
 };
 
-let mainGameDelete = async (id) => {
+let mainGameDelete = async id => {
   await database.query("DELETE FROM main_games WHERE id = $1", [id]);
   c = new Cache(config.cacheForMinutes);
 };

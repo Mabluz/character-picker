@@ -11,7 +11,7 @@ server.use(cors());
 
 server.use(bodyParser.json()); // for parsing application/json
 server.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-server.use(function (req, res, next) {
+server.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type");
@@ -27,7 +27,9 @@ server.use(function (req, res, next) {
   next();
 });
 
-server.use(express.static(process.env.GAMES_DIR || path.join(__dirname, "games")));
+server.use(
+  express.static(process.env.GAMES_DIR || path.join(__dirname, "games"))
+);
 
 server.use("/adminview", require("./controllers/admin-controller"));
 server.use("/email", require("./controllers/email-controller"));
@@ -41,7 +43,7 @@ const startServer = async () => {
 
     if (!process._eval) {
       let portUsed = process.env.PORT || 1337;
-      server.listen(portUsed, function () {
+      server.listen(portUsed, function() {
         console.log("HTTP server started at port " + portUsed);
       });
     }
