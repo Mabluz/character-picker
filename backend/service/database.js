@@ -68,9 +68,9 @@ const runMigrations = async () => {
 };
 
 const autoLoadGames = async () => {
-  const gamesDir = path.join(__dirname, "..", "games");
+  const gamesDir = process.env.GAMES_DIR || path.join(__dirname, "..", "games");
   if (!fs.existsSync(gamesDir)) {
-    console.log("No games directory found");
+    console.log("No games directory found at", gamesDir);
     return;
   }
 

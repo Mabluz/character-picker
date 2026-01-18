@@ -27,7 +27,7 @@ server.use(function (req, res, next) {
   next();
 });
 
-server.use(express.static(path.join(__dirname, "games")));
+server.use(express.static(process.env.GAMES_DIR || path.join(__dirname, "games")));
 
 server.use("/adminview", require("./controllers/admin-controller"));
 server.use("/email", require("./controllers/email-controller"));

@@ -18,8 +18,6 @@ A web application for randomly picking characters in board games. Perfect for ga
 
 ### 1. Clone and Install Dependencies
 
-Note: Remove the submodule if you dont have access.
-
 ```bash
 git clone <repository-url>
 cd character-picker
@@ -130,17 +128,16 @@ character-picker/
 
 ## Game Data Management
 
-The game data files are stored in a separate private Git repository as a Git submodule to keep the game assets and configurations private. This setup allows the main repository to remain public while protecting the copyrighted game content.
+The game data files are stored in a separate private Git repository as a Git submodule for local development. For production deployment, games are deployed separately from the private repository, and the backend loads them from a configurable directory path.
 
 ### Setting Up Game Data
 
-After cloning the repository, initialize the submodule:
+For local development:
+- The submodule provides game data automatically after `git submodule update --init --recursive`
 
-```bash
-git submodule update --init --recursive
-```
-
-This will clone the private game data repository into `backend/games/`.
+For production deployment:
+- Games are deployed from the private `character-picker-games` repository to `/var/www/games`
+- Backend loads games from `GAMES_DIR=/var/www/games` environment variable
 
 ### For Contributors and Forks
 
@@ -162,6 +159,12 @@ Each game requires:
 - A `load.json` file with game configuration
 - Optional: `background/` folder with images
 - Optional: Additional subfolders for character images
+
+### Deployment
+
+- **Games**: Deployed from the private `character-picker-games` repository
+- **Backend**: Deployed from this repository, loads games from `GAMES_DIR`
+- **Frontend**: Deployed from this repository
 
 ## Adding Database Migrations
 
