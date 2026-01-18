@@ -5,9 +5,53 @@ on:
     branches: [ "main" ]
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      games: ${{ steps.filter.outputs.games }}
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "games=true" >> $GITHUB_OUTPUT
+            echo "backend=true" >> $GITHUB_OUTPUT
+            echo "frontend=true" >> $GITHUB_OUTPUT
+          else
+            # Get changed files
+            CHANGED_FILES=$(git diff --name-only HEAD~1)
+            echo "Changed files: $CHANGED_FILES"
+            
+            if echo "$CHANGED_FILES" | grep -q "^backend/games/"; then
+              echo "games=true" >> $GITHUB_OUTPUT
+            else
+              echo "games=false" >> $GITHUB_OUTPUT
+            fi
+            
+            if echo "$CHANGED_FILES" | grep -q "^backend/"; then
+              echo "backend=true" >> $GITHUB_OUTPUT
+            else
+              echo "backend=false" >> $GITHUB_OUTPUT
+            fi
+            
+            if echo "$CHANGED_FILES" | grep -q "^frontend/"; then
+              echo "frontend=true" >> $GITHUB_OUTPUT
+            else
+              echo "frontend=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
   deploy-games:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'backend/games/') || github.event_name == 'workflow_dispatch'
+    needs: check-changes
+    if: needs.check-changes.outputs.games == 'true'
 
     steps:
       - name: Checkout code
@@ -27,8 +71,8 @@ jobs:
 
   deploy-backend:
     runs-on: ubuntu-latest
-    needs: deploy-games
-    if: contains(github.event.head_commit.modified, 'backend/') || github.event_name == 'workflow_dispatch'
+    needs: [check-changes, deploy-games]
+    if: needs.check-changes.outputs.backend == 'true'
 
     steps:
       - name: Checkout code
@@ -57,7 +101,8 @@ jobs:
 
   deploy-frontend:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'frontend/') || github.event_name == 'workflow_dispatch'
+    needs: check-changes
+    if: needs.check-changes.outputs.frontend == 'true'
 
     steps:
       - name: Checkout code
