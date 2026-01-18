@@ -29,7 +29,7 @@ jobs:
             CHANGED_FILES=$(git diff --name-only HEAD~1)
             echo "Changed files: $CHANGED_FILES"
             
-            if echo "$CHANGED_FILES" | grep -q "^backend/games/"; then
+            if echo "$CHANGED_FILES" | grep -q "^backend/games"; then
               echo "games=true" >> $GITHUB_OUTPUT
             else
               echo "games=false" >> $GITHUB_OUTPUT
