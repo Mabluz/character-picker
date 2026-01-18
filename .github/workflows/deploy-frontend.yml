@@ -41,12 +41,13 @@ jobs:
           target: ${{ secrets.FRONTEND_PATH }}
           strip_components: 2
 
-      - name: Rebuild and restart frontend container
+      - name: Restart backend container
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.FRONTEND_PATH }}
-            docker compose up -d --build --force-recreate frontend
+            cd /srv/docker/nginx
+            docker compose build character-picker-frontend
+            docker compose up -d character-picker-frontend
