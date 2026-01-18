@@ -1,12 +1,67 @@
-name: Deploy Zellstrikka Frontend
+name: Deploy Character Picker
 
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/**'
 
 jobs:
-  build-and-deploy:
+  deploy-games:
     runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'backend/games/') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Upload games via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "backend/games/*"
+          target: ${{ secrets.GAMES_PATH }}
+          strip_components: 2
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: deploy-games
+    if: contains(github.event.head_commit.modified, 'backend/') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy backend to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./*"
+          target: ${{ secrets.BACKEND_PATH }}
+          strip_components: 0
+
+      - name: Restart backend container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /srv/docker/nginx
+            docker compose build character-picker-backend
+            docker compose up -d character-picker-backend
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'frontend/') || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout code
@@ -24,12 +79,6 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
-
-      - name: Deploy frontend
-        run: |
-          cd frontend/dist
-          ls -la
-        shell: bash
 
       - name: Upload frontend via SCP
         uses: appleboy/scp-action@v0.1.7
