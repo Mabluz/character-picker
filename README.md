@@ -2,21 +2,6 @@
 
 A web application for randomly picking characters in board games. Perfect for game nights when players can't decide which characters to play.
 
-## Supported Games
-
-- Arcadia Quest
-- Dark Souls: The Board Game
-- Descent (Second Edition)
-- Kingdom Death
-- Marvel United
-- Nemesis
-- Rising Sun
-- The Others
-- Vast
-- Vengeance
-- Village Attacks
-- Zombicide
-- Zombicide: Black Plague / Green Horde
 
 ## Tech Stack
 
