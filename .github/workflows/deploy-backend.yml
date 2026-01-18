@@ -33,3 +33,13 @@ jobs:
           source: "backend/**"
           target: ${{ secrets.BACKEND_PATH }}
           strip_components: 1
+
+      - name: Rebuild and restart backend container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.BACKEND_PATH }}
+            docker compose up -d --build --force-recreate backend

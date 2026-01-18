@@ -40,3 +40,13 @@ jobs:
           source: "frontend/dist/*"
           target: ${{ secrets.FRONTEND_PATH }}
           strip_components: 2
+
+      - name: Rebuild and restart frontend container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.FRONTEND_PATH }}
+            docker compose up -d --build --force-recreate frontend
