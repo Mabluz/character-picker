@@ -1,4 +1,4 @@
-/backend/games/*
+/backend/games/
 
 # Dependencies
 node_modules

@@ -33,9 +33,12 @@ A web application for randomly picking characters in board games. Perfect for ga
 
 ### 1. Clone and Install Dependencies
 
+Note: Remove the submodule if you dont have access.
+
 ```bash
 git clone <repository-url>
 cd character-picker
+git submodule update --init --recursive
 npm install
 ```
 
@@ -63,7 +66,7 @@ Backend runs on http://localhost:1337
 
 On first startup, the backend will:
 - Run database migrations automatically
-- Load all games from `backend/games/` into the database
+- Load all games from the `backend/games/` into the database
 
 ### 5. Start the Frontend
 
@@ -80,7 +83,7 @@ character-picker/
 ├── backend/
 │   ├── controllers/       # API route handlers
 │   ├── service/           # Business logic
-│   ├── games/             # Game data (JSON files)
+│   ├── games/             # Game data (JSON files / Git submodule - private repo)
 │   ├── migrations/        # Database migrations
 │   ├── config/            # Configuration
 │   └── app.js             # Express server entry point
@@ -139,6 +142,41 @@ character-picker/
 ```
 
 3. Restart the backend - the game will be loaded automatically
+
+## Game Data Management
+
+The game data files are stored in a separate private Git repository as a Git submodule to keep the game assets and configurations private. This setup allows the main repository to remain public while protecting the copyrighted game content.
+
+### Setting Up Game Data
+
+After cloning the repository, initialize the submodule:
+
+```bash
+git submodule update --init --recursive
+```
+
+This will clone the private game data repository into `backend/games/`.
+
+### For Contributors and Forks
+
+If you are contributing to this project or have forked it:
+
+1. **Existing Contributors**: The submodule should work automatically if you have access to the private repository.
+
+2. **New Forks/Contributors**: Since the game data is in a private repository, you will need to:
+   - Create your own private repository for game data
+   - Add it as a submodule: `git submodule add <your-private-repo-url> backend/games`
+   - Or create a local `backend/games/` folder with your own game data
+
+The application will work with any valid game data structure - you can use the existing games as templates or create your own.
+
+### Game Data Structure
+
+Each game requires:
+- A folder: `backend/games/<game-name>/`
+- A `load.json` file with game configuration
+- Optional: `background/` folder with images
+- Optional: Additional subfolders for character images
 
 ## Adding Database Migrations
 
