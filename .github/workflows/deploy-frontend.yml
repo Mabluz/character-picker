@@ -41,13 +41,12 @@ jobs:
           target: ${{ secrets.FRONTEND_PATH }}
           strip_components: 2
 
-      - name: Restart backend container
+      - name: Restart frontend container
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /srv/docker/nginx
-            docker compose build character-picker-frontend
-            docker compose up -d character-picker-frontend
+            cd /srv/www/character-picker
+            docker compose -f docker-compose.yml up -d --build character-picker-frontend
