@@ -55,14 +55,12 @@
           >
         </div>
         <div class="info">
-          I love boardgames and coding. And randomization for boardgames are
-          something that coding can help do well. I therefore started on this
-          little hobby project of mine, where I threw together a quick solution
-          in just some days. Seeing how many people enjoyed it I have revisited
-          the entire site and recreated it to last. This is what you see here
-          today. But bigger infrastructure also means more server cost
-          (currently using heroku.com). Since I'm just keeping this alive by my
-          own pocket I would appreciate a donation if you enjoy this site.
+          I love board games and coding, and randomization is something code
+          handles well. What started as a quick hobby project built in a few
+          days has grown into something more. Seeing how many people enjoyed it,
+          I rebuilt the entire site to be more robust and lasting. However,
+          better infrastructure means higher server costs. If you find this site
+          useful, I'd appreciate a donation to help keep it running.
         </div>
         <div class="painted">
           Also,
@@ -76,7 +74,7 @@
       </div>
       <div class="right">
         <donate-button></donate-button>
-        <div>A:{{ isAndroid }} - I:{{ isIOS }}</div>
+        <!-- <div>A:{{ isAndroid }} - I:{{ isIOS }}</div> -->
       </div>
     </div>
   </div>
