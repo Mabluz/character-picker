@@ -11,13 +11,13 @@ module.exports = {
   userGameUUIDPrefix: "usergame---",
   serverFullUrl: debug
     ? "http://localhost:1337/"
-    : "http://192.168.1.13:3003/api/",
+    : "https://randomboardgame.zellflagstad.com/api/",
   cacheForMinutes: 1000 * 60 * 180,
   emailKey: process.env.EMAIL_KEY,
   emailFrom: process.env.EMAIL_FROM,
   emailLandingPagePasswordReset: debug
     ? "http://localhost:8080/#/password-reset/"
-    : "http://192.168.1.13:3003/#/password-reset/",
+    : "https://randomboardgame.zellflagstad.com/#/password-reset/",
   adminAuthUser: process.env.ADMIN_AUTH_USER,
   adminAuthPass: process.env.ADMIN_AUTH_PASS,
   adminAuthUser2: process.env.ADMIN_AUTH_USER2,
