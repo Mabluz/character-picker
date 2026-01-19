@@ -275,6 +275,8 @@ export default {
             delete tab.categories;
             return tab;
           });
+          // Delete legacy characters array to avoid conflicts when loading
+          delete userData.characters;
         } else if (userData.characters) {
           userData.tabs = [
             { characters: charsObjectToString(userData.characters) }

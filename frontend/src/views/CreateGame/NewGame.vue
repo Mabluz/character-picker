@@ -259,6 +259,7 @@
       :tabs="tabData"
       :editable="true"
     ></char-tabs>
+
     <table
       id="character-table"
       v-for="(tab, tIndex) in currentGame.tabs"
@@ -282,10 +283,10 @@
         <td class="remove" :class="{ changed: isChanged(char, 'remove', 0) }">
           <input
             type="checkbox"
-            name="name"
-            v-model="char.remove"
+            name="remove"
+            :checked="char.remove"
             @click="storeChange(char.remove, char.uuid[0], true)"
-            @change="storeChange(char.remove, char.uuid[0])"
+            @change="setCharRemove(tIndex, cIndex, $event.target.checked)"
           />
         </td>
         <td class="name" :class="{ changed: isChanged(char, 'name', 1) }">
@@ -293,6 +294,7 @@
             type="text"
             name="name"
             v-model="char.name"
+            @input="char.name = filterPipeChar(char.name)"
             @focus="storeChange(char.name, char.uuid[1])"
             @blur="storeChange(char.name, char.uuid[1])"
           />
@@ -302,6 +304,7 @@
             type="text"
             name="type"
             v-model="char.type"
+            @input="char.type = filterPipeChar(char.type)"
             @focus="storeChange(char.type, char.uuid[3])"
             @blur="storeChange(char.type, char.uuid[3])"
           />
@@ -311,6 +314,7 @@
             type="text"
             name="container"
             v-model="char.container"
+            @input="char.container = filterPipeChar(char.container)"
             @focus="storeChange(char.container, char.uuid[2])"
             @blur="storeChange(char.container, char.uuid[2])"
           />
@@ -320,6 +324,7 @@
             type="text"
             name="image"
             v-model="char.image"
+            @input="char.image = filterPipeChar(char.image)"
             @focus="storeChange(char.image, char.uuid[4])"
             @blur="storeChange(char.image, char.uuid[4])"
           />
@@ -395,6 +400,12 @@
           </tr>
         </table>
       </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Tip:</strong> Use a slash (/) in the Type field to create multiple
+      filter values. For example, "Warrior/Tank" will allow filtering by either
+      "Warrior" or "Tank".
     </div>
   </div>
 </template>
@@ -741,6 +752,17 @@ export default {
                 this.changesFound = true;
                 this.changes[id] = "overview";
             },*/
+filterPipeChar(value) {
+      if (value && value.includes("|")) {
+        return value.replace(/\|/g, "");
+      }
+      return value;
+    },
+    setCharRemove(tIndex, cIndex, checked) {
+      const char = this.currentGame.tabs[tIndex].characters[cIndex];
+      this.$set(char, "remove", checked);
+      this.storeChange(checked, char.uuid[0]);
+    },
     addCharBack(tIndex, cIndex) {
       let char = JSON.parse(
         JSON.stringify(this.mainGameDiff.tabs[tIndex].characters[cIndex])
@@ -878,6 +900,18 @@ export default {
   }
   .required {
     color: red;
+  }
+
+  .info-box {
+    background: #e8f4fd;
+    border: 1px solid #b8daff;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: left;
+    font-size: 14px;
+    color: #004085;
   }
 
   .store-actions {
