@@ -5,8 +5,11 @@ import uuid from "uuid";
 
 const splitUpGameData = game => {
   if (game && game.characters && game.characters.length > 0) {
-    if (game.characters[0].constructor === String)
+    if (game.characters[0].constructor === String) {
       game.tabs = [setupGameData(game.characters)];
+      // Delete legacy characters array to prevent re-parsing on subsequent setGame calls
+      delete game.characters;
+    }
   } else if (game && game.tabs) {
     game.tabs = game.tabs.map(tab => {
       if (tab.characters[0].constructor === String) {
