@@ -81,12 +81,12 @@ export default {
   head: function() {
     let head = {};
     head.title = {
-      inner: "Randomize your drafting - randomboardgame.com"
+      inner: "Randomize your drafting - randomboardgame"
     };
     head.meta = [];
     head.meta.push({
       property: "og:title",
-      content: "Randomize your drafting - randomboardgame.com"
+      content: "Randomize your drafting - randomboardgame"
     });
     head.meta.push({
       property: "og:image",

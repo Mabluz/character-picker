@@ -308,7 +308,7 @@ export default {
     if (this.title)
       head.meta.push({
         property: "og:title",
-        content: this.title + " - randomboardgame.com"
+        content: this.title + " - randomboardgame"
       });
     if (url) head.meta.push({ property: "og:image", content: url });
 

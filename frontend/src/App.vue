@@ -122,7 +122,7 @@ export default {
   },
   mounted() {
     this.showInstallGuide =
-      window.location.origin.indexOf("randomboardgame.com") > -1 &&
+      window.location.origin.indexOf("randomboardgame.zellflagstad.com") > -1 &&
       !this.$cookies.get(this.cookieKey[1]) &&
       !this.showInstallUIAndroid;
   },
