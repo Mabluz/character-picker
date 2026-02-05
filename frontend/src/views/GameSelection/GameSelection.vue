@@ -42,6 +42,8 @@
         </router-link>
       </div>
 
+      <ad-component ad-slot="YOUR_GAMES_AD_SLOT"></ad-component>
+
       <div class="heading">Pre-set games</div>
     </div>
     <div class="container">
@@ -66,13 +68,14 @@
 import { mapState, mapGetters } from "vuex";
 import SearchInput from "./SearchInput";
 import SpinningDice from "./SpinningDice";
+import AdComponent from "../../components/AdComponent";
 import _ from "lodash";
 import config from "../../../config/config";
 import Login from "../Login/Login";
 
 export default {
   name: "GameSelection",
-  components: { Login, SpinningDice, SearchInput },
+  components: { Login, SpinningDice, SearchInput, AdComponent },
   data: function() {
     return {
       searchValue: ""

@@ -43,8 +43,9 @@
       </div>
     </div>
 
-    <!--<img src="../public/spinner.gif" />-->
     <router-view />
+
+    <ad-component ad-slot="YOUR_FOOTER_AD_SLOT"></ad-component>
 
     <div class="footer">
       <div class="left">
@@ -77,16 +78,15 @@
         <!-- <div>A:{{ isAndroid }} - I:{{ isIOS }}</div> -->
       </div>
     </div>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6501658256632489"
-            crossorigin="anonymous"></script>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
 import DonateButton from "./views/Donate/DonateButton";
+import AdComponent from "./components/AdComponent";
 export default {
-  components: { DonateButton },
+  components: { DonateButton, AdComponent },
   data() {
     return {
       showInstallUIAndroid: false,

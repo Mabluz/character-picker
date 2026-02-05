@@ -93,6 +93,10 @@
                 <td class="count">{{ item.count }}</td>
               </tr>
             </table>
+            <ad-component
+              ad-slot="YOUR_SIDEBAR_AD_SLOT"
+              ad-format="vertical"
+            ></ad-component>
           </div>
           <div class="button-container" :class="{ fixed: fixedScrolling }">
             <char-button
@@ -251,6 +255,7 @@ import { mapState, mapGetters, mapMutations } from "vuex";
 import config from "../../../config/config";
 import _ from "lodash";
 import PageTabs from "../PageTabs/PageTabs";
+import AdComponent from "../../components/AdComponent";
 import CharTabs from "./CharTabs";
 import CharButton from "../CharButton";
 import Login from "../Login/Login";
@@ -287,7 +292,7 @@ let blankState = () => {
 
 export default {
   name: "CharacterPicker",
-  components: { Login, CharButton, CharTabs, PageTabs },
+  components: { Login, CharButton, CharTabs, PageTabs, AdComponent },
   props: ["gameId"],
   data() {
     return blankState();
