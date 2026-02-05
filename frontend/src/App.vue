@@ -77,6 +77,8 @@
         <!-- <div>A:{{ isAndroid }} - I:{{ isIOS }}</div> -->
       </div>
     </div>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6501658256632489"
+            crossorigin="anonymous"></script>
   </div>
 </template>
 
