@@ -1,14 +1,27 @@
 import Vue from "vue";
 import Router from "vue-router";
-import CharacterPicker from "./views/CharacterPicker/CharacterPicker";
-import GameSelection from "./views/GameSelection/GameSelection";
-import NewGame from "./views/CreateGame/NewGame";
-import PasswordReset from "./views/Password/PasswordReset";
-import DonatePage from "./views/Donate/Donate";
-import DonateThanks from "./views/Donate/DonateThanks";
-import DonateCancel from "./views/Donate/DonateCancel";
-
 Vue.use(Router);
+
+const CharacterPicker = () =>
+  import(
+    /* webpackChunkName: "character-picker" */ "./views/CharacterPicker/CharacterPicker"
+  );
+const GameSelection = () =>
+  import(
+    /* webpackChunkName: "game-selection" */ "./views/GameSelection/GameSelection"
+  );
+const NewGame = () =>
+  import(/* webpackChunkName: "new-game" */ "./views/CreateGame/NewGame");
+const PasswordReset = () =>
+  import(
+    /* webpackChunkName: "password-reset" */ "./views/Password/PasswordReset"
+  );
+const DonatePage = () =>
+  import(/* webpackChunkName: "donate" */ "./views/Donate/Donate");
+const DonateThanks = () =>
+  import(/* webpackChunkName: "donate-thanks" */ "./views/Donate/DonateThanks");
+const DonateCancel = () =>
+  import(/* webpackChunkName: "donate-cancel" */ "./views/Donate/DonateCancel");
 
 export default new Router({
   routes: [

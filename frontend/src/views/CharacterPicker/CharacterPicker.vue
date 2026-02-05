@@ -260,7 +260,13 @@
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex";
 import config from "../../../config/config";
-import _ from "lodash";
+import intersection from "lodash/intersection";
+import filter from "lodash/filter";
+import forEach from "lodash/forEach";
+import range from "lodash/range";
+import clone from "lodash/clone";
+import first from "lodash/first";
+import shuffle from "lodash/shuffle";
 import PageTabs from "../PageTabs/PageTabs";
 import AdComponent from "../../components/AdComponent";
 import CharTabs from "./CharTabs";
@@ -445,8 +451,8 @@ export default {
             const objectType = char.type.split("/");
             const objectContainer = char.container.split("/");
             if (
-              _.intersection(targetValue, objectType).length > 0 ||
-              _.intersection(targetValue, objectContainer).length > 0
+              intersection(targetValue, objectType).length > 0 ||
+              intersection(targetValue, objectContainer).length > 0
             ) {
               char.skipp = true;
               char.remove = true;
@@ -459,8 +465,8 @@ export default {
             const objectType = char.type.split("/");
             const objectContainer = char.container.split("/");
             if (
-              (_.intersection(targetValue, objectType).length > 0 ||
-                _.intersection(targetValue, objectContainer).length > 0) &&
+              (intersection(targetValue, objectType).length > 0 ||
+                intersection(targetValue, objectContainer).length > 0) &&
               !isObjectDualChecked(objectType, objectContainer)
             ) {
               char.skipp = false;
@@ -476,15 +482,15 @@ export default {
         let tab = self.game.tabs[self.selectedCharacterTabIndex];
         let filterValues =
           tab && tab.categories && tab.categories.all ? tab.categories.all : [];
-        const checkedInputs = _.filter(filterValues, cat => {
+        const checkedInputs = filter(filterValues, cat => {
           return cat.checked;
         });
         let checkCount = 0;
         for (let i = 0; i < checkedInputs.length; i++) {
           let checkboxValue = checkedInputs[i].value.split("/");
           if (
-            _.intersection(checkboxValue, objectType).length > 0 ||
-            _.intersection(checkboxValue, objectContainer).length > 0
+            intersection(checkboxValue, objectType).length > 0 ||
+            intersection(checkboxValue, objectContainer).length > 0
           ) {
             checkCount++;
           }
@@ -511,8 +517,8 @@ export default {
         this.game.tabs[this.selectedCharacterTabIndex].characters.forEach(
           char => {
             if (
-              _.intersection(filterValues, char.type.split("/")).length > 0 ||
-              _.intersection(filterValues, char.container.split("/")).length > 0
+              intersection(filterValues, char.type.split("/")).length > 0 ||
+              intersection(filterValues, char.container.split("/")).length > 0
             ) {
               if (char.remove === false) count += 1;
             }
@@ -663,7 +669,7 @@ export default {
       }, 500);
       this.animatePicking = true;
       let abortPicking = false;
-      _.forEach(_.range(0, 101), function(value, index) {
+      forEach(range(0, 101), function(value, index) {
         setTimeout(function() {
           if (!abortPicking) {
             abortPicking = drawOneRandom(index === 100);
@@ -683,8 +689,8 @@ export default {
       });
 
       function drawOneRandom(finalPick) {
-        let available = _.filter(
-          _.clone(self.game.tabs[self.selectedCharacterTabIndex].characters),
+        let available = filter(
+          clone(self.game.tabs[self.selectedCharacterTabIndex].characters),
           function(value) {
             return value.remove === false && value.skipp === false;
           }
@@ -693,7 +699,7 @@ export default {
           alert("All characters picked!");
           return true;
         }
-        let currentPicked = _.first(_.shuffle(available));
+        let currentPicked = first(shuffle(available));
         markPickedTable(currentPicked);
         if (finalPick) {
           self.pictureImg =

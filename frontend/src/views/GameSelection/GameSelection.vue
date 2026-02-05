@@ -77,7 +77,7 @@ import { mapState, mapGetters } from "vuex";
 import SearchInput from "./SearchInput";
 import SpinningDice from "./SpinningDice";
 import AdComponent from "../../components/AdComponent";
-import _ from "lodash";
+import sample from "lodash/sample";
 import config from "../../../config/config";
 import Login from "../Login/Login";
 
@@ -200,7 +200,7 @@ export default {
           "E",
           "F"
         ];
-        return _.sample(colors);
+        return sample(colors);
       }
     }
   },

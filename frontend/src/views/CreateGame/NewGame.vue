@@ -792,7 +792,6 @@ export default {
     let waitOnUserLoad = async index => {
       if (!self.userGames && index < 10) {
         setTimeout(() => {
-          console.log("WAIT");
           return waitOnUserLoad(index + 1);
         }, 50);
       } else {

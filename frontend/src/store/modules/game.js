@@ -1,6 +1,12 @@
 import axios from "axios";
 import config from "../../../config/config";
-import _ from "lodash";
+import values from "lodash/values";
+import map from "lodash/map";
+import uniq from "lodash/uniq";
+import flatten from "lodash/flatten";
+import union from "lodash/union";
+import intersection from "lodash/intersection";
+import clone from "lodash/clone";
 import uuid from "uuid";
 
 const splitUpGameData = game => {
@@ -27,7 +33,7 @@ const splitUpGameData = game => {
     let container = {};
     container.characters = characters.map((char, index) => {
       let charArray =
-        char.constructor === String ? char.split("|") : _.values(char);
+        char.constructor === String ? char.split("|") : values(char);
       if (charArray[0] === "") {
         charArray.shift();
         charArray.unshift(true);
@@ -53,10 +59,10 @@ const splitUpGameData = game => {
     });
 
     container.categories = {};
-    container.categories.types = _.map(
-      _.uniq(
-        _.flatten(
-          _.map(container.characters, function(value) {
+    container.categories.types = map(
+      uniq(
+        flatten(
+          map(container.characters, function(value) {
             return value && value.type ? value.type.split("/") : [];
           })
         )
@@ -65,9 +71,9 @@ const splitUpGameData = game => {
         return { value: value, count: countAllTypes(value) };
       }
     );
-    container.categories.containers = _.map(
-      _.uniq(
-        _.map(container.characters, function(value) {
+    container.categories.containers = map(
+      uniq(
+        map(container.characters, function(value) {
           return value.container;
         })
       ),
@@ -75,7 +81,7 @@ const splitUpGameData = game => {
         return { value: value, count: countAllTypes(value) };
       }
     );
-    container.categories.all = _.union(
+    container.categories.all = union(
       container.categories.types,
       container.categories.containers
     );
@@ -94,8 +100,8 @@ const splitUpGameData = game => {
         let objectContainer =
           object && object.container ? object.container.split("/") : [];
         if (
-          _.intersection(value, objectType).length > 0 ||
-          _.intersection(value, objectContainer).length > 0
+          intersection(value, objectType).length > 0 ||
+          intersection(value, objectContainer).length > 0
         ) {
           count++;
         }
@@ -127,7 +133,7 @@ export default {
     },
     setGame(state, game) {
       game = splitUpGameData(game);
-      let cloneBaby = _.clone(game);
+      let cloneBaby = clone(game);
       cloneBaby.tabs = cloneBaby.tabs.map(set => {
         set.characters = set.characters.map(char => {
           char.uuid = [uuid(), uuid(), uuid(), uuid(), uuid()];
@@ -173,7 +179,7 @@ export default {
           data: userData
         })
           .catch(function(error) {
-            console.log("error: ", error);
+            console.error("error: ", error);
             if (
               error &&
               error.response &&
@@ -194,7 +200,6 @@ export default {
       loading = false;
       commit("page/setLoadingSpinner", loading, { root: true });
 
-      console.log("Delete", data);
       return data;
     },
     async saveUserGame({ state, rootState, commit }, userData) {
@@ -213,7 +218,7 @@ export default {
           data: buildBackendDataOfGames(userData)
         })
           .catch(function(error) {
-            console.log("error: ", error);
+            console.error("error: ", error);
             if (
               error &&
               error.response &&
@@ -332,7 +337,6 @@ export default {
 
         gameData = gameData && gameData.data ? gameData.data : undefined;
       }
-      console.log("Using game data", gameData);
       if (gameData) {
         commit("setGame", gameData);
         return true;
