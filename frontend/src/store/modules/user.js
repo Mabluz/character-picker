@@ -1,7 +1,6 @@
 import axios from "axios";
 import config from "../../../config/config";
 import cookie from "vue-cookies";
-import _ from "lodash";
 
 let userCookieName = "charPickerLogin";
 
@@ -36,14 +35,14 @@ export default {
     }
   },
   actions: {
-    async loginUser({ state, rootState, commit, dispatch }, userData) {
-      let data = await new Promise((resolve, reject) => {
+    async loginUser({ commit, dispatch }, userData) {
+      let data = await new Promise(resolve => {
         axios({
           method: "post",
           url: config.backendServer + "/user/login",
           data: userData
         })
-          .catch(function(error, test) {
+          .catch(function(error) {
             if (
               error &&
               error.response &&
@@ -67,14 +66,14 @@ export default {
       });
       return data;
     },
-    async signupUser({ state, rootState, commit, dispatch }, userData) {
-      let data = await new Promise((resolve, reject) => {
+    async signupUser({ dispatch, commit }, userData) {
+      let data = await new Promise(resolve => {
         axios({
           method: "post",
           url: config.backendServer + "/user/signup",
           data: userData
         })
-          .catch(function(error, test) {
+          .catch(function(error) {
             if (
               error &&
               error.response &&
@@ -98,14 +97,14 @@ export default {
       });
       return data;
     },
-    async resetPassword({ state, rootState, commit, dispatch }, userData) {
-      let data = await new Promise((resolve, reject) => {
+    async resetPassword(context, userData) {
+      let data = await new Promise(resolve => {
         axios({
           method: "post",
           url: config.backendServer + "/user/resetpassword",
           data: userData
         })
-          .catch(function(error, test) {
+          .catch(function(error) {
             if (
               error &&
               error.response &&
@@ -127,11 +126,8 @@ export default {
       });
       return data;
     },
-    async acceptPasswordReset(
-      { state, rootState, commit, dispatch },
-      userData
-    ) {
-      let data = await new Promise((resolve, reject) => {
+    async acceptPasswordReset(context, userData) {
+      let data = await new Promise(resolve => {
         axios({
           method: "post",
           url: config.backendServer + "/user/validatepasswordreset",
@@ -159,20 +155,19 @@ export default {
       });
       return data;
     },
-    logout({ state, rootState, commit, dispatch }) {
+    logout({ commit }) {
       cookie.set(userCookieName, "", 0);
       commit("setUser", blankState());
       commit("game/setUserGames", undefined, { root: true });
     },
-    setCookieLogin({ state, rootState, commit, dispatch }, userData) {
+    setCookieLogin(context, userData) {
       cookie.set(
         userCookieName,
         userData.email + "|||" + userData.token,
         "14d"
       );
     },
-    async getLoginSession({ state, rootState, commit, dispatch }) {
-      let self = this;
+    async getLoginSession({ commit }) {
       let data = cookie.get(userCookieName);
       if (data) {
         data = data.split("|||");
@@ -186,7 +181,7 @@ export default {
             url: config.backendServer + "/user/validate",
             data: data
           })
-            .catch(function(error, test) {
+            .catch(function() {
               cookie.set(userCookieName, "", 0);
               commit("setUser", blankState());
               commit("game/setUserGames", undefined, { root: true });

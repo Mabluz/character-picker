@@ -2,7 +2,7 @@
   <div class="tabs">
     <ul>
       <li><a href="/">Games</a></li>
-      <li v-for="li in list">
+      <li v-for="(li, index) in list" :key="'tab_link_' + index">
         <router-link :to="li.url">{{ li.text }}</router-link>
       </li>
       <li>{{ getCurrentPage }}</li>

@@ -263,7 +263,8 @@
     <table
       id="character-table"
       v-for="(tab, tIndex) in currentGame.tabs"
-      v-if="selectedCharacterTabIndex === tIndex"
+      :key="'tab_table_' + tIndex"
+      v-show="selectedCharacterTabIndex === tIndex"
     >
       <tr>
         <th class="remove">
@@ -278,6 +279,7 @@
       </tr>
       <tr
         v-for="(char, cIndex) in tab.characters"
+        :key="'char_row_' + cIndex"
         :class="{ 'checked-remove': char.remove }"
       >
         <td class="remove" :class="{ changed: isChanged(char, 'remove', 0) }">
@@ -367,7 +369,8 @@
         <table
           id="missing-character-table"
           v-for="(tab, tIndex) in getMainGameDiff.tabs"
-          v-if="tab && tab.characters && tab.characters.length > 0"
+          :key="'missing_tab_' + tIndex"
+          v-show="tab && tab.characters && tab.characters.length > 0"
         >
           <tr>
             <th
@@ -384,7 +387,10 @@
             <th>Image</th>
             <th class="actions">Actions</th>
           </tr>
-          <tr v-for="(char, cIndex) in tab.characters">
+          <tr
+            v-for="(char, cIndex) in tab.characters"
+            :key="'missing_char_' + cIndex"
+          >
             <td style="text-align: left" class="name">{{ char.name }}</td>
             <td style="text-align: left">{{ char.container }}</td>
             <td style="text-align: left">{{ char.type }}</td>
@@ -502,7 +508,9 @@ export default {
       if (this.mainGameDiff) {
         try {
           tabs = JSON.parse(JSON.stringify(this.mainGameDiff.tabs));
-        } catch (e) {}
+        } catch (e) {
+          // ignore
+        }
         tabs = tabs.map((tab, tIndex) => {
           let foundChars = [];
           let useIndex =
@@ -752,7 +760,7 @@ export default {
                 this.changesFound = true;
                 this.changes[id] = "overview";
             },*/
-filterPipeChar(value) {
+    filterPipeChar(value) {
       if (value && value.includes("|")) {
         return value.replace(/\|/g, "");
       }

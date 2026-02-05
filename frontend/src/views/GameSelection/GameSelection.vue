@@ -27,7 +27,11 @@
           <h2 style="color: black">Create new game</h2>
         </router-link>
       </div>
-      <div class="entrance" v-for="usergame in filteredUserGames">
+      <div
+        class="entrance"
+        v-for="usergame in filteredUserGames"
+        :key="usergame.id"
+      >
         <router-link :to="'/game/' + usergame.id">
           <div
             class="background"
@@ -47,7 +51,11 @@
       <div class="heading">Pre-set games</div>
     </div>
     <div class="container">
-      <div class="entrance" v-for="gameData in filteredGames">
+      <div
+        class="entrance"
+        v-for="gameData in filteredGames"
+        :key="gameData.id"
+      >
         <router-link :to="'/game/' + gameData.id">
           <div
             class="background"

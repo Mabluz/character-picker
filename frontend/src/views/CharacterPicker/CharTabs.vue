@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper" :class="{ mobile: isMobile }">
     <ul class="tabs" data-tabgroup="first-tab-group">
-      <li v-for="(tab, index) in getTabs">
+      <li v-for="(tab, index) in getTabs" :key="'tab_' + index">
         <a @click="clickTab(index)" :class="{ active: index === activeTab }">
           <span v-if="isEditable">
             <input type="text" v-model="tab.title" />

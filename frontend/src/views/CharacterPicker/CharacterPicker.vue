@@ -74,6 +74,7 @@
               </tr>
               <tr
                 v-for="(item, index) in getAllCategories"
+                :key="'category_' + index"
                 :class="{ remove: item.checked }"
                 :id="'filter_' + index"
               >
@@ -93,6 +94,7 @@
                 <td class="count">{{ item.count }}</td>
               </tr>
             </table>
+
             <ad-component
               ad-slot="YOUR_SIDEBAR_AD_SLOT"
               ad-format="vertical"
@@ -171,7 +173,8 @@
               <th class="from">From</th>
             </tr>
             <tr
-              v-for="char in getFilteredGameChars"
+              v-for="(char, index) in getFilteredGameChars"
+              :key="'char_' + index"
               :class="{
                 remove: char.remove,
                 hover: char.hovered,
@@ -242,7 +245,11 @@
       <div id="cover"></div>
       <div id="coverContent"></div>
 
-      <div class="hidden-image-load" v-for="chars in getFilteredGameChars">
+      <div
+        class="hidden-image-load"
+        v-for="(chars, index) in getFilteredGameChars"
+        :key="'hidden_img_' + index"
+      >
         <img :src="chars.image" />
       </div>
     </div>

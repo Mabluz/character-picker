@@ -155,7 +155,7 @@ export default {
     getUserGames() {}
   },
   actions: {
-    async deleteUserGame({ state, rootState, commit, dispatch }, gameId) {
+    async deleteUserGame({ rootState, commit, dispatch }, gameId) {
       let userData = {
         email: rootState.user.user.email,
         token: rootState.user.user.token
@@ -166,13 +166,13 @@ export default {
         commit("page/setLoadingSpinner", loading, { root: true });
       }, 500);
 
-      let data = await new Promise((resolve, reject) => {
+      let data = await new Promise(resolve => {
         axios({
           method: "delete",
           url: config.backendServer + "/usergame/" + gameId,
           data: userData
         })
-          .catch(function(error, test) {
+          .catch(function(error) {
             console.log("error: ", error);
             if (
               error &&
@@ -197,7 +197,7 @@ export default {
       console.log("Delete", data);
       return data;
     },
-    async saveUserGame({ state, rootState, commit, dispatch }, userData) {
+    async saveUserGame({ state, rootState, commit }, userData) {
       userData.email = rootState.user.user.email;
       userData.token = rootState.user.user.token;
 
@@ -206,13 +206,13 @@ export default {
         commit("page/setLoadingSpinner", loading, { root: true });
       }, 500);
 
-      let data = await new Promise((resolve, reject) => {
+      let data = await new Promise(resolve => {
         axios({
           method: "post",
           url: config.backendServer + "/usergame/" + userData.background.title,
           data: buildBackendDataOfGames(userData)
         })
-          .catch(function(error, test) {
+          .catch(function(error) {
             console.log("error: ", error);
             if (
               error &&
@@ -290,7 +290,7 @@ export default {
         return userData;
       }
     },
-    async downloadMainGameData({ state, rootState, commit, dispatch }, gameId) {
+    async downloadMainGameData({ commit }, gameId) {
       let gameData; // Main game
       let loading = true;
       setTimeout(() => {
@@ -305,7 +305,7 @@ export default {
       gameData = gameData && gameData.data ? gameData.data : undefined;
       return splitUpGameData(gameData);
     },
-    async downloadGame({ state, rootState, commit, dispatch }, gameId) {
+    async downloadGame({ state, commit, dispatch }, gameId) {
       let gameData;
       if (state.userGames) {
         // User game
@@ -338,7 +338,7 @@ export default {
         return true;
       }
     },
-    async downloadOverview({ state, rootState, commit }) {
+    async downloadOverview({ commit }) {
       let loading = true;
       setTimeout(() => {
         commit("page/setLoadingSpinner", loading, { root: true });

@@ -2,7 +2,7 @@
 var express = require("express");
 var path = require("path");
 var serveStatic = require("serve-static");
-app = express();
+var app = express();
 app.use(serveStatic(__dirname + "/dist"));
 app.get("/", (req, res) => {
   res.render(path.join(__dirname + "/index.html"));

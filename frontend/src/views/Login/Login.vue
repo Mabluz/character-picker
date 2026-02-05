@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import CharButton from "../CharButton";
 import config from "../../../config/config";
 export default {
@@ -124,6 +124,7 @@ export default {
       if (this.selectedIndex === 0) return "Sign In";
       if (this.selectedIndex === 1) return "Sign Up";
       if (this.selectedIndex === 2) return "Reset password";
+      return "";
     }
   },
   methods: {
@@ -196,7 +197,7 @@ export default {
           self.inputEmailError = "You need to fill out your email";
           return false;
         }
-        let re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        let re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!re.test(self.inputEmail)) {
           self.inputEmailError = "Email not valid";
           return false;
