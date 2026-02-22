@@ -27,12 +27,7 @@
         thoughts myself about what it could be I started recreating the entire
         site. I built it to last with the latest frontend framework and a
         backend API system to store the data. A user system to be able to create
-        your own lists and what not. All this is now deployed and hosted on
-        heroku.com, a site where the hosting is free as long as the websites
-        traffic is not through the roof / being to popular. I could have kept
-        the site to myself and surfed on herokus free hosting, but no that's not
-        what I want. I want as many people as possible to enjoy this site, and
-        that will increase the server cost over time.
+        your own lists and what not. All this is now deployed and hosted on the cloud.
       </p>
       <p>
         I will cover as much as I can with my own money, but if you love this

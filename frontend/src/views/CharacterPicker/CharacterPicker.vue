@@ -46,6 +46,31 @@
       </div>
 
       <div class="background" :style="getBackgroundStyling"></div>
+
+      <!-- Mobile top ads -->
+      <div class="amazon-ads amazon-ads--mobile-top" v-if="getAffiliateAds && isMobile">
+        <div class="amazon-ads__header">
+          <span class="amazon-ads__label">Ad</span>
+          Sponsored
+        </div>
+        <div class="amazon-ads__items">
+          <a
+            v-for="(ad, index) in getStickyAds"
+            :key="'affiliate_mobile_' + index"
+            :href="ad.link"
+            target="_blank"
+            rel="noopener nofollow sponsored"
+            class="amazon-ads__item"
+            :class="'partner-' + ad.partner"
+          >
+            <img :src="ad.image" />
+            <span v-if="ad.title" class="amazon-ads__item-title">{{ ad.title }}</span>
+            <span v-if="ad.partner" class="amazon-ads__item-partner">Ad from {{ ad.partner }}</span>
+          </a>
+        </div>
+        <p class="amazon-ads__disclaimer">As an Amazon Associate I earn from qualifying purchases.</p>
+      </div>
+
       <div
         id="content"
         class="content"
@@ -242,6 +267,72 @@
           />
         </div>
       </div>
+      <!-- Fixed sidebar: hidden when bottom ads are in view -->
+      <transition name="ads-slide">
+        <div
+          class="amazon-ads amazon-ads--sticky"
+          v-if="getAffiliateAds && !affiliateAdsReached && !isMobile"
+        >
+          <div class="amazon-ads__header">
+            <span class="amazon-ads__label">Ad</span>
+            Sponsored
+          </div>
+          <div class="amazon-ads__items">
+            <a
+              v-for="(ad, index) in getStickyAds"
+              :key="'affiliate_sticky_' + index"
+              :href="ad.link"
+              target="_blank"
+              rel="noopener nofollow sponsored"
+              class="amazon-ads__item"
+              :class="'partner-' + ad.partner"
+            >
+              <img :src="ad.image" />
+              <span v-if="ad.title" class="amazon-ads__item-title">{{
+                ad.title
+              }}</span>
+              <span v-if="ad.partner" class="amazon-ads__item-partner"
+                >Ad from {{ ad.partner }}</span
+              >
+            </a>
+          </div>
+          <p class="amazon-ads__disclaimer">As an Amazon Associate I earn from qualifying purchases.</p>
+        </div>
+      </transition>
+
+      <!-- Sentinel: marks where the bottom ads live -->
+      <div ref="affiliateSentinel"></div>
+
+      <!-- Bottom ads: always visible -->
+      <div class="amazon-ads amazon-ads--bottom" v-if="getAffiliateAds">
+        <div class="amazon-ads__header">
+          <span class="amazon-ads__label">Ad</span>
+          Sponsored
+        </div>
+        <div class="amazon-ads__items">
+          <a
+            v-for="(ad, index) in getAffiliateAds.ads"
+            :key="'affiliate_bottom_' + index"
+            :href="ad.link"
+            target="_blank"
+            rel="noopener nofollow sponsored"
+            class="amazon-ads__item"
+            :class="'partner-' + ad.partner"
+          >
+            <img :src="ad.image" />
+            <span v-if="ad.title" class="amazon-ads__item-title">{{
+              ad.title
+            }}</span>
+            <span v-if="ad.partner" class="amazon-ads__item-partner"
+              >Ad from {{ ad.partner }}</span
+            >
+          </a>
+        </div>
+        <p class="amazon-ads__disclaimer">
+          As an Amazon Associate I earn from qualifying purchases.
+        </p>
+      </div>
+
       <div id="cover"></div>
       <div id="coverContent"></div>
 
@@ -299,7 +390,9 @@ let blankState = () => {
     thumbnailCssLeft: 0,
     thumbnailHide: true,
     thumbnailActive: false,
-    thumbnailZoomHeight: undefined
+    thumbnailZoomHeight: undefined,
+
+    affiliateAdsReached: false
   };
 };
 
@@ -385,6 +478,13 @@ export default {
     },
     getContainerHeight() {
       return this.contentHeight ? "height:" + this.contentHeight + "px" : "";
+    },
+    getAffiliateAds() {
+      return this.game && this.game.affiliate ? this.game.affiliate : null;
+    },
+    getStickyAds() {
+      if (!this.getAffiliateAds || !this.getAffiliateAds.ads) return [];
+      return shuffle(this.getAffiliateAds.ads).slice(0, 4);
     }
   },
   methods: {
@@ -775,6 +875,11 @@ export default {
             (window.pageYOffset || document.scrollTop) -
             (document.clientTop || 0);
           self.fixedScrolling = scrollTop > 130;
+
+          if (self.$refs.affiliateSentinel) {
+            const rect = self.$refs.affiliateSentinel.getBoundingClientRect();
+            self.affiliateAdsReached = rect.top <= window.innerHeight * 0.85;
+          }
         });
       }
     };
@@ -1091,6 +1196,214 @@ tr.picked td input {
   .content .left .button-container.fixed {
     top: 20px;
   }
+}
+
+.amazon-ads {
+  text-align: center;
+  padding: 40px 20px 20px;
+
+  &--sticky {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+    .amazon-ads__header {
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+
+    .amazon-ads__items {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .amazon-ads__item {
+      width: 100px;
+      padding: 8px;
+
+      img {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .amazon-ads__item-title {
+      font-size: 10px;
+    }
+
+    .amazon-ads__item-partner {
+      font-size: 9px;
+      padding-top: 4px;
+    }
+
+    .amazon-ads__disclaimer {
+      font-size: 9px;
+      line-height: 9px;
+      margin-top: 10px;
+      padding-top: 8px;
+      max-width: 120px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  &--mobile-top {
+    margin-bottom: 20px;
+    padding: 14px 10px;
+    background: #f5f5f5;
+    border-bottom: 3px solid #e0e0e0;
+
+    .amazon-ads__header {
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+
+    .amazon-ads__items {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .amazon-ads__item {
+      width: 120px;
+      padding: 8px;
+
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    .amazon-ads__item-title {
+      font-size: 11px;
+    }
+
+    .amazon-ads__item-partner {
+      font-size: 10px;
+    }
+  }
+
+  &--bottom {
+    margin-top: 40px;
+    background: #f5f5f5;
+    border-top: 3px solid #e0e0e0;
+    border-bottom: 3px solid #e0e0e0;
+    padding: 30px 20px;
+
+    .amazon-ads__items {
+      max-width: 780px; // 4 × 180px cards + 3 × 20px gaps
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  &__header {
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #444;
+    margin-bottom: 20px;
+  }
+
+  &__label {
+    display: inline-block;
+    background: #444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+    letter-spacing: 0;
+  }
+
+  &__items {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px;
+    width: 180px;
+    text-decoration: none;
+    color: #222;
+    transition: box-shadow 0.2s, transform 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    &.partner-amazon {
+      border-color: #ff9900;
+
+      .amazon-ads__item-partner {
+        color: #ff9900;
+      }
+    }
+
+    img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+  }
+
+  &__item-title {
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  &__item-partner {
+    font-size: 11px;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  &__disclaimer {
+    font-size: 12px;
+    font-style: italic;
+    color: #666;
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.ads-slide-enter-active,
+.ads-slide-leave-active {
+  transition: right 0.35s ease, opacity 0.35s ease;
+}
+.ads-slide-enter,
+.ads-slide-leave-to {
+  right: -300px;
+  opacity: 0;
 }
 
 body {

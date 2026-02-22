@@ -14,7 +14,7 @@
       >Donate (PayPal)</char-button
     >
     <div v-if="showInfo" class="help">
-      Servers cost... Help me keeping this site alive.
+      Servers are not free... Help me keeping this site alive.
       <router-link :to="'/donate/'">Read more</router-link>.
     </div>
   </div>

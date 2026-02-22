@@ -92,14 +92,15 @@ const autoLoadGames = async () => {
       const title = gameData.background?.title || folder.replace(/-/g, " ");
 
       await client.query(
-        `INSERT INTO main_games (id, title, characters, tabs, background, settings)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO main_games (id, title, characters, tabs, background, settings, affiliate)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (id) DO UPDATE SET
            title = $2,
            characters = $3,
            tabs = $4,
            background = $5,
            settings = $6,
+           affiliate = $7,
            updated_at = NOW()`,
         [
           folder,
@@ -107,7 +108,8 @@ const autoLoadGames = async () => {
           JSON.stringify(gameData.characters || []),
           gameData.tabs ? JSON.stringify(gameData.tabs) : null,
           JSON.stringify(gameData.background || {}),
-          JSON.stringify(gameData.settings || {})
+          JSON.stringify(gameData.settings || {}),
+          gameData.affiliate ? JSON.stringify(gameData.affiliate) : null
         ]
       );
       console.log(`Game loaded: ${folder}`);

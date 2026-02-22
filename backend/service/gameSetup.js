@@ -18,7 +18,7 @@ let getMainGame = async (gamename = undefined) => {
     }
 
     const result = await database.query(
-      "SELECT id, title, background, settings FROM main_games ORDER BY LOWER(title)"
+      "SELECT id, title, background, settings, affiliate FROM main_games ORDER BY LOWER(title)"
     );
 
     let games = result.rows.map(row => ({
@@ -30,7 +30,8 @@ let getMainGame = async (gamename = undefined) => {
         ? config.serverFullUrl + row.background.url
         : undefined,
       backgroundOpacity: row.background?.transparent || 0,
-      titleColor: row.background?.color || 0
+      titleColor: row.background?.color || 0,
+      affiliate: row.affiliate || null
     }));
 
     c.put(config.mainGamePrefix + "all", games);
@@ -45,7 +46,7 @@ let getMainGame = async (gamename = undefined) => {
     }
 
     const result = await database.query(
-      "SELECT id, title, characters, tabs, background, settings FROM main_games WHERE id = $1",
+      "SELECT id, title, characters, tabs, background, settings, affiliate FROM main_games WHERE id = $1",
       [gamename]
     );
 
@@ -64,6 +65,10 @@ let getMainGame = async (gamename = undefined) => {
     // Include tabs if the game uses tab structure
     if (row.tabs) {
       game.tabs = row.tabs;
+    }
+
+    if (row.affiliate) {
+      game.affiliate = row.affiliate;
     }
 
     c.put(config.mainGamePrefix + gamename, game);
@@ -133,14 +138,15 @@ let mainGameSetter = async (id, data) => {
   const title = gameData.background?.title || id.replace(/-/g, " ");
 
   await database.query(
-    `INSERT INTO main_games (id, title, characters, tabs, background, settings, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, NOW())
+    `INSERT INTO main_games (id, title, characters, tabs, background, settings, affiliate, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
      ON CONFLICT (id) DO UPDATE SET
        title = $2,
        characters = $3,
        tabs = $4,
        background = $5,
        settings = $6,
+       affiliate = $7,
        updated_at = NOW()`,
     [
       id,
@@ -148,7 +154,8 @@ let mainGameSetter = async (id, data) => {
       JSON.stringify(gameData.characters || []),
       gameData.tabs ? JSON.stringify(gameData.tabs) : null,
       JSON.stringify(gameData.background || {}),
-      JSON.stringify(gameData.settings || {})
+      JSON.stringify(gameData.settings || {}),
+      gameData.affiliate ? JSON.stringify(gameData.affiliate) : null
     ]
   );
 

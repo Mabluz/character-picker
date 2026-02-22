@@ -1,5 +1,37 @@
 <template>
   <div class="game-selection">
+    <div class="side-ads side-ads--left" v-if="leftColumnAds.length">
+      <div class="side-ads__label">Ad</div>
+      <a
+        v-for="(ad, index) in leftColumnAds"
+        :key="'left_ad_' + index"
+        :href="ad.link"
+        target="_blank"
+        rel="noopener nofollow sponsored"
+        class="side-ads__item"
+        :class="'partner-' + ad.partner"
+      >
+        <img :src="ad.image" />
+        <span v-if="ad.title">{{ ad.title }}</span>
+        <span v-if="ad.partner" class="side-ads__item-partner">Ad from {{ ad.partner }}</span>
+      </a>
+    </div>
+    <div class="side-ads side-ads--right" v-if="rightColumnAds.length">
+      <div class="side-ads__label">Ad</div>
+      <a
+        v-for="(ad, index) in rightColumnAds"
+        :key="'right_ad_' + index"
+        :href="ad.link"
+        target="_blank"
+        rel="noopener nofollow sponsored"
+        class="side-ads__item"
+        :class="'partner-' + ad.partner"
+      >
+        <img :src="ad.image" />
+        <span v-if="ad.title">{{ ad.title }}</span>
+        <span v-if="ad.partner" class="side-ads__item-partner">Ad from {{ ad.partner }}</span>
+      </a>
+    </div>
     <h1>
       <span class="border"></span>Random Boardgame<spinning-dice
         class="dice-container"
@@ -15,6 +47,29 @@
       >Can't find a randomizer for a specific game? Create it yourself!<br />See
       your games by logging in!</login
     >
+
+    <!-- Mobile affiliate ads under CTA -->
+    <div class="mobile-top-ads" v-if="mobileTopAds.length">
+      <div class="mobile-top-ads__header">
+        <span class="mobile-top-ads__label">Ad</span>
+        Sponsored
+      </div>
+      <div class="mobile-top-ads__items">
+        <a
+          v-for="(ad, index) in mobileTopAds"
+          :key="'mobile_top_ad_' + index"
+          :href="ad.link"
+          target="_blank"
+          rel="noopener nofollow sponsored"
+          class="mobile-top-ads__item"
+          :class="'partner-' + ad.partner"
+        >
+          <img :src="ad.image" />
+          <span v-if="ad.title" class="mobile-top-ads__item-title">{{ ad.title }}</span>
+          <span v-if="ad.partner" class="mobile-top-ads__item-partner">Ad from {{ ad.partner }}</span>
+        </a>
+      </div>
+    </div>
 
     <search-input @search="filterSearch" class="search"></search-input>
     <div class="container user-games" v-if="userLoggedIn">
@@ -69,6 +124,30 @@
         </router-link>
       </div>
     </div>
+
+    <!-- Bottom affiliate ads -->
+    <div class="bottom-ads" v-if="bottomAds.length">
+      <div class="bottom-ads__header">
+        <span class="bottom-ads__label">Ad</span>
+        Sponsored
+      </div>
+      <div class="bottom-ads__items">
+        <a
+          v-for="(ad, index) in bottomAds"
+          :key="'bottom_ad_' + index"
+          :href="ad.link"
+          target="_blank"
+          rel="noopener nofollow sponsored"
+          class="bottom-ads__item"
+          :class="'partner-' + ad.partner"
+        >
+          <img :src="ad.image" />
+          <span v-if="ad.title" class="bottom-ads__item-title">{{ ad.title }}</span>
+          <span v-if="ad.partner" class="bottom-ads__item-partner">Ad from {{ ad.partner }}</span>
+        </a>
+      </div>
+      <p class="bottom-ads__disclaimer">As an Amazon Associate I earn from qualifying purchases.</p>
+    </div>
   </div>
 </template>
 
@@ -78,6 +157,7 @@ import SearchInput from "./SearchInput";
 import SpinningDice from "./SpinningDice";
 import AdComponent from "../../components/AdComponent";
 import sample from "lodash/sample";
+import shuffle from "lodash/shuffle";
 import config from "../../../config/config";
 import Login from "../Login/Login";
 
@@ -136,6 +216,32 @@ export default {
           .toLowerCase()
           .startsWith(this.searchValue.toLowerCase());
       });
+    },
+    shuffledAffiliateAds() {
+      if (!this.gameOverview) return [];
+      const seenTitles = new Set();
+      const all = this.gameOverview
+        .filter(g => g.affiliate && g.affiliate.ads)
+        .flatMap(g => g.affiliate.ads)
+        .filter(ad => ad.image && ad.partner === "amazon")
+        .filter(ad => {
+          if (!ad.title || seenTitles.has(ad.title)) return false;
+          seenTitles.add(ad.title);
+          return true;
+        });
+      return shuffle([...all]);
+    },
+    leftColumnAds() {
+      return this.shuffledAffiliateAds.slice(0, 2);
+    },
+    rightColumnAds() {
+      return this.shuffledAffiliateAds.slice(2, 4);
+    },
+    mobileTopAds() {
+      return this.shuffledAffiliateAds.slice(4, 8);
+    },
+    bottomAds() {
+      return this.shuffledAffiliateAds.slice(8, 18);
     },
     filteredGames() {
       if (!this.gameOverview) return [];
@@ -318,6 +424,273 @@ export default {
         width: 100%;
       }
     }
+  }
+}
+
+.game-selection {
+  position: relative;
+}
+
+.mobile-top-ads {
+  display: none;
+  background: #f5f5f5;
+  border-top: 3px solid #e0e0e0;
+  border-bottom: 3px solid #e0e0e0;
+  padding: 20px 16px;
+  text-align: center;
+  margin-top: 20px;
+
+  @media (max-width: 990px) {
+    display: block;
+  }
+
+  &__header {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #444;
+    margin-bottom: 14px;
+  }
+
+  &__label {
+    display: inline-block;
+    background: #444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  &__items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    width: calc(50% - 7px);
+    box-sizing: border-box;
+    text-decoration: none;
+    color: #222;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    &.partner-amazon {
+      border-color: #ff9900;
+
+      .mobile-top-ads__item-partner {
+        color: #ff9900;
+      }
+    }
+
+    img {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__item-title {
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  &__item-partner {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+}
+
+.bottom-ads {
+  background: #f5f5f5;
+  border-top: 3px solid #e0e0e0;
+  border-bottom: 3px solid #e0e0e0;
+  padding: 30px 20px;
+  text-align: center;
+
+  &__header {
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #444;
+    margin-bottom: 20px;
+  }
+
+  &__label {
+    display: inline-block;
+    background: #444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  &__items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 880px; // 5 × 160px + 4 × 20px gaps
+    margin: 0 auto;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px;
+    width: 160px;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: #222;
+    transition: box-shadow 0.2s, transform 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    &.partner-amazon {
+      border-color: #ff9900;
+
+      .bottom-ads__item-partner {
+        color: #ff9900;
+      }
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+  }
+
+  &__item-title {
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  &__item-partner {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  &__disclaimer {
+    font-size: 12px;
+    font-style: italic;
+    color: #666;
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.side-ads {
+  position: absolute;
+  top: 80px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+
+  &--left { left: 10px; }
+  &--right { right: 10px; }
+
+  @media (max-width: 1400px) {
+    display: none;
+  }
+
+  &__label {
+    display: inline-block;
+    background: #444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px;
+    width: 160px;
+    text-decoration: none;
+    color: #222;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.3;
+    transition: box-shadow 0.2s, transform 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    &.partner-amazon {
+      border-color: #ff9900;
+
+      .side-ads__item-partner {
+        color: #ff9900;
+      }
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__item-partner {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 6px;
+    text-transform: capitalize;
   }
 }
 </style>

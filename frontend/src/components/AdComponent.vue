@@ -1,5 +1,5 @@
 <template>
-  <div class="ad-container">
+<!--  <div class="ad-container">
     <ins
       class="adsbygoogle"
       :style="adStyle"
@@ -8,7 +8,7 @@
       :data-ad-format="adFormat"
       :data-full-width-responsive="fullWidthResponsive"
     ></ins>
-  </div>
+  </div>-->
 </template>
 
 <script>
