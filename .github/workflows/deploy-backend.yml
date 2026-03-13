@@ -42,4 +42,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /srv/www/character-picker
+            docker rm -f character-picker-backend 2>/dev/null || true
             docker compose -f docker-compose.yml up -d --build character-picker-backend
