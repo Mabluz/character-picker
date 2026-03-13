@@ -48,7 +48,10 @@
       <div class="background" :style="getBackgroundStyling"></div>
 
       <!-- Mobile top ads -->
-      <div class="amazon-ads amazon-ads--mobile-top" v-if="getAffiliateAds && isMobile">
+      <div
+        class="amazon-ads amazon-ads--mobile-top"
+        v-if="getAffiliateAds && isMobile"
+      >
         <div class="amazon-ads__header">
           <span class="amazon-ads__label">Ad</span>
           Sponsored
@@ -64,11 +67,17 @@
             :class="'partner-' + ad.partner"
           >
             <img :src="ad.image" />
-            <span v-if="ad.title" class="amazon-ads__item-title">{{ ad.title }}</span>
-            <span v-if="ad.partner" class="amazon-ads__item-partner">Ad from {{ ad.partner }}</span>
+            <span v-if="ad.title" class="amazon-ads__item-title">{{
+              ad.title
+            }}</span>
+            <span v-if="ad.partner" class="amazon-ads__item-partner"
+              >Ad from {{ ad.partner }}</span
+            >
           </a>
         </div>
-        <p class="amazon-ads__disclaimer">As an Amazon Associate I earn from qualifying purchases.</p>
+        <p class="amazon-ads__disclaimer">
+          As an Amazon Associate I earn from qualifying purchases.
+        </p>
       </div>
 
       <div
@@ -296,7 +305,9 @@
               >
             </a>
           </div>
-          <p class="amazon-ads__disclaimer">As an Amazon Associate I earn from qualifying purchases.</p>
+          <p class="amazon-ads__disclaimer">
+            As an Amazon Associate I earn from qualifying purchases.
+          </p>
         </div>
       </transition>
 
@@ -359,7 +370,6 @@ import clone from "lodash/clone";
 import first from "lodash/first";
 import shuffle from "lodash/shuffle";
 import PageTabs from "../PageTabs/PageTabs";
-import AdComponent from "../../components/AdComponent";
 import CharTabs from "./CharTabs";
 import CharButton from "../CharButton";
 import Login from "../Login/Login";
@@ -398,7 +408,7 @@ let blankState = () => {
 
 export default {
   name: "CharacterPicker",
-  components: { Login, CharButton, CharTabs, PageTabs, AdComponent },
+  components: { Login, CharButton, CharTabs, PageTabs },
   props: ["gameId"],
   data() {
     return blankState();

@@ -13,7 +13,9 @@
       >
         <img :src="ad.image" />
         <span v-if="ad.title">{{ ad.title }}</span>
-        <span v-if="ad.partner" class="side-ads__item-partner">Ad from {{ ad.partner }}</span>
+        <span v-if="ad.partner" class="side-ads__item-partner"
+          >Ad from {{ ad.partner }}</span
+        >
       </a>
     </div>
     <div class="side-ads side-ads--right" v-if="rightColumnAds.length">
@@ -29,7 +31,9 @@
       >
         <img :src="ad.image" />
         <span v-if="ad.title">{{ ad.title }}</span>
-        <span v-if="ad.partner" class="side-ads__item-partner">Ad from {{ ad.partner }}</span>
+        <span v-if="ad.partner" class="side-ads__item-partner"
+          >Ad from {{ ad.partner }}</span
+        >
       </a>
     </div>
     <h1>
@@ -65,8 +69,12 @@
           :class="'partner-' + ad.partner"
         >
           <img :src="ad.image" />
-          <span v-if="ad.title" class="mobile-top-ads__item-title">{{ ad.title }}</span>
-          <span v-if="ad.partner" class="mobile-top-ads__item-partner">Ad from {{ ad.partner }}</span>
+          <span v-if="ad.title" class="mobile-top-ads__item-title">{{
+            ad.title
+          }}</span>
+          <span v-if="ad.partner" class="mobile-top-ads__item-partner"
+            >Ad from {{ ad.partner }}</span
+          >
         </a>
       </div>
     </div>
@@ -142,11 +150,17 @@
           :class="'partner-' + ad.partner"
         >
           <img :src="ad.image" />
-          <span v-if="ad.title" class="bottom-ads__item-title">{{ ad.title }}</span>
-          <span v-if="ad.partner" class="bottom-ads__item-partner">Ad from {{ ad.partner }}</span>
+          <span v-if="ad.title" class="bottom-ads__item-title">{{
+            ad.title
+          }}</span>
+          <span v-if="ad.partner" class="bottom-ads__item-partner"
+            >Ad from {{ ad.partner }}</span
+          >
         </a>
       </div>
-      <p class="bottom-ads__disclaimer">As an Amazon Associate I earn from qualifying purchases.</p>
+      <p class="bottom-ads__disclaimer">
+        As an Amazon Associate I earn from qualifying purchases.
+      </p>
     </div>
   </div>
 </template>
@@ -155,7 +169,6 @@
 import { mapState, mapGetters } from "vuex";
 import SearchInput from "./SearchInput";
 import SpinningDice from "./SpinningDice";
-import AdComponent from "../../components/AdComponent";
 import sample from "lodash/sample";
 import shuffle from "lodash/shuffle";
 import config from "../../../config/config";
@@ -163,7 +176,7 @@ import Login from "../Login/Login";
 
 export default {
   name: "GameSelection",
-  components: { Login, SpinningDice, SearchInput, AdComponent },
+  components: { Login, SpinningDice, SearchInput },
   data: function() {
     return {
       searchValue: ""
@@ -631,8 +644,12 @@ export default {
   gap: 16px;
   align-items: center;
 
-  &--left { left: 10px; }
-  &--right { right: 10px; }
+  &--left {
+    left: 10px;
+  }
+  &--right {
+    right: 10px;
+  }
 
   @media (max-width: 1400px) {
     display: none;

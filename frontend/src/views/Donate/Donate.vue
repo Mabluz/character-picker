@@ -27,7 +27,8 @@
         thoughts myself about what it could be I started recreating the entire
         site. I built it to last with the latest frontend framework and a
         backend API system to store the data. A user system to be able to create
-        your own lists and what not. All this is now deployed and hosted on the cloud.
+        your own lists and what not. All this is now deployed and hosted on the
+        cloud.
       </p>
       <p>
         I will cover as much as I can with my own money, but if you love this

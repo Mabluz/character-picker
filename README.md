@@ -1,3 +1,8 @@
+# Games to add
+- Deep Madness
+- The Witcher
+- Cuthulu Death may die
+
 # Character Picker
 
 A web application for randomly picking characters in board games. Perfect for game nights when players can't decide which characters to play.

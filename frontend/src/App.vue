@@ -84,9 +84,8 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import DonateButton from "./views/Donate/DonateButton";
-import AdComponent from "./components/AdComponent";
 export default {
-  components: { DonateButton, AdComponent },
+  components: { DonateButton },
   data() {
     return {
       showInstallUIAndroid: false,
