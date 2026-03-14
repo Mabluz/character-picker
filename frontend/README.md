@@ -1,7 +1,6 @@
 BEFORE RELEASE: To clear app cache change version in
 character-picker-vue/public/custom-service-worker.js
 
-
 # TODOS
 - Finish Hate
 - Finish Who Goes There
