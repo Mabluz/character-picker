@@ -1,6 +1,5 @@
 # Games to add
 - Burgle Bros
-- Here to Slay
 - Marvel Champions
 - The Witcher
 - Cuthulu Death may die
