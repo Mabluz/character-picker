@@ -82,7 +82,7 @@ let getUserAccount = async userEmail => {
 
   console.log("User PostgreSQL used");
   const result = await database.query(
-    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data,
+    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked,
             COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
      FROM users u
      LEFT JOIN user_games ug ON u.id = ug.user_id
@@ -103,6 +103,8 @@ let getUserAccount = async userEmail => {
     token: row.token,
     tokenTime: row.token_time ? parseInt(row.token_time) : null,
     newUserData: row.new_user_data,
+    isAdmin: row.is_admin || false,
+    isBlocked: row.is_blocked || false,
     data: row.data || []
   };
 
@@ -124,11 +126,13 @@ let signUpUser = async (userEmail, userPassword) => {
   );
 
   clearUserCache(email);
+  emailService.sendWelcome(email);
 
   return {
     answer: {
       email: email,
       token: token,
+      isAdmin: false,
       data: []
     }
   };
@@ -206,6 +210,7 @@ let newLogin = async data => {
     answer: {
       email: data.email,
       token: token,
+      isAdmin: data.isAdmin || false,
       data: games
     }
   };
@@ -214,6 +219,9 @@ let newLogin = async data => {
 let validateUser = async (email, token, onlyGetData = true) => {
   if (email && token) {
     let userAccount = await getUserAccount(email);
+    if (userAccount.isBlocked) {
+      return { login: false, blocked: true };
+    }
     if (userAccount.email === email && userAccount.token === token) {
       let date = new Date().getTime();
       let timeDiff = date - userAccount.tokenTime;
@@ -221,6 +229,7 @@ let validateUser = async (email, token, onlyGetData = true) => {
         // 14 days
         return {
           login: true,
+          isAdmin: userAccount.isAdmin || false,
           data: onlyGetData ? userAccount.data : userAccount
         };
       }
@@ -233,7 +242,7 @@ let validateUser = async (email, token, onlyGetData = true) => {
 
 const adminGetAllUsers = async (backupData = false) => {
   const result = await database.query(
-    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data,
+    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked,
             COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
      FROM users u
      LEFT JOIN user_games ug ON u.id = ug.user_id
@@ -243,6 +252,8 @@ const adminGetAllUsers = async (backupData = false) => {
   let users = result.rows.map(row => ({
     userId: row.id,
     email: row.email,
+    isAdmin: row.is_admin || false,
+    isBlocked: row.is_blocked || false,
     userKey: backupData ? row.user_key : undefined,
     token: backupData ? row.token : undefined,
     tokenTime: row.token_time ? parseInt(row.token_time) : null,
@@ -264,6 +275,34 @@ const adminGetAllUsers = async (backupData = false) => {
   return users;
 };
 
+const setUserBlocked = async (userId, isBlocked) => {
+  await database.query(
+    `UPDATE users SET is_blocked = $1, updated_at = NOW() WHERE id = $2`,
+    [isBlocked, userId]
+  );
+  const result = await database.query(
+    `SELECT email FROM users WHERE id = $1`,
+    [userId]
+  );
+  if (result.rows.length > 0) {
+    clearUserCache(result.rows[0].email);
+  }
+};
+
+const setUserAdmin = async (userId, isAdmin) => {
+  await database.query(
+    `UPDATE users SET is_admin = $1, updated_at = NOW() WHERE id = $2`,
+    [isAdmin, userId]
+  );
+  const result = await database.query(
+    `SELECT email FROM users WHERE id = $1`,
+    [userId]
+  );
+  if (result.rows.length > 0) {
+    clearUserCache(result.rows[0].email);
+  }
+};
+
 module.exports = {
   generateUserKey,
   getUserAccount,
@@ -273,5 +312,7 @@ module.exports = {
   validateUser,
   newLogin,
   clearUserCache,
-  adminGetAllUsers
+  adminGetAllUsers,
+  setUserAdmin,
+  setUserBlocked
 };

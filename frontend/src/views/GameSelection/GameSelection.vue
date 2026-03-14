@@ -51,6 +51,7 @@
       >Can't find a randomizer for a specific game? Create it yourself!<br />See
       your games by logging in!</login
     >
+    <router-link v-if="isAdmin" to="/admin" class="admin-link">Admin panel</router-link>
 
     <!-- Mobile affiliate ads under CTA -->
     <div class="mobile-top-ads" v-if="mobileTopAds.length">
@@ -200,7 +201,7 @@ export default {
   },
   computed: {
     ...mapState("game", ["gameOverview", "userGames"]),
-    ...mapGetters("user", ["userLoggedIn"]),
+    ...mapGetters("user", ["userLoggedIn", "isAdmin"]),
     filteredUserGames() {
       if (!this.userGames) return [];
       let userGames = this.userGames;
@@ -442,6 +443,24 @@ export default {
 
 .game-selection {
   position: relative;
+}
+
+.admin-link {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: #f76331;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  &:hover {
+    background: #d94e1f;
+  }
 }
 
 .mobile-top-ads {

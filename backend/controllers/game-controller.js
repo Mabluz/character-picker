@@ -49,7 +49,7 @@ router.post("/usergame/:gamename", cors(), async (req, res, next) => {
   return res.json({});
 });
 
-router.put("/pushmaingames/:gamename", cors(), async (req, res, next) => {
+/*router.put("/pushmaingames/:gamename", cors(), async (req, res, next) => {
   if (req.headers[config.customHeaderMainPush] !== config.authCodeForMainPush)
     return res.status(401).send("No access");
 
@@ -64,6 +64,6 @@ router.delete("/delmaingames/:gamename", cors(), async (req, res, next) => {
 
   await gameServer.mainGameDelete(req.params.gamename);
   res.send("Data deleted");
-});
+});*/
 
 module.exports = router;

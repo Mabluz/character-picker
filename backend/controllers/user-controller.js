@@ -72,6 +72,7 @@ router.post("/login", cors(), async (req, res, next) => {
   let userAccuout = await userServer.getUserAccount(body.email);
 
   if (userAccuout.error) return res.status(500).json(userAccuout);
+  if (userAccuout.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
   if (userKey !== userAccuout.userKey)
     return res.status(500).json({ error: "Incorrect password" });
 

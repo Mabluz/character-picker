@@ -22,6 +22,12 @@ const DonateThanks = () =>
   import(/* webpackChunkName: "donate-thanks" */ "./views/Donate/DonateThanks");
 const DonateCancel = () =>
   import(/* webpackChunkName: "donate-cancel" */ "./views/Donate/DonateCancel");
+const AdminPage = () =>
+  import(/* webpackChunkName: "admin" */ "./views/Admin/Admin");
+const AdminEmails = () =>
+  import(/* webpackChunkName: "admin-emails" */ "./views/Admin/AdminEmails");
+const AdminGames = () =>
+  import(/* webpackChunkName: "admin-games" */ "./views/Admin/AdminGames");
 
 export default new Router({
   routes: [
@@ -64,6 +70,21 @@ export default new Router({
       path: "/donate/cancel",
       name: "DonateCancel",
       component: DonateCancel
+    },
+    {
+      path: "/admin",
+      name: "AdminPage",
+      component: AdminPage
+    },
+    {
+      path: "/admin/emails",
+      name: "AdminEmails",
+      component: AdminEmails
+    },
+    {
+      path: "/admin/games",
+      name: "AdminGames",
+      component: AdminGames
     }
   ]
 });

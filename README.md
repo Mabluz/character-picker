@@ -1,5 +1,7 @@
 # Games to add
-- Deep Madness
+- Burgle Bros
+- Here to Slay
+- Marvel Champions
 - The Witcher
 - Cuthulu Death may die
 

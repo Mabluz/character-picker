@@ -3,8 +3,6 @@ require("dotenv").config();
 const debug = process.env.NODE_ENV !== "production";
 
 module.exports = {
-  authCodeForMainPush: process.env.AUTH_CODE_FOR_MAIN_PUSH,
-  customHeaderMainPush: process.env.CUSTOM_HEADER_MAIN_PUSH,
   mainGamePrefix: "maingame____",
   userPrefix: "usergame_____",
   mainGameUUIDPrefix: "maingame---",
@@ -13,7 +11,6 @@ module.exports = {
     ? "http://localhost:1337/"
     : "https://randomboardgame.com/api/",
   cacheForMinutes: 1000 * 60 * 180,
-  emailKey: process.env.EMAIL_KEY,
   emailFrom: process.env.EMAIL_FROM,
   emailLandingPagePasswordReset: debug
     ? "http://localhost:8080/#/password-reset/"

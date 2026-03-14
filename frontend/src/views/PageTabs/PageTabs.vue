@@ -26,6 +26,12 @@ export default {
 <style scoped lang="less">
 .tabs {
   text-align: left;
+  ul {
+    background: white;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 0 14px 14px 0;
+  }
   li {
     display: inline-block;
     list-style: none;

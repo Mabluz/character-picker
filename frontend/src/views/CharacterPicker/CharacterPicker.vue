@@ -3,7 +3,7 @@
     <div v-if="game" :class="{ mobile: isMobile }">
       <page-tabs
         :currentPage="game.background.title"
-        style="padding-left: 130px"
+        style="padding-left: 145px"
       ></page-tabs>
 
       <div class="usergame-container" v-if="isUserGame && userLoggedIn">
