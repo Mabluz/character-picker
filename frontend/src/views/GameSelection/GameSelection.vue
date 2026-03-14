@@ -14,7 +14,7 @@
         <img :src="ad.image" />
         <span v-if="ad.title">{{ ad.title }}</span>
         <span v-if="ad.partner" class="side-ads__item-partner"
-          >Ad from {{ ad.partner }}</span
+          >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
         >
       </a>
     </div>
@@ -32,7 +32,7 @@
         <img :src="ad.image" />
         <span v-if="ad.title">{{ ad.title }}</span>
         <span v-if="ad.partner" class="side-ads__item-partner"
-          >Ad from {{ ad.partner }}</span
+          >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
         >
       </a>
     </div>
@@ -74,7 +74,7 @@
             ad.title
           }}</span>
           <span v-if="ad.partner" class="mobile-top-ads__item-partner"
-            >Ad from {{ ad.partner }}</span
+            >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
           >
         </a>
       </div>
@@ -155,7 +155,7 @@
             ad.title
           }}</span>
           <span v-if="ad.partner" class="bottom-ads__item-partner"
-            >Ad from {{ ad.partner }}</span
+            >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
           >
         </a>
       </div>
@@ -238,6 +238,10 @@ export default {
         .filter(g => g.affiliate && g.affiliate.ads)
         .flatMap(g => g.affiliate.ads)
         .filter(ad => ad.image && ad.partner === "amazon")
+        .filter(ad => {
+          const title = (ad.title || "").toLowerCase();
+          return !(title.includes("card") && title.includes("sleeve"));
+        })
         .filter(ad => {
           if (!ad.title || seenTitles.has(ad.title)) return false;
           seenTitles.add(ad.title);

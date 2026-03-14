@@ -71,7 +71,7 @@
               ad.title
             }}</span>
             <span v-if="ad.partner" class="amazon-ads__item-partner"
-              >Ad from {{ ad.partner }}</span
+              >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
             >
           </a>
         </div>
@@ -301,7 +301,7 @@
                 ad.title
               }}</span>
               <span v-if="ad.partner" class="amazon-ads__item-partner"
-                >Ad from {{ ad.partner }}</span
+                >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
               >
             </a>
           </div>
@@ -335,7 +335,7 @@
               ad.title
             }}</span>
             <span v-if="ad.partner" class="amazon-ads__item-partner"
-              >Ad from {{ ad.partner }}</span
+              >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
             >
           </a>
         </div>
@@ -377,6 +377,44 @@
       </div>
     </div>
     <!--<div v-else-if="!userLoggedIn">You are not logged in!</div>-->
+
+    <!-- Report data button -->
+    <button class="report-btn" @click="reportOpen = true" title="Report missing or incorrect game data">&#9888; Report wrong data</button>
+
+    <!-- Report popup -->
+    <transition name="report-fade">
+      <div class="report-overlay" v-if="reportOpen" @click.self="closeReport">
+        <div class="report-modal">
+          <template v-if="!reportSent">
+            <h3>Report a data issue</h3>
+            <p class="report-subtitle">Spotted a missing expansion, wrong character, or other data problem? Let me know!</p>
+            <label>
+              <span>Your email <span class="optional">(optional)</span></span>
+              <input v-model="reportEmail" type="email" placeholder="your@email.com" />
+            </label>
+            <label>
+              <span>Description <span class="required">*</span></span>
+              <textarea v-model="reportDescription" placeholder="What's wrong? (e.g. missing character, wrong expansion name...)" rows="4"></textarea>
+            </label>
+            <p class="report-error" v-if="reportError">{{ reportError }}</p>
+            <div class="report-actions">
+              <button class="btn-cancel" @click="closeReport">Cancel</button>
+              <button class="btn-send" @click="submitReport" :disabled="reportSending">
+                {{ reportSending ? 'Sending...' : 'Send report' }}
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <div class="report-success">
+              <div class="report-success__icon">&#10003;</div>
+              <h3>Thank you!</h3>
+              <p>Your report helps make the data better for everyone. I appreciate it!</p>
+              <button class="btn-send" @click="closeReport">Close</button>
+            </div>
+          </template>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -423,7 +461,14 @@ let blankState = () => {
     thumbnailActive: false,
     thumbnailZoomHeight: undefined,
 
-    affiliateAdsReached: false
+    affiliateAdsReached: false,
+
+    reportOpen: false,
+    reportEmail: "",
+    reportDescription: "",
+    reportError: "",
+    reportSending: false,
+    reportSent: false
   };
 };
 
@@ -520,6 +565,42 @@ export default {
   },
   methods: {
     ...mapMutations("page", ["setLoadingSpinner"]),
+    closeReport() {
+      this.reportOpen = false;
+      this.reportEmail = "";
+      this.reportDescription = "";
+      this.reportError = "";
+      this.reportSending = false;
+      this.reportSent = false;
+    },
+    async submitReport() {
+      if (!this.reportDescription.trim()) {
+        this.reportError = "Please describe the issue.";
+        return;
+      }
+      this.reportError = "";
+      this.reportSending = true;
+      const gameName = this.game && this.game.background && this.game.background.title
+        ? this.game.background.title
+        : "Unknown game";
+      try {
+        const response = await fetch(config.backendServer + "/email/report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description: this.reportDescription,
+            email: this.reportEmail,
+            game: gameName
+          })
+        });
+        if (!response.ok) throw new Error("Failed to send");
+        this.reportSent = true;
+      } catch (e) {
+        this.reportError = "Something went wrong. Please try again.";
+      } finally {
+        this.reportSending = false;
+      }
+    },
     autoSave() {
       this.$store.commit("game/setGame", this.game);
     },
@@ -1724,6 +1805,173 @@ h3 {
         background: #c4c4c4;
       }
     }
+  }
+}
+</style>
+<style scoped lang="less">
+.report-btn {
+  position: fixed;
+  bottom: 90px;
+  left: 16px;
+  z-index: 1000;
+  width: 177.96px;
+  height: 46px;
+  background: #fff;
+  color: #f76331;
+  border: 2px solid #f76331;
+  border-radius: 50px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  &:hover {
+    background: #fff5f2;
+    transform: translateY(-2px);
+  }
+}
+
+.report-fade-enter-active,
+.report-fade-leave-active {
+  transition: opacity 0.25s ease;
+  .report-modal {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+}
+.report-fade-enter,
+.report-fade-leave-to {
+  opacity: 0;
+  .report-modal {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+.report-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.report-modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
+  h3 {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    color: #222;
+  }
+
+  .report-subtitle {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #666;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 14px;
+
+    input, textarea {
+      margin-top: 6px;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+      resize: vertical;
+      &:focus {
+        outline: 2px solid #f76331;
+        border-color: #f76331;
+      }
+    }
+  }
+
+  .optional {
+    font-weight: 400;
+    color: #888;
+  }
+
+  .required {
+    color: #f76331;
+  }
+
+  .report-error {
+    color: #c0392b;
+    font-size: 13px;
+    margin: 0 0 12px 0;
+  }
+
+  .report-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .btn-cancel {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    &:hover { background: #f5f5f5; }
+  }
+
+  .btn-send {
+    background: #f76331;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    &:hover:not(:disabled) { background: #d94e1f; }
+    &:disabled { opacity: 0.6; cursor: default; }
+  }
+}
+
+.report-success {
+  text-align: center;
+  padding: 12px 0;
+
+  &__icon {
+    font-size: 48px;
+    color: #27ae60;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    margin-bottom: 10px;
+  }
+
+  p {
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 20px;
   }
 }
 </style>
