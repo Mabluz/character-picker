@@ -53,7 +53,7 @@ jobs:
 
       - name: Purge Cloudflare cache
         run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/zones/c45921a1ebf186899ddbf3373199b473/purge_cache" \
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/9ef45a0a04d52d5e0ab38d2e0f7247ba/purge_cache" \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             --data '{"purge_everything":true}'
