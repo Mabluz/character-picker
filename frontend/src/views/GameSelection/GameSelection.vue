@@ -38,10 +38,15 @@
         >
       </a>
     </div>
-    <h1>
+    <h1 class="desktop-heading">
       <span class="border"></span>Random Boardgame<spinning-dice
         class="dice-container"
       ></spinning-dice>
+    </h1>
+    <h1 class="mobile-heading">
+      <spinning-dice class="dice-container"></spinning-dice>
+      Random Boardgame
+      <div class="border"></div>
     </h1>
 
     <div class="intro" v-if="!userLoggedIn">
@@ -422,22 +427,32 @@ export default {
       }
     }
   }
+  .mobile-heading {
+    display: none;
+  }
   @media (max-width: 990px) {
-    h1 {
-      .border {
-        display: none;
-      }
+    .desktop-heading {
+      display: none;
+    }
+    .mobile-heading {
+      display: block;
+      text-align: center;
       .dice-container {
-        display: none;
-        /*
-                    display: block;
-                    height: 40px;
-                    right: auto;
-                    left: 50%;
-                    margin-left: -16px;
-                    top: 83px;
-                     */
+        position: inherit !important;
+        margin: 0 20px !important;
+        display: block;
+        width: 60px;
+        height: 80px;
       }
+      .border {
+        position: static !important;
+        display: block;
+        width: 100%;
+        left: auto;
+      }
+    }
+    h1 .dice-container {
+      position: static !important;
     }
     .container {
       .entrance {
