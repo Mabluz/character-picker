@@ -25,7 +25,9 @@
       </div>
     </div>
 
-    <router-view />
+    <div class="page-content">
+      <router-view />
+    </div>
 
     <div class="footer">
       <div class="left">
@@ -372,6 +374,10 @@ p {
   font-size: 16px;
   line-height: 20px;
 }
+.page-content {
+  min-height: calc(100vh - 300px);
+}
+
 .footer {
   padding: 50px;
   background: #f76331;

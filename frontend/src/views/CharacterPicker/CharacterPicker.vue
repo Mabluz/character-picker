@@ -377,6 +377,23 @@
     </div>
     <!--<div v-else-if="!userLoggedIn">You are not logged in!</div>-->
 
+    <div v-else class="skeleton-page">
+      <div class="skeleton-tabs">
+        <div class="skeleton-shimmer skeleton-tab-item"></div>
+        <div class="skeleton-shimmer skeleton-tab-item"></div>
+      </div>
+      <div class="skeleton-shimmer skeleton-title"></div>
+      <div class="skeleton-main">
+        <div class="skeleton-left-panel">
+          <div class="skeleton-shimmer skeleton-btn"></div>
+          <div class="skeleton-shimmer skeleton-row" v-for="i in 10" :key="i"></div>
+        </div>
+        <div class="skeleton-right-panel">
+          <div class="skeleton-shimmer skeleton-image"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Report data button -->
     <button class="report-btn" :class="{ 'picking-fade': startPicking }" @click="reportOpen = true" title="Report missing or incorrect game data">&#9888; Report wrong data</button>
 
@@ -2013,6 +2030,94 @@ h3 {
     color: #555;
     font-size: 15px;
     margin-bottom: 20px;
+  }
+}
+
+.skeleton-page {
+  min-height: calc(100vh - 300px);
+  padding: 20px 5% 60px;
+  box-sizing: border-box;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+  padding-left: 145px;
+
+  .skeleton-tab-item {
+    width: 80px;
+    height: 18px;
+    border-radius: 3px;
+  }
+}
+
+.skeleton-title {
+  width: 300px;
+  height: 40px;
+  margin: 0 auto 60px;
+  border-radius: 6px;
+}
+
+.skeleton-main {
+  display: flex;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 990px) {
+    flex-direction: column;
+  }
+}
+
+.skeleton-left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .skeleton-btn {
+    width: 180px;
+    height: 44px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+  }
+
+  .skeleton-row {
+    width: 100%;
+    height: 28px;
+    border-radius: 3px;
+  }
+}
+
+.skeleton-right-panel {
+  width: 300px;
+  flex-shrink: 0;
+
+  .skeleton-image {
+    width: 100%;
+    height: 380px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 990px) {
+    width: 100%;
+
+    .skeleton-image {
+      height: 200px;
+    }
   }
 }
 </style>
