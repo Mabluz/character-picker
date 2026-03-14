@@ -344,6 +344,17 @@
         </p>
       </div>
 
+      <div class="copyright-disclaimer" v-if="getOwnerName || getOwnerLink">
+        <p>
+          The information presented on this site about {{ game.background.title }}, both literal and graphical, is copyrighted by
+          <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{ getOwnerName || getOwnerLink }}</a><span v-else>{{ getOwnerName }}</span>.
+        </p>
+        <p>
+          This website is not produced, endorsed, supported, or affiliated with
+          <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{ getOwnerName || getOwnerLink }}</a><span v-else>{{ getOwnerName }}</span>.
+        </p>
+      </div>
+
       <div id="cover"></div>
       <div id="coverContent"></div>
 
@@ -1003,6 +1014,19 @@ h1 {
   margin-bottom: 80px;
   a {
     color: #f76331;
+  }
+}
+.copyright-disclaimer {
+  margin-top: 0;
+  padding: 20px;
+  background: #f5f5f5;
+  border-bottom: 3px solid #e0e0e0;
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  a {
+    color: #888;
+    text-decoration: underline;
   }
 }
 .content {

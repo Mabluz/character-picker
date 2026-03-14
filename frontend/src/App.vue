@@ -74,7 +74,10 @@
         </div>
       </div>
       <div class="right">
-        <donate-button></donate-button>
+        <a href='https://ko-fi.com/F2F51VYOPV' target='_blank'>
+          <img height='60' style='border:0px;height:60px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' />
+        </a>
+        <p class="donate-text">Thanks for stopping by! If you enjoy this project and want to help keep it alive, I'd really appreciate a small donation. Your support means a lot and helps me keep creating.</p>
         <!-- <div>A:{{ isAndroid }} - I:{{ isIOS }}</div> -->
       </div>
     </div>
@@ -83,9 +86,8 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import DonateButton from "./views/Donate/DonateButton";
 export default {
-  components: { DonateButton },
+  components: {},
   data() {
     return {
       showInstallUIAndroid: false,
@@ -123,9 +125,21 @@ export default {
   },
   mounted() {
     this.showInstallGuide =
-      window.location.origin.indexOf("randomboardgame.zellflagstad.com") > -1 &&
+      window.location.origin.indexOf("randomboardgame.com") > -1 &&
       !this.$cookies.get(this.cookieKey[1]) &&
       !this.showInstallUIAndroid;
+
+    const script = document.createElement("script");
+    script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
+    script.onload = () => {
+      window.kofiWidgetOverlay.draw("mariuszellflagstad", {
+        type: "floating-chat",
+        "floating-chat.donateButton.text": "Support me",
+        "floating-chat.donateButton.background-color": "#f45d22",
+        "floating-chat.donateButton.text-color": "#fff"
+      });
+    };
+    document.body.appendChild(script);
   },
   async created() {
     var w;
@@ -298,6 +312,12 @@ p {
   color: #fff;
   a {
     color: #fff;
+  }
+  .donate-text {
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: 10px;
+    opacity: 0.85;
   }
   .left,
   .right {
