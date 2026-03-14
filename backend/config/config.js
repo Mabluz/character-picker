@@ -14,7 +14,7 @@ module.exports = {
   emailFrom: process.env.EMAIL_FROM,
   emailLandingPagePasswordReset: debug
     ? "http://localhost:8080/#/password-reset/"
-    : "https://randomboardgame.com/#/password-reset/",
+    : "https://randomboardgame.com/password-reset/",
   adminAuthUser: process.env.ADMIN_AUTH_USER,
   adminAuthPass: process.env.ADMIN_AUTH_PASS,
   adminAuthUser2: process.env.ADMIN_AUTH_USER2,

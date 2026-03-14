@@ -34,6 +34,7 @@ server.use(
 server.use("/adminview", require("./controllers/admin-controller"));
 server.use("/email", require("./controllers/email-controller"));
 server.use("/user", require("./controllers/user-controller"));
+server.use("/", require("./controllers/sitemap-controller"));
 server.use("/", require("./controllers/game-controller"));
 
 const startServer = async () => {
