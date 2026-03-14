@@ -16,6 +16,8 @@ const PasswordReset = () =>
   import(
     /* webpackChunkName: "password-reset" */ "./views/Password/PasswordReset"
   );
+const NotFound = () =>
+  import(/* webpackChunkName: "not-found" */ "./views/NotFound/NotFound");
 const DonatePage = () =>
   import(/* webpackChunkName: "donate" */ "./views/Donate/Donate");
 const DonateThanks = () =>
@@ -89,6 +91,11 @@ export default new Router({
       path: "/admin/games",
       name: "AdminGames",
       component: AdminGames
+    },
+    {
+      path: "*",
+      name: "NotFound",
+      component: NotFound
     }
   ]
 });
