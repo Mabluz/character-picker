@@ -6,46 +6,26 @@
     </div>
 
     <div class="install-app" v-if="showInstallUIAndroid && isAndroid">
-      <!--  -->
-      <div class="close" @click="installClose(cookieKey[0])">
-        <img src="/close-black.png" />
-      </div>
-      <div class="install-text">
-        Random Boardgame can be installed as an app on your Android.<br />Want
-        to contine?
-      </div>
-      <button @click="installApp">Install</button>
-    </div>
-    <div class="install-app" v-if="showInstallGuide && isAndroid">
-      <!--  -->
-      <div class="close" @click="installClose(cookieKey[1])">
-        <img src="/close-black.png" />
-      </div>
-      <div class="install-text">
-        Random Boardgame can be installed as an app on your Android.<br />
-        <a href="https://character-picker.herokuapp.com/"
-          >Go to downloadable site?</a
-        >
+      <button class="install-close" @click="installClose(cookieKey[0])" aria-label="Close">&times;</button>
+      <div class="install-body">
+        <div class="install-text">
+          Install <strong>Random Boardgame</strong> as an app on your Android device.
+        </div>
+        <button class="install-btn" @click="installApp">Install</button>
       </div>
     </div>
-    <div class="install-app" v-if="showInstallUIIos && isIOS">
-      <!--  -->
-      <div class="close" @click="installClose(cookieKey[2])">
-        <img src="/close-black.png" />
-      </div>
-      <div class="install-text full">
-        Random Boardgame can be added as an app on your iOS.
-        <br />Share->Options->Add to Homescreen<br />(<a
-          href="https://www.youtube.com/watch?v=bV8xE6lOdoY"
-          target="_blank"
-          >Or see how on youtube</a
-        >)
+<div class="install-app" v-if="showInstallUIIos && isIOS">
+      <button class="install-close" @click="installClose(cookieKey[1])" aria-label="Close">&times;</button>
+      <div class="install-body">
+        <div class="install-text">
+          Add <strong>Random Boardgame</strong> to your iOS home screen:
+          <span class="install-steps">Share &rarr; Add to Home Screen</span>
+          <a href="https://www.youtube.com/watch?v=bV8xE6lOdoY" target="_blank">See how on YouTube</a>
+        </div>
       </div>
     </div>
 
     <router-view />
-
-    <ad-component ad-slot="YOUR_FOOTER_AD_SLOT"></ad-component>
 
     <div class="footer">
       <div class="left">
@@ -74,7 +54,7 @@
         </div>
       </div>
       <div class="right">
-        <a href="https://ko-fi.com/F2F51VYOPV" target="_blank">
+        <a ref="kofiFooter" href="https://ko-fi.com/F2F51VYOPV" target="_blank">
           <img
             height="60"
             style="border:0px;height:60px;"
@@ -102,20 +82,26 @@ export default {
     return {
       showInstallUIAndroid: false,
       showInstallUIIos: false,
-      showInstallGuide: false,
       deferredPrompt: undefined,
       isAndroid: false,
       isIOS: false,
       cookieKey: [
         "showInstallUIAndroid",
-        "showInstallGuideAndroid",
         "showInstallUIIos"
       ]
     };
   },
   computed: {
     ...mapState("user", []),
-    ...mapGetters("page", ["isLoading", "loadingTime"])
+    ...mapGetters("page", ["isLoading", "loadingTime"]),
+    installBannerVisible() {
+      return this.showInstallUIAndroid || this.showInstallUIIos;
+    }
+  },
+  watch: {
+    installBannerVisible(val) {
+      document.body.classList.toggle("install-banner-active", val);
+    }
   },
   methods: {
     async installApp() {
@@ -131,14 +117,30 @@ export default {
       this.$cookies.set(cookieKey, "closed", 60 * 60 * 24 * 7); // 7 days
       this.showInstallUIAndroid = false;
       this.showInstallUIIos = false;
-      this.showInstallGuide = false;
     }
   },
+  beforeDestroy() {
+    if (this._kofiObserver) this._kofiObserver.disconnect();
+  },
   mounted() {
-    this.showInstallGuide =
-      window.location.origin.indexOf("randomboardgame.com") > -1 &&
-      !this.$cookies.get(this.cookieKey[1]) &&
-      !this.showInstallUIAndroid;
+    if (this.installBannerVisible) {
+      document.body.classList.add("install-banner-active");
+    }
+
+    this._kofiObserver = new IntersectionObserver(([entry]) => {
+      const kofi = document.querySelector(".floatingchat-container-wrap, .floatingchat-container-wrap-mobi");
+      if (kofi) {
+        kofi.style.transition = "opacity 0.3s ease";
+        kofi.style.opacity = entry.isIntersecting ? "0" : "1";
+        kofi.style.pointerEvents = entry.isIntersecting ? "none" : "";
+      }
+    });
+
+    this.$nextTick(() => {
+      if (this.$refs.kofiFooter) {
+        this._kofiObserver.observe(this.$refs.kofiFooter);
+      }
+    });
 
     const script = document.createElement("script");
     script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
@@ -161,9 +163,9 @@ export default {
         : w;
     w = document && document.body ? document.body.clientWidth : w;
     this.isIOS =
-      /iPhone|iPad|Mac|Macintosh|iPod/i.test(navigator.userAgent) && w < 1400;
+      /iPhone|iPad|iPod/i.test(navigator.userAgent) && w < 1400;
     this.isAndroid = /Android/i.test(navigator.userAgent) && w < 1400;
-    if (this.isIOS && !this.$cookies.get(this.cookieKey[2]))
+    if (this.isIOS && !this.$cookies.get(this.cookieKey[1]))
       this.showInstallUIIos = true;
 
     let self = this;
@@ -175,13 +177,11 @@ export default {
       self.deferredPrompt = e;
       if (!self.$cookies.get(self.cookieKey[0]))
         self.showInstallUIAndroid = true;
-      self.showInstallGuide = false;
       // eslint-disable-next-line no-console
       console.log(`'beforeinstallprompt' event was fired.`);
     });
     window.addEventListener("appinstalled", () => {
       self.showInstallUIAndroid = false;
-      self.showInstallGuide = false;
       self.deferredPrompt = null;
       // eslint-disable-next-line no-console
       console.log("PWA was installed");
@@ -202,57 +202,109 @@ export default {
 .install-app {
   position: fixed;
   z-index: 999;
-  background: #f76331;
-  width: 100%;
-  border-top: 1px solid black;
-  line-height: 24px;
-  padding: 10px 0;
-  //height: 2vh;
   bottom: 0;
-  .install-text {
-    margin-top: 5px;
-    color: white;
-    width: 60%;
-    left: 0;
-    display: inline-block;
-    a {
-      color: white;
+  left: 0;
+  width: 100%;
+  background: #f76331;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
+  padding: 16px 52px 16px 20px;
+  box-sizing: border-box;
+
+  .install-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color 0.15s ease, background 0.15s ease;
+    &:hover {
+      color: #fff;
+      background: rgba(0, 0, 0, 0.12);
     }
-    &.full {
-      width: 80%;
-      margin-left: 10px;
-      @media (max-width: 600px) {
-        text-align: left;
-        float: left;
+  }
+
+  .install-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+
+  .install-text {
+    color: #fff;
+    font-size: 15px;
+    line-height: 1.5;
+    flex: 1;
+
+    strong {
+      font-weight: 700;
+    }
+
+    a {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      &:hover {
+        text-decoration-thickness: 2px;
       }
     }
-  }
-  .close {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    img {
-      cursor: pointer;
-      width: 30px;
-      height: 30px;
+
+    .install-steps {
+      display: block;
+      font-weight: 600;
+      margin: 4px 0;
+      letter-spacing: 0.3px;
     }
   }
-  span {
-    margin-right: 20px;
-  }
-  button {
-    width: 20%;
-    margin-bottom: 5px;
-    margin-left: 2%;
-    vertical-align: bottom;
-    display: inline-block;
-    background: white;
-    border-radius: 4px;
-    padding: 10px;
+
+  .install-btn {
+    flex-shrink: 0;
+    background: #fff;
+    color: #f76331;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 28px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    &:hover {
+      background: #f0f0f0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+    &:active {
+      transform: scale(0.97);
+    }
+
+    @media (max-width: 480px) {
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 body {
   margin: 0;
+}
+body.install-banner-active {
+  .floatingchat-container-wrap,
+  .floatingchat-container-wrap-mobi {
+    display: none !important;
+  }
 }
 .spinner {
   position: fixed;

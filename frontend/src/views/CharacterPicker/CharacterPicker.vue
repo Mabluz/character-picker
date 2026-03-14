@@ -129,10 +129,6 @@
               </tr>
             </table>
 
-            <ad-component
-              ad-slot="YOUR_SIDEBAR_AD_SLOT"
-              ad-format="vertical"
-            ></ad-component>
           </div>
           <div class="button-container" :class="{ fixed: fixedScrolling }">
             <char-button
@@ -246,6 +242,8 @@
             </tr>
           </table>
 
+          <button class="report-btn-inline" @click="reportOpen = true">&#9888; Report wrong data</button>
+
           <img
             id="tumbnail"
             :src="thumbnailImg"
@@ -280,6 +278,7 @@
       <transition name="ads-slide">
         <div
           class="amazon-ads amazon-ads--sticky"
+          :class="{ 'picking-fade': startPicking }"
           v-if="getAffiliateAds && !affiliateAdsReached && !isMobile"
         >
           <div class="amazon-ads__header">
@@ -379,7 +378,7 @@
     <!--<div v-else-if="!userLoggedIn">You are not logged in!</div>-->
 
     <!-- Report data button -->
-    <button class="report-btn" @click="reportOpen = true" title="Report missing or incorrect game data">&#9888; Report wrong data</button>
+    <button class="report-btn" :class="{ 'picking-fade': startPicking }" @click="reportOpen = true" title="Report missing or incorrect game data">&#9888; Report wrong data</button>
 
     <!-- Report popup -->
     <transition name="report-fade">
@@ -500,6 +499,17 @@ export default {
     if (url) head.meta.push({ property: "og:image", content: url });
 
     return head;
+  },
+  watch: {
+    startPicking(val) {
+      document.body.classList.toggle("picking-active", val);
+      const kofi = document.querySelector(".floatingchat-container-wrap");
+      if (kofi) {
+        kofi.style.transition = "opacity 0.4s ease";
+        kofi.style.opacity = val ? "0" : "1";
+        kofi.style.pointerEvents = val ? "none" : "";
+      }
+    }
   },
   computed: {
     ...mapGetters("user", ["userLoggedIn"]),
@@ -943,6 +953,7 @@ export default {
     }
   },
   async destroyed() {
+    document.body.classList.remove("picking-active");
     let self = this;
     let obj = blankState();
     Object.keys(obj).forEach(key => {
@@ -1057,11 +1068,11 @@ export default {
 <style scoped lang="less">
 .mobile {
   .content {
-    margin: 60px 0;
-    width: 100%;
+    margin: 120px 5%;
+    width: 90%;
     &.picking {
-      margin: 60px 0;
-      width: 100%;
+      margin: 120px 5%;
+      width: 90%;
     }
     .left {
       table {
@@ -1807,6 +1818,7 @@ h3 {
     }
   }
 }
+
 </style>
 <style scoped lang="less">
 .report-btn {
@@ -1832,6 +1844,35 @@ h3 {
     background: #fff5f2;
     transform: translateY(-2px);
   }
+  @media (max-width: 990px) {
+    display: none;
+  }
+}
+
+.report-btn-inline {
+  display: none;
+  @media (max-width: 990px) {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: #fff;
+    color: #f76331;
+    border: 2px solid #f76331;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    &:hover {
+      background: #fff5f2;
+    }
+  }
+}
+
+.picking-fade {
+  opacity: 0 !important;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
 }
 
 .report-fade-enter-active,

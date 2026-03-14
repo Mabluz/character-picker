@@ -110,8 +110,6 @@
         </router-link>
       </div>
 
-      <ad-component ad-slot="YOUR_GAMES_AD_SLOT"></ad-component>
-
       <div class="heading">Pre-set games</div>
     </div>
     <div class="container">
