@@ -531,22 +531,33 @@ export default {
   head: function() {
     let head = {};
     head.title = {
-      inner: this.title
+      inner: this.title ? this.title + " - randomboardgame" : "randomboardgame"
     };
-    let url =
+    let imgUrl =
       this.game && this.game.background && this.game.background.thumbnail
         ? this.game.background.thumbnail
         : this.game && this.game.background && this.game.background.url
         ? this.game.background.url
         : undefined;
-    if (url && !url.startsWith("http")) url = config.backendServer + "/" + url;
+    if (imgUrl && !imgUrl.startsWith("http")) imgUrl = config.backendServer + "/" + imgUrl;
+    const pageUrl = this.gameId ? config.vueServer + "/game/" + this.gameId : config.vueServer;
+    const description = this.title
+      ? "Randomly pick characters and heroes for " + this.title + ". Use the randomizer to draft your party."
+      : "Randomly pick characters and heroes for your board games.";
+    head.link = [
+      { rel: "canonical", href: pageUrl }
+    ];
     head.meta = [];
-    if (this.title)
-      head.meta.push({
-        property: "og:title",
-        content: this.title + " - randomboardgame"
-      });
-    if (url) head.meta.push({ property: "og:image", content: url });
+    head.meta.push({ name: "description", content: description });
+    head.meta.push({ property: "og:type", content: "website" });
+    head.meta.push({ property: "og:url", content: pageUrl });
+    if (this.title) head.meta.push({ property: "og:title", content: this.title + " - randomboardgame" });
+    head.meta.push({ property: "og:description", content: description });
+    if (imgUrl) head.meta.push({ property: "og:image", content: imgUrl });
+    head.meta.push({ name: "twitter:card", content: "summary_large_image" });
+    if (this.title) head.meta.push({ name: "twitter:title", content: this.title + " - randomboardgame" });
+    head.meta.push({ name: "twitter:description", content: description });
+    if (imgUrl) head.meta.push({ name: "twitter:image", content: imgUrl });
 
     return head;
   },
