@@ -553,12 +553,11 @@ export default {
   watch: {
     startPicking(val) {
       document.body.classList.toggle("picking-active", val);
-      const kofi = document.querySelector(".floatingchat-container-wrap");
-      if (kofi) {
+      document.querySelectorAll(".floatingchat-container-wrap, .floatingchat-container-wrap-mobi").forEach(kofi => {
         kofi.style.transition = "opacity 0.4s ease";
         kofi.style.opacity = val ? "0" : "1";
         kofi.style.pointerEvents = val ? "none" : "";
-      }
+      });
     }
   },
   computed: {
@@ -1366,7 +1365,7 @@ tr.picked td input {
     max-height: 0px;
     overflow: hidden;
     width: auto;
-    max-height: auto;
+    max-height: none;
     -webkit-transition: max-height 0.5s;
     -moz-transition: max-height 0.5s;
     -o-transition: max-height 0.5s;
