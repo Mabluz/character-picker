@@ -74,10 +74,20 @@
         </div>
       </div>
       <div class="right">
-        <a href='https://ko-fi.com/F2F51VYOPV' target='_blank'>
-          <img height='60' style='border:0px;height:60px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' />
+        <a href="https://ko-fi.com/F2F51VYOPV" target="_blank">
+          <img
+            height="60"
+            style="border:0px;height:60px;"
+            src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
+            border="0"
+            alt="Buy Me a Coffee at ko-fi.com"
+          />
         </a>
-        <p class="donate-text">Thanks for stopping by! If you enjoy this project and want to help keep it alive, I'd really appreciate a small donation. Your support means a lot and helps me keep creating.</p>
+        <p class="donate-text">
+          Thanks for stopping by! If you enjoy this project and want to help
+          keep it alive, I'd really appreciate a small donation. Your support
+          means a lot and helps me keep creating.
+        </p>
         <!-- <div>A:{{ isAndroid }} - I:{{ isIOS }}</div> -->
       </div>
     </div>
@@ -113,6 +123,7 @@ export default {
       this.showInstallUIAndroid = false;
       this.deferredPrompt.prompt();
       const { outcome } = await this.deferredPrompt.userChoice;
+      // eslint-disable-next-line no-console
       console.log(`User response to the install prompt: ${outcome}`);
       this.deferredPrompt = null;
     },
@@ -158,18 +169,21 @@ export default {
     let self = this;
     window.addEventListener("beforeinstallprompt", e => {
       // Does not trigger on iOS!!
+      // eslint-disable-next-line no-console
       console.log("beforeinstallprompt");
       e.preventDefault();
       self.deferredPrompt = e;
       if (!self.$cookies.get(self.cookieKey[0]))
         self.showInstallUIAndroid = true;
       self.showInstallGuide = false;
+      // eslint-disable-next-line no-console
       console.log(`'beforeinstallprompt' event was fired.`);
     });
     window.addEventListener("appinstalled", () => {
       self.showInstallUIAndroid = false;
       self.showInstallGuide = false;
       self.deferredPrompt = null;
+      // eslint-disable-next-line no-console
       console.log("PWA was installed");
     });
     await this.$store.dispatch("user/getLoginSession");
