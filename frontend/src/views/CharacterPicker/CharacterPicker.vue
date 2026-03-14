@@ -71,7 +71,8 @@
               ad.title
             }}</span>
             <span v-if="ad.partner" class="amazon-ads__item-partner"
-              >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+              >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+              {{ ad.partner }}</span
             >
           </a>
         </div>
@@ -128,7 +129,6 @@
                 <td class="count">{{ item.count }}</td>
               </tr>
             </table>
-
           </div>
           <div class="button-container" :class="{ fixed: fixedScrolling }">
             <char-button
@@ -242,7 +242,9 @@
             </tr>
           </table>
 
-          <button class="report-btn-inline" @click="reportOpen = true">&#9888; Report wrong data</button>
+          <button class="report-btn-inline" @click="reportOpen = true">
+            &#9888; Report wrong data
+          </button>
 
           <img
             id="tumbnail"
@@ -300,7 +302,8 @@
                 ad.title
               }}</span>
               <span v-if="ad.partner" class="amazon-ads__item-partner"
-                >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+                >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+                {{ ad.partner }}</span
               >
             </a>
           </div>
@@ -334,7 +337,8 @@
               ad.title
             }}</span>
             <span v-if="ad.partner" class="amazon-ads__item-partner"
-              >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+              >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+              {{ ad.partner }}</span
             >
           </a>
         </div>
@@ -386,7 +390,11 @@
       <div class="skeleton-main">
         <div class="skeleton-left-panel">
           <div class="skeleton-shimmer skeleton-btn"></div>
-          <div class="skeleton-shimmer skeleton-row" v-for="i in 10" :key="i"></div>
+          <div
+            class="skeleton-shimmer skeleton-row"
+            v-for="i in 10"
+            :key="i"
+          ></div>
         </div>
         <div class="skeleton-right-panel">
           <div class="skeleton-shimmer skeleton-image"></div>
@@ -395,7 +403,14 @@
     </div>
 
     <!-- Report data button -->
-    <button class="report-btn" :class="{ 'picking-fade': startPicking }" @click="reportOpen = true" title="Report missing or incorrect game data">&#9888; Report wrong data</button>
+    <button
+      class="report-btn"
+      :class="{ 'picking-fade': startPicking }"
+      @click="reportOpen = true"
+      title="Report missing or incorrect game data"
+    >
+      &#9888; Report wrong data
+    </button>
 
     <!-- Report popup -->
     <transition name="report-fade">
@@ -403,20 +418,35 @@
         <div class="report-modal">
           <template v-if="!reportSent">
             <h3>Report a data issue</h3>
-            <p class="report-subtitle">Spotted a missing expansion, wrong character, or other data problem? Let me know!</p>
+            <p class="report-subtitle">
+              Spotted a missing expansion, wrong character, or other data
+              problem? Let me know!
+            </p>
             <label>
               <span>Your email <span class="optional">(optional)</span></span>
-              <input v-model="reportEmail" type="email" placeholder="your@email.com" />
+              <input
+                v-model="reportEmail"
+                type="email"
+                placeholder="your@email.com"
+              />
             </label>
             <label>
               <span>Description <span class="required">*</span></span>
-              <textarea v-model="reportDescription" placeholder="What's wrong? (e.g. missing character, wrong expansion name...)" rows="4"></textarea>
+              <textarea
+                v-model="reportDescription"
+                placeholder="What's wrong? (e.g. missing character, wrong expansion name...)"
+                rows="4"
+              ></textarea>
             </label>
             <p class="report-error" v-if="reportError">{{ reportError }}</p>
             <div class="report-actions">
               <button class="btn-cancel" @click="closeReport">Cancel</button>
-              <button class="btn-send" @click="submitReport" :disabled="reportSending">
-                {{ reportSending ? 'Sending...' : 'Send report' }}
+              <button
+                class="btn-send"
+                @click="submitReport"
+                :disabled="reportSending"
+              >
+                {{ reportSending ? "Sending..." : "Send report" }}
               </button>
             </div>
           </template>
@@ -424,7 +454,10 @@
             <div class="report-success">
               <div class="report-success__icon">&#10003;</div>
               <h3>Thank you!</h3>
-              <p>Your report helps make the data better for everyone. I appreciate it!</p>
+              <p>
+                Your report helps make the data better for everyone. I
+                appreciate it!
+              </p>
               <button class="btn-send" @click="closeReport">Close</button>
             </div>
           </template>
@@ -607,9 +640,10 @@ export default {
       }
       this.reportError = "";
       this.reportSending = true;
-      const gameName = this.game && this.game.background && this.game.background.title
-        ? this.game.background.title
-        : "Unknown game";
+      const gameName =
+        this.game && this.game.background && this.game.background.title
+          ? this.game.background.title
+          : "Unknown game";
       try {
         const response = await fetch(config.backendServer + "/email/report", {
           method: "POST",
@@ -1835,7 +1869,6 @@ h3 {
     }
   }
 }
-
 </style>
 <style scoped lang="less">
 .report-btn {
@@ -1853,7 +1886,7 @@ h3 {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   font-family: inherit;
   box-sizing: border-box;
   transition: background 0.2s, color 0.2s, transform 0.2s;
@@ -1911,7 +1944,7 @@ h3 {
 .report-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -1925,7 +1958,7 @@ h3 {
   padding: 28px 24px;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 
   h3 {
     margin: 0 0 6px 0;
@@ -1948,7 +1981,8 @@ h3 {
     color: #333;
     margin-bottom: 14px;
 
-    input, textarea {
+    input,
+    textarea {
       margin-top: 6px;
       padding: 8px 10px;
       font-size: 14px;
@@ -1993,7 +2027,9 @@ h3 {
     font-size: 14px;
     font-family: inherit;
     cursor: pointer;
-    &:hover { background: #f5f5f5; }
+    &:hover {
+      background: #f5f5f5;
+    }
   }
 
   .btn-send {
@@ -2006,8 +2042,13 @@ h3 {
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    &:hover:not(:disabled) { background: #d94e1f; }
-    &:disabled { opacity: 0.6; cursor: default; }
+    &:hover:not(:disabled) {
+      background: #d94e1f;
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
   }
 }
 
@@ -2047,8 +2088,12 @@ h3 {
 }
 
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-tabs {

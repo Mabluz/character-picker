@@ -6,21 +6,36 @@
     </div>
 
     <div class="install-app" v-if="showInstallUIAndroid && isAndroid">
-      <button class="install-close" @click="installClose(cookieKey[0])" aria-label="Close">&times;</button>
+      <button
+        class="install-close"
+        @click="installClose(cookieKey[0])"
+        aria-label="Close"
+      >
+        &times;
+      </button>
       <div class="install-body">
         <div class="install-text">
-          Install <strong>Random Boardgame</strong> as an app on your Android device.
+          Install <strong>Random Boardgame</strong> as an app on your Android
+          device.
         </div>
         <button class="install-btn" @click="installApp">Install</button>
       </div>
     </div>
-<div class="install-app" v-if="showInstallUIIos && isIOS">
-      <button class="install-close" @click="installClose(cookieKey[1])" aria-label="Close">&times;</button>
+    <div class="install-app" v-if="showInstallUIIos && isIOS">
+      <button
+        class="install-close"
+        @click="installClose(cookieKey[1])"
+        aria-label="Close"
+      >
+        &times;
+      </button>
       <div class="install-body">
         <div class="install-text">
           Add <strong>Random Boardgame</strong> to your iOS home screen:
           <span class="install-steps">Share &rarr; Add to Home Screen</span>
-          <a href="https://www.youtube.com/watch?v=bV8xE6lOdoY" target="_blank">See how on YouTube</a>
+          <a href="https://www.youtube.com/watch?v=bV8xE6lOdoY" target="_blank"
+            >See how on YouTube</a
+          >
         </div>
       </div>
     </div>
@@ -87,10 +102,7 @@ export default {
       deferredPrompt: undefined,
       isAndroid: false,
       isIOS: false,
-      cookieKey: [
-        "showInstallUIAndroid",
-        "showInstallUIIos"
-      ]
+      cookieKey: ["showInstallUIAndroid", "showInstallUIIos"]
     };
   },
   computed: {
@@ -130,7 +142,9 @@ export default {
     }
 
     this._kofiObserver = new IntersectionObserver(([entry]) => {
-      const kofi = document.querySelector(".floatingchat-container-wrap, .floatingchat-container-wrap-mobi");
+      const kofi = document.querySelector(
+        ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
+      );
       if (kofi) {
         kofi.style.transition = "opacity 0.3s ease";
         kofi.style.opacity = entry.isIntersecting ? "0" : "1";
@@ -164,8 +178,7 @@ export default {
         ? document.documentElement.clientWidth
         : w;
     w = document && document.body ? document.body.clientWidth : w;
-    this.isIOS =
-      /iPhone|iPad|iPod/i.test(navigator.userAgent) && w < 1400;
+    this.isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && w < 1400;
     this.isAndroid = /Android/i.test(navigator.userAgent) && w < 1400;
     if (this.isIOS && !this.$cookies.get(this.cookieKey[1]))
       this.showInstallUIIos = true;
@@ -284,7 +297,8 @@ export default {
     padding: 10px 28px;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease, transform 0.1s ease,
+      box-shadow 0.15s ease;
     &:hover {
       background: #f0f0f0;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);

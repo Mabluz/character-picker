@@ -6,7 +6,9 @@
     </div>
     <nav class="admin-nav">
       <router-link to="/admin" exact class="admin-nav__link">Users</router-link>
-      <router-link to="/admin/emails" class="admin-nav__link">Email log</router-link>
+      <router-link to="/admin/emails" class="admin-nav__link"
+        >Email log</router-link
+      >
       <router-link to="/admin/games" class="admin-nav__link">Games</router-link>
     </nav>
 
@@ -30,7 +32,11 @@
           >
             {{ clearing ? "Clearing..." : `Mark ${alertCount} alerts as seen` }}
           </button>
-          <button class="btn btn--secondary" @click="loadAll" :disabled="loading">
+          <button
+            class="btn btn--secondary"
+            @click="loadAll"
+            :disabled="loading"
+          >
             {{ loading ? "Loading..." : "Refresh" }}
           </button>
         </div>
@@ -51,7 +57,9 @@
           <div class="summary-label">Spam complaints</div>
         </div>
         <div class="summary-card delayed">
-          <div class="summary-number">{{ countByStatus("delivery_delayed") }}</div>
+          <div class="summary-number">
+            {{ countByStatus("delivery_delayed") }}
+          </div>
           <div class="summary-label">Delayed</div>
         </div>
         <div class="summary-card failed">
@@ -63,8 +71,8 @@
       <!-- Alert banner -->
       <div v-if="alertCount > 0" class="alert-banner">
         <span class="alert-dot"></span>
-        <strong>{{ alertCount }} new alerts</strong> since last check — rows marked
-        <span class="new-tag-inline">New</span> have not been seen yet.
+        <strong>{{ alertCount }} new alerts</strong> since last check — rows
+        marked <span class="new-tag-inline">New</span> have not been seen yet.
       </div>
 
       <!-- Sent emails section -->
@@ -81,14 +89,18 @@
           @click="activeFilter = f.value"
         >
           {{ f.label }}
-          <span class="filter-count">{{ f.value === "all" ? emails.length : countByStatus(f.value) }}</span>
+          <span class="filter-count">{{
+            f.value === "all" ? emails.length : countByStatus(f.value)
+          }}</span>
         </button>
       </div>
 
       <div v-if="loading" class="state-msg">Loading email log...</div>
       <div v-else-if="emailsError" class="error-box">{{ emailsError }}</div>
       <div v-else-if="filteredEmails.length === 0" class="state-msg">
-        <span v-if="emails.length === 0">No emails found. Emails sent via Resend will appear here.</span>
+        <span v-if="emails.length === 0"
+          >No emails found. Emails sent via Resend will appear here.</span
+        >
         <span v-else>No emails with this status.</span>
       </div>
 
@@ -112,10 +124,15 @@
               <td class="new-cell">
                 <span v-if="isNewAlert(email)" class="new-tag">New</span>
               </td>
-              <td class="subject-cell">{{ email.subject || "(no subject)" }}</td>
+              <td class="subject-cell">
+                {{ email.subject || "(no subject)" }}
+              </td>
               <td class="to-cell">{{ formatRecipients(email.to) }}</td>
               <td>
-                <span class="status-badge" :class="statusClass(email.last_event)">
+                <span
+                  class="status-badge"
+                  :class="statusClass(email.last_event)"
+                >
                   {{ statusLabel(email.last_event) }}
                 </span>
               </td>
@@ -127,7 +144,11 @@
 
       <!-- Load more -->
       <div v-if="hasMore && !loading" class="load-more-row">
-        <button class="btn btn--secondary" @click="loadMore" :disabled="loadingMore">
+        <button
+          class="btn btn--secondary"
+          @click="loadMore"
+          :disabled="loadingMore"
+        >
           {{ loadingMore ? "Loading..." : "Load more" }}
         </button>
       </div>
@@ -135,7 +156,10 @@
       <!-- Failed send attempts -->
       <div class="section-title" style="margin-top: 2.5rem;">
         <h2>Failed send attempts</h2>
-        <p>Emails rejected by Resend before sending (e.g. domain not verified, invalid API key)</p>
+        <p>
+          Emails rejected by Resend before sending (e.g. domain not verified,
+          invalid API key)
+        </p>
       </div>
 
       <div v-if="!loading && sendErrors.length === 0" class="state-msg">
@@ -168,7 +192,11 @@
               <td class="to-cell">{{ err.recipient }}</td>
               <td class="error-msg-cell">{{ err.error_message }}</td>
               <td>
-                <span v-if="err.error_code" class="status-badge status-bounced">{{ err.error_code }}</span>
+                <span
+                  v-if="err.error_code"
+                  class="status-badge status-bounced"
+                  >{{ err.error_code }}</span
+                >
                 <span v-else class="status-badge status-unknown">—</span>
               </td>
               <td class="date-cell">{{ formatDate(err.created_at) }}</td>
@@ -235,7 +263,10 @@ export default {
       return new Date(s.replace(" ", "T") + "Z");
     },
     isNewAlert(email) {
-      return ALERT_STATUSES.has(email.last_event) && this.parseUTC(email.created_at) > this.clearedAt;
+      return (
+        ALERT_STATUSES.has(email.last_event) &&
+        this.parseUTC(email.created_at) > this.clearedAt
+      );
     },
     statusClass(status) {
       const map = {
@@ -276,17 +307,29 @@ export default {
       this.nextCursor = undefined;
       this.emailsError = "";
 
-      const [emailsResult, errorsResult, countResult] = await Promise.allSettled([
+      const [
+        emailsResult,
+        errorsResult,
+        countResult
+      ] = await Promise.allSettled([
         this.$store.dispatch("user/adminGetEmails", { limit: PAGE_SIZE }),
         this.$store.dispatch("user/adminGetEmailErrors"),
         this.$store.dispatch("user/adminGetEmailAlertCount")
       ]);
 
       if (emailsResult.status === "fulfilled") {
-        const page = emailsResult.value && emailsResult.value.data ? emailsResult.value.data : (emailsResult.value || []);
+        const page =
+          emailsResult.value && emailsResult.value.data
+            ? emailsResult.value.data
+            : emailsResult.value || [];
         this.emails = Array.isArray(page) ? page : [];
-        this.hasMore = emailsResult.value && emailsResult.value.has_more ? emailsResult.value.has_more : false;
-        this.nextCursor = this.emails.length ? this.emails[this.emails.length - 1].id : undefined;
+        this.hasMore =
+          emailsResult.value && emailsResult.value.has_more
+            ? emailsResult.value.has_more
+            : false;
+        this.nextCursor = this.emails.length
+          ? this.emails[this.emails.length - 1].id
+          : undefined;
       } else {
         this.emailsError = "Could not load email log.";
       }
@@ -310,10 +353,12 @@ export default {
           limit: PAGE_SIZE,
           after: this.nextCursor
         });
-        const page = result && result.data ? result.data : (result || []);
+        const page = result && result.data ? result.data : result || [];
         this.emails = [...this.emails, ...page];
         this.hasMore = result && result.has_more ? result.has_more : false;
-        this.nextCursor = page.length ? page[page.length - 1].id : this.nextCursor;
+        this.nextCursor = page.length
+          ? page[page.length - 1].id
+          : this.nextCursor;
       } finally {
         this.loadingMore = false;
       }
@@ -322,7 +367,9 @@ export default {
       this.clearing = true;
       try {
         const result = await this.$store.dispatch("user/adminClearEmailAlerts");
-        this.clearedAt = new Date(result && result.cleared_at ? result.cleared_at : Date.now());
+        this.clearedAt = new Date(
+          result && result.cleared_at ? result.cleared_at : Date.now()
+        );
         this.alertCount = 0;
       } catch (e) {
         console.error("Failed to clear alerts", e);
@@ -367,7 +414,9 @@ export default {
   color: @accent;
   text-decoration: none;
   font-size: 16px;
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .admin-nav {
@@ -385,7 +434,9 @@ export default {
     margin-bottom: -2px;
     transition: color 0.15s, border-color 0.15s;
 
-    &:hover { color: @accent; }
+    &:hover {
+      color: @accent;
+    }
     &.router-link-active {
       color: @accent;
       border-bottom-color: @accent;
@@ -398,7 +449,9 @@ export default {
   text-align: center;
   padding: 80px 20px;
   font-size: 18px;
-  a { color: @accent; }
+  a {
+    color: @accent;
+  }
 }
 
 .emails-header {
@@ -431,18 +484,25 @@ export default {
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.2s;
-  &:disabled { opacity: 0.5; cursor: default; }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 
   &--secondary {
     background: #e2e8f0;
     color: #4a5568;
-    &:hover:not(:disabled) { background: #cbd5e0; }
+    &:hover:not(:disabled) {
+      background: #cbd5e0;
+    }
   }
 
   &--clear {
     background: #fc4444;
     color: white;
-    &:hover:not(:disabled) { background: #e53e3e; }
+    &:hover:not(:disabled) {
+      background: #e53e3e;
+    }
   }
 }
 
@@ -453,8 +513,12 @@ export default {
   gap: 12px;
   margin-bottom: 20px;
 
-  @media (max-width: 900px) { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 600px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .summary-card {
@@ -462,14 +526,24 @@ export default {
   border-radius: 10px;
   padding: 18px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   border-top: 4px solid transparent;
 
-  &.delivered  { border-color: #38a169; }
-  &.bounced    { border-color: #e53e3e; }
-  &.complained { border-color: #dd6b20; }
-  &.delayed    { border-color: #d69e2e; }
-  &.failed     { border-color: #9b2c2c; }
+  &.delivered {
+    border-color: #38a169;
+  }
+  &.bounced {
+    border-color: #e53e3e;
+  }
+  &.complained {
+    border-color: #dd6b20;
+  }
+  &.delayed {
+    border-color: #d69e2e;
+  }
+  &.failed {
+    border-color: #9b2c2c;
+  }
 }
 
 .summary-number {
@@ -508,8 +582,15 @@ export default {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.85);
+  }
 }
 
 .new-tag-inline {
@@ -561,24 +642,33 @@ export default {
   transition: all 0.2s;
   font-family: inherit;
 
-  &:hover { border-color: @accent; color: @accent; }
-  &.active { background: @accent; border-color: @accent; color: white; }
+  &:hover {
+    border-color: @accent;
+    color: @accent;
+  }
+  &.active {
+    background: @accent;
+    border-color: @accent;
+    color: white;
+  }
 }
 
 .filter-count {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 999px;
   padding: 1px 7px;
   font-size: 12px;
   font-weight: 700;
-  .active & { background: rgba(255,255,255,0.25); }
+  .active & {
+    background: rgba(255, 255, 255, 0.25);
+  }
 }
 
 /* Table */
 .table-wrap {
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   margin-bottom: 12px;
   overflow-x: auto;
@@ -600,18 +690,31 @@ table {
       text-transform: uppercase;
       letter-spacing: 0.04em;
       border-bottom: 1px solid #e2e8f0;
-      &:first-child { width: 48px; padding-right: 0; }
+      &:first-child {
+        width: 48px;
+        padding-right: 0;
+      }
     }
   }
 
   tbody tr {
     border-bottom: 1px solid #f0f4f8;
     transition: background 0.12s;
-    &:last-child { border-bottom: none; }
-    &:hover td { background: #f7fafc; }
-    &.row-new td { background: #fff8f8; }
-    &.row-new:hover td { background: #ffefef; }
-    &.error-row:hover td { background: #fff5f5; }
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover td {
+      background: #f7fafc;
+    }
+    &.row-new td {
+      background: #fff8f8;
+    }
+    &.row-new:hover td {
+      background: #ffefef;
+    }
+    &.error-row:hover td {
+      background: #fff5f5;
+    }
 
     td {
       padding: 11px 14px;
@@ -621,7 +724,10 @@ table {
   }
 }
 
-.new-cell { width: 48px; padding-right: 0 !important; }
+.new-cell {
+  width: 48px;
+  padding-right: 0 !important;
+}
 
 .new-tag {
   display: inline-block;
@@ -640,9 +746,20 @@ table {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.to-cell { color: #4a5568; font-size: 13px; }
-.error-msg-cell { color: #9b2c2c; font-size: 13px; max-width: 260px; }
-.date-cell { color: #718096; font-size: 13px; white-space: nowrap; }
+.to-cell {
+  color: #4a5568;
+  font-size: 13px;
+}
+.error-msg-cell {
+  color: #9b2c2c;
+  font-size: 13px;
+  max-width: 260px;
+}
+.date-cell {
+  color: #718096;
+  font-size: 13px;
+  white-space: nowrap;
+}
 
 /* Status badges */
 .status-badge {
@@ -654,15 +771,42 @@ table {
   white-space: nowrap;
 }
 
-.status-delivered  { background: #c6f6d5; color: #276749; }
-.status-sent       { background: #bee3f8; color: #2a69ac; }
-.status-queued     { background: #e2e8f0; color: #4a5568; }
-.status-bounced    { background: #fed7d7; color: #9b2c2c; }
-.status-complained { background: #feebc8; color: #7b341e; }
-.status-delayed    { background: #fefcbf; color: #744210; }
-.status-clicked    { background: #e9d8fd; color: #553c9a; }
-.status-opened     { background: #b2f5ea; color: #234e52; }
-.status-unknown    { background: #e2e8f0; color: #4a5568; }
+.status-delivered {
+  background: #c6f6d5;
+  color: #276749;
+}
+.status-sent {
+  background: #bee3f8;
+  color: #2a69ac;
+}
+.status-queued {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+.status-bounced {
+  background: #fed7d7;
+  color: #9b2c2c;
+}
+.status-complained {
+  background: #feebc8;
+  color: #7b341e;
+}
+.status-delayed {
+  background: #fefcbf;
+  color: #744210;
+}
+.status-clicked {
+  background: #e9d8fd;
+  color: #553c9a;
+}
+.status-opened {
+  background: #b2f5ea;
+  color: #234e52;
+}
+.status-unknown {
+  background: #e2e8f0;
+  color: #4a5568;
+}
 
 .state-msg {
   text-align: center;

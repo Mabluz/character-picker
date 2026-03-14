@@ -6,7 +6,9 @@
     </div>
     <nav class="admin-nav">
       <router-link to="/admin" exact class="admin-nav__link">Users</router-link>
-      <router-link to="/admin/emails" class="admin-nav__link">Email log</router-link>
+      <router-link to="/admin/emails" class="admin-nav__link"
+        >Email log</router-link
+      >
       <router-link to="/admin/games" class="admin-nav__link">Games</router-link>
     </nav>
 
@@ -24,12 +26,16 @@
               class="toggle-btn"
               :class="{ active: gameType === 'user' }"
               @click="switchType('user')"
-            >User games <span class="count">{{ userGames.length }}</span></button>
+            >
+              User games <span class="count">{{ userGames.length }}</span>
+            </button>
             <button
               class="toggle-btn"
               :class="{ active: gameType === 'main' }"
               @click="switchType('main')"
-            >Pre-set games <span class="count">{{ mainGames.length }}</span></button>
+            >
+              Pre-set games <span class="count">{{ mainGames.length }}</span>
+            </button>
           </div>
           <input
             class="search"
@@ -42,18 +48,24 @@
         <div class="list-body">
           <div v-if="loading" class="state-msg">Loading...</div>
           <div v-else-if="error" class="error-box">{{ error }}</div>
-          <div v-else-if="filteredGames.length === 0" class="state-msg">No games found.</div>
+          <div v-else-if="filteredGames.length === 0" class="state-msg">
+            No games found.
+          </div>
 
           <div
             v-for="game in filteredGames"
             :key="game.id"
             class="game-item"
-            :class="{ selected: selectedGame && selectedGame._key === gameKey(game) }"
+            :class="{
+              selected: selectedGame && selectedGame._key === gameKey(game)
+            }"
             @click="select(game)"
           >
             <div class="game-item__title">{{ gameTitle(game) }}</div>
             <div class="game-item__meta">
-              <span v-if="gameType === 'user'" class="game-item__owner">{{ game.owner_email }}</span>
+              <span v-if="gameType === 'user'" class="game-item__owner">{{
+                game.owner_email
+              }}</span>
               <span class="game-item__id">{{ gameId(game) }}</span>
             </div>
             <div class="game-item__date">{{ formatDate(game.updated_at) }}</div>
@@ -76,12 +88,16 @@
               <button class="btn btn--copy" @click="copyJson">
                 {{ copied ? "Copied!" : "Copy JSON" }}
               </button>
-              <button class="btn btn--download" @click="downloadJson">Download</button>
+              <button class="btn btn--download" @click="downloadJson">
+                Download
+              </button>
             </div>
           </div>
 
           <div class="json-stats">
-            <span v-if="gameType === 'user'">Owner: {{ selectedGame._raw.owner_email }}</span>
+            <span v-if="gameType === 'user'"
+              >Owner: {{ selectedGame._raw.owner_email }}</span
+            >
             <span>Updated: {{ formatDate(selectedGame._raw.updated_at) }}</span>
             <span v-if="selectedGame._data.characters">
               {{ selectedGame._data.characters.length }} characters
@@ -148,9 +164,14 @@ export default {
       if (!this.selectedGame) return [];
       const d = this.selectedGame._data;
       const sections = [{ key: "full", label: "Full JSON" }];
-      if (d.characters && d.characters.length) sections.push({ key: "characters", label: `Characters (${d.characters.length})` });
+      if (d.characters && d.characters.length)
+        sections.push({
+          key: "characters",
+          label: `Characters (${d.characters.length})`
+        });
       if (d.tabs) sections.push({ key: "tabs", label: "Tabs" });
-      if (d.background) sections.push({ key: "background", label: "Background" });
+      if (d.background)
+        sections.push({ key: "background", label: "Background" });
       if (d.settings) sections.push({ key: "settings", label: "Settings" });
       if (d.affiliate) sections.push({ key: "affiliate", label: "Affiliate" });
       return sections;
@@ -182,7 +203,11 @@ export default {
         this.userGames = userGames || [];
         this.mainGames = mainGames || [];
       } catch (e) {
-        this.error = "Failed to load games: " + (e.response && e.response.data && e.response.data.error ? e.response.data.error : e.message);
+        this.error =
+          "Failed to load games: " +
+          (e.response && e.response.data && e.response.data.error
+            ? e.response.data.error
+            : e.message);
       } finally {
         this.loading = false;
       }
@@ -207,9 +232,13 @@ export default {
     gameTitle(game) {
       if (this.gameType === "user") {
         const d = game.game_data || game;
-        return d.background && d.background.title ? d.background.title : (game.id || "Untitled");
+        return d.background && d.background.title
+          ? d.background.title
+          : game.id || "Untitled";
       }
-      return game.background && game.background.title ? game.background.title : (game.title || game.id || "Untitled");
+      return game.background && game.background.title
+        ? game.background.title
+        : game.title || game.id || "Untitled";
     },
     gameId(game) {
       return game.id || "";
@@ -221,17 +250,28 @@ export default {
     copyJson() {
       navigator.clipboard.writeText(this.formattedSection).then(() => {
         this.copied = true;
-        setTimeout(() => { this.copied = false; }, 2000);
+        setTimeout(() => {
+          this.copied = false;
+        }, 2000);
       });
     },
     downloadJson() {
       const d = this.selectedGame._data;
-      const id = (d.id || this.gameId(this.selectedGame._raw) || "game").replace(/[^a-z0-9-_]/gi, "_");
-      const blob = new Blob([this.formattedSection], { type: "application/json" });
+      const id = (
+        d.id ||
+        this.gameId(this.selectedGame._raw) ||
+        "game"
+      ).replace(/[^a-z0-9-_]/gi, "_");
+      const blob = new Blob([this.formattedSection], {
+        type: "application/json"
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = id + (this.activeSection !== "full" ? `-${this.activeSection}` : "") + ".json";
+      a.download =
+        id +
+        (this.activeSection !== "full" ? `-${this.activeSection}` : "") +
+        ".json";
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -260,14 +300,20 @@ export default {
   align-items: center;
   gap: 20px;
   margin-bottom: 30px;
-  h1 { margin: 0; display: inline; font-size: 28px; }
+  h1 {
+    margin: 0;
+    display: inline;
+    font-size: 28px;
+  }
 }
 
 .back-link {
   color: @accent;
   text-decoration: none;
   font-size: 16px;
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .admin-nav {
@@ -284,8 +330,14 @@ export default {
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     transition: color 0.15s, border-color 0.15s;
-    &:hover { color: @accent; }
-    &.router-link-active { color: @accent; border-bottom-color: @accent; font-weight: 600; }
+    &:hover {
+      color: @accent;
+    }
+    &.router-link-active {
+      color: @accent;
+      border-bottom-color: @accent;
+      font-weight: 600;
+    }
   }
 }
 
@@ -293,7 +345,9 @@ export default {
   text-align: center;
   padding: 80px 20px;
   font-size: 18px;
-  a { color: @accent; }
+  a {
+    color: @accent;
+  }
 }
 
 /* Two-panel layout */
@@ -341,18 +395,27 @@ export default {
   color: #555;
   transition: all 0.15s;
 
-  &.active { background: @accent; border-color: @accent; color: white; }
-  &:not(.active):hover { border-color: @accent; color: @accent; }
+  &.active {
+    background: @accent;
+    border-color: @accent;
+    color: white;
+  }
+  &:not(.active):hover {
+    border-color: @accent;
+    color: @accent;
+  }
 }
 
 .count {
   display: inline-block;
-  background: rgba(0,0,0,0.12);
+  background: rgba(0, 0, 0, 0.12);
   border-radius: 10px;
   padding: 0 5px;
   font-size: 11px;
   margin-left: 3px;
-  .active & { background: rgba(255,255,255,0.25); }
+  .active & {
+    background: rgba(255, 255, 255, 0.25);
+  }
 }
 
 .search {
@@ -364,7 +427,9 @@ export default {
   font-size: 13px;
   font-family: inherit;
   outline: none;
-  &:focus { border-color: @accent; }
+  &:focus {
+    border-color: @accent;
+  }
 }
 
 .game-item {
@@ -374,9 +439,16 @@ export default {
   transition: background 0.12s;
   overflow: hidden;
 
-  &:hover { background: #fdf4f0; }
-  &.selected { background: #fff0ea; border-left: 3px solid @accent; }
-  &:last-child { border-bottom: none; }
+  &:hover {
+    background: #fdf4f0;
+  }
+  &.selected {
+    background: #fff0ea;
+    border-left: 3px solid @accent;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
 
   &__title {
     font-size: 14px;
@@ -491,8 +563,20 @@ export default {
   font-family: inherit;
   transition: opacity 0.15s;
 
-  &--copy { background: #e2e8f0; color: #4a5568; &:hover { background: #cbd5e0; } }
-  &--download { background: @accent; color: white; &:hover { opacity: 0.85; } }
+  &--copy {
+    background: #e2e8f0;
+    color: #4a5568;
+    &:hover {
+      background: #cbd5e0;
+    }
+  }
+  &--download {
+    background: @accent;
+    color: white;
+    &:hover {
+      opacity: 0.85;
+    }
+  }
 }
 
 .json-stats {
@@ -528,8 +612,14 @@ export default {
   border-bottom: 3px solid transparent;
   transition: all 0.15s;
 
-  &:hover { color: @accent; }
-  &.active { color: @accent; border-bottom-color: @accent; font-weight: 600; }
+  &:hover {
+    color: @accent;
+  }
+  &.active {
+    color: @accent;
+    border-bottom-color: @accent;
+    font-weight: 600;
+  }
 }
 
 .json-pre {
@@ -568,8 +658,16 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .games-layout { flex-direction: column; height: auto; }
-  .games-list { width: 100%; max-height: 300px; }
-  .json-panel { min-height: 400px; }
+  .games-layout {
+    flex-direction: column;
+    height: auto;
+  }
+  .games-list {
+    width: 100%;
+    max-height: 300px;
+  }
+  .json-panel {
+    min-height: 400px;
+  }
 }
 </style>

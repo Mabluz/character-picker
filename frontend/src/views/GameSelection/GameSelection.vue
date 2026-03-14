@@ -14,7 +14,8 @@
         <img :src="ad.image" />
         <span v-if="ad.title">{{ ad.title }}</span>
         <span v-if="ad.partner" class="side-ads__item-partner"
-          >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+          >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+          {{ ad.partner }}</span
         >
       </a>
     </div>
@@ -32,7 +33,8 @@
         <img :src="ad.image" />
         <span v-if="ad.title">{{ ad.title }}</span>
         <span v-if="ad.partner" class="side-ads__item-partner"
-          >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+          >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+          {{ ad.partner }}</span
         >
       </a>
     </div>
@@ -51,7 +53,9 @@
       >Can't find a randomizer for a specific game? Create it yourself!<br />See
       your games by logging in!</login
     >
-    <router-link v-if="isAdmin" to="/admin" class="admin-link">Admin panel</router-link>
+    <router-link v-if="isAdmin" to="/admin" class="admin-link"
+      >Admin panel</router-link
+    >
 
     <!-- Mobile affiliate ads under CTA -->
     <div class="mobile-top-ads" v-if="mobileTopAds.length">
@@ -74,7 +78,8 @@
             ad.title
           }}</span>
           <span v-if="ad.partner" class="mobile-top-ads__item-partner"
-            >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+            >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+            {{ ad.partner }}</span
           >
         </a>
       </div>
@@ -153,7 +158,8 @@
             ad.title
           }}</span>
           <span v-if="ad.partner" class="bottom-ads__item-partner"
-            >{{ ad.partner === 'amazon' ? 'Ad' : 'Link' }} from {{ ad.partner }}</span
+            >{{ ad.partner === "amazon" ? "Ad" : "Link" }} from
+            {{ ad.partner }}</span
           >
         </a>
       </div>
@@ -459,7 +465,7 @@ export default {
   padding: 8px 14px;
   border-radius: 6px;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   &:hover {
     background: #d94e1f;
   }

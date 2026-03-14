@@ -197,7 +197,8 @@ export default {
       const { email, token } = state.user || {};
       const response = await axios({
         method: "patch",
-        url: config.backendServer + "/adminview/api/users/" + userId + "/blocked",
+        url:
+          config.backendServer + "/adminview/api/users/" + userId + "/blocked",
         data: { email, token, isBlocked }
       });
       return response.data;

@@ -6,7 +6,9 @@
     </div>
     <nav class="admin-nav">
       <router-link to="/admin" exact class="admin-nav__link">Users</router-link>
-      <router-link to="/admin/emails" class="admin-nav__link">Email log</router-link>
+      <router-link to="/admin/emails" class="admin-nav__link"
+        >Email log</router-link
+      >
       <router-link to="/admin/games" class="admin-nav__link">Games</router-link>
     </nav>
 
@@ -17,10 +19,18 @@
 
     <div v-else>
       <div class="toolbar">
-        <button class="btn btn--secondary" @click="loadUsers" :disabled="loading">
+        <button
+          class="btn btn--secondary"
+          @click="loadUsers"
+          :disabled="loading"
+        >
           {{ loading ? "Loading..." : "Refresh" }}
         </button>
-        <button class="btn btn--download" @click="downloadBackup" :disabled="downloading">
+        <button
+          class="btn btn--download"
+          @click="downloadBackup"
+          :disabled="downloading"
+        >
           {{ downloading ? "Preparing..." : "Download backup" }}
         </button>
       </div>
@@ -31,7 +41,9 @@
         <span>{{ users.length }} users</span>
         <span>{{ totalGames }} games total</span>
         <span>{{ adminCount }} admins</span>
-        <span class="stat--blocked" v-if="blockedCount">{{ blockedCount }} blocked</span>
+        <span class="stat--blocked" v-if="blockedCount"
+          >{{ blockedCount }} blocked</span
+        >
       </div>
 
       <div class="table-wrap">
@@ -46,7 +58,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in sortedUsers" :key="user.userId" :class="{ 'row-blocked': user.isBlocked }">
+            <tr
+              v-for="user in sortedUsers"
+              :key="user.userId"
+              :class="{ 'row-blocked': user.isBlocked }"
+            >
               <td class="email">
                 {{ user.email }}
                 <span v-if="user.isBlocked" class="blocked-badge">blocked</span>
@@ -115,7 +131,10 @@ export default {
       });
     },
     totalGames() {
-      return this.users.reduce((sum, u) => sum + (u.data ? u.data.length : 0), 0);
+      return this.users.reduce(
+        (sum, u) => sum + (u.data ? u.data.length : 0),
+        0
+      );
     },
     adminCount() {
       return this.users.filter(u => u.isAdmin).length;
@@ -131,7 +150,11 @@ export default {
       try {
         this.users = await this.$store.dispatch("user/adminGetUsers");
       } catch (e) {
-        this.error = "Failed to load users. " + (e.response && e.response.data && e.response.data.error ? e.response.data.error : e.message);
+        this.error =
+          "Failed to load users. " +
+          (e.response && e.response.data && e.response.data.error
+            ? e.response.data.error
+            : e.message);
       } finally {
         this.loading = false;
       }
@@ -174,11 +197,14 @@ export default {
       this.error = null;
       try {
         const data = await this.$store.dispatch("user/adminGetBackup");
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json"
+        });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "backup-" + new Date().toISOString().slice(0, 10) + ".json";
+        a.download =
+          "backup-" + new Date().toISOString().slice(0, 10) + ".json";
         a.click();
         URL.revokeObjectURL(url);
       } catch (e) {
@@ -228,7 +254,9 @@ export default {
   color: @accent;
   text-decoration: none;
   font-size: 16px;
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .admin-nav {
@@ -246,7 +274,9 @@ export default {
     margin-bottom: -2px;
     transition: color 0.15s, border-color 0.15s;
 
-    &:hover { color: @accent; }
+    &:hover {
+      color: @accent;
+    }
     &.router-link-active {
       color: @accent;
       border-bottom-color: @accent;
@@ -259,7 +289,9 @@ export default {
   text-align: center;
   padding: 80px 20px;
   font-size: 18px;
-  a { color: @accent; }
+  a {
+    color: @accent;
+  }
 }
 
 .toolbar {
@@ -277,18 +309,25 @@ export default {
   font-family: inherit;
   transition: opacity 0.2s;
 
-  &:disabled { opacity: 0.5; cursor: default; }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 
   &--secondary {
     background: #eee;
     color: #333;
-    &:hover:not(:disabled) { background: #ddd; }
+    &:hover:not(:disabled) {
+      background: #ddd;
+    }
   }
 
   &--download {
     background: @accent;
     color: white;
-    &:hover:not(:disabled) { opacity: 0.85; }
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+    }
   }
 }
 
@@ -342,8 +381,12 @@ table {
   tbody tr {
     border-bottom: 1px solid @border;
     transition: background 0.15s;
-    &:last-child { border-bottom: none; }
-    &:hover { background: #fafafa; }
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: #fafafa;
+    }
 
     td {
       padding: 11px 16px;
@@ -351,11 +394,24 @@ table {
     }
   }
 
-  .email { font-family: monospace; font-size: 13px; }
-  .date { color: #888; font-size: 13px; }
-  .toggle-cell { width: 80px; }
-  .row-blocked td { background: #fff5f5; color: #999; }
-  .row-blocked:hover td { background: #ffe8e8; }
+  .email {
+    font-family: monospace;
+    font-size: 13px;
+  }
+  .date {
+    color: #888;
+    font-size: 13px;
+  }
+  .toggle-cell {
+    width: 80px;
+  }
+  .row-blocked td {
+    background: #fff5f5;
+    color: #999;
+  }
+  .row-blocked:hover td {
+    background: #ffe8e8;
+  }
 }
 
 .stat--blocked {
@@ -414,13 +470,18 @@ table {
 
   input:checked + .slider {
     background: @accent;
-    &::before { transform: translateX(20px); }
+    &::before {
+      transform: translateX(20px);
+    }
   }
 
   &--danger input:checked + .slider {
     background: #e53e3e;
   }
 
-  input:disabled + .slider { opacity: 0.5; cursor: default; }
+  input:disabled + .slider {
+    opacity: 0.5;
+    cursor: default;
+  }
 }
 </style>
