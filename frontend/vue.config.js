@@ -1,5 +1,5 @@
 module.exports = {
-  filenameHashing: false,
+  filenameHashing: true,
   devServer: {
     proxy: {
       "/sitemap.xml": {
