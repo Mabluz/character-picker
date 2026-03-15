@@ -167,21 +167,24 @@ export default {
         "floating-chat.donateButton.text-color": "#fff"
       });
       setTimeout(() => {
-        const widget = document.querySelector(
+        const widgets = document.querySelectorAll(
           ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
         );
-        if (!widget) return;
-        const closeBtn = document.createElement("button");
-        closeBtn.className = "kofi-close-btn";
-        closeBtn.innerHTML = "&times;";
-        closeBtn.addEventListener("click", e => {
-          e.stopPropagation();
-          e.preventDefault();
-          sessionStorage.setItem("kofiDismissed", "1");
-          widget.style.opacity = "0";
-          widget.style.pointerEvents = "none";
+        widgets.forEach(widget => {
+          const closeBtn = document.createElement("button");
+          closeBtn.className = "kofi-close-btn";
+          closeBtn.innerHTML = "&times;";
+          closeBtn.addEventListener("click", e => {
+            e.stopPropagation();
+            e.preventDefault();
+            sessionStorage.setItem("kofiDismissed", "1");
+            widgets.forEach(w => {
+              w.style.opacity = "0";
+              w.style.pointerEvents = "none";
+            });
+          });
+          widget.appendChild(closeBtn);
         });
-        widget.appendChild(closeBtn);
       }, 1500);
     };
     document.body.appendChild(script);
