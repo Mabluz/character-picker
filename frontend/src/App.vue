@@ -142,6 +142,7 @@ export default {
     }
 
     this._onScroll = () => {
+      if (sessionStorage.getItem("kofiDismissed")) return;
       const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
       const kofi = document.querySelector(
         ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
@@ -154,6 +155,8 @@ export default {
     };
     window.addEventListener("scroll", this._onScroll);
 
+    if (sessionStorage.getItem("kofiDismissed")) return;
+
     const script = document.createElement("script");
     script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
     script.onload = () => {
@@ -163,6 +166,23 @@ export default {
         "floating-chat.donateButton.background-color": "#f45d22",
         "floating-chat.donateButton.text-color": "#fff"
       });
+      setTimeout(() => {
+        const widget = document.querySelector(
+          ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
+        );
+        if (!widget) return;
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "kofi-close-btn";
+        closeBtn.innerHTML = "&times;";
+        closeBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          e.preventDefault();
+          sessionStorage.setItem("kofiDismissed", "1");
+          widget.style.opacity = "0";
+          widget.style.pointerEvents = "none";
+        });
+        widget.appendChild(closeBtn);
+      }, 1500);
     };
     document.body.appendChild(script);
   },
@@ -311,6 +331,30 @@ export default {
 }
 body {
   margin: 0;
+}
+.kofi-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  &:hover {
+    background: #f5f5f5;
+    color: #000;
+  }
 }
 body.install-banner-active {
   .floatingchat-container-wrap,
