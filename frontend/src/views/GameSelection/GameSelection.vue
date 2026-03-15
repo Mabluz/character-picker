@@ -498,6 +498,7 @@ export default {
 
   @media (max-width: 990px) {
     display: block;
+    margin-top: 80px;
   }
 
   &__header {
