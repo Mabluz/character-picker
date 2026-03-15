@@ -366,10 +366,12 @@ h1 {
   margin: 70px;
   display: inline-block;
   position: relative;
-  .dice-container {
-    position: absolute;
-    right: -50px;
-    top: -10px;
+  @media (min-width: 991px) {
+    .dice-container {
+      position: absolute;
+      right: -50px;
+      top: -10px;
+    }
   }
   .border {
     border-bottom: 4px solid #f76331;

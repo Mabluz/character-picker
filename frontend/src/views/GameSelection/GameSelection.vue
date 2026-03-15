@@ -438,8 +438,7 @@ export default {
       display: block;
       text-align: center;
       .dice-container {
-        position: unset !important;
-        margin: 0 auto !important;
+        margin: 0 auto 20px auto !important;
         display: block;
         width: 60px;
         height: 80px;
@@ -450,9 +449,6 @@ export default {
         width: 100%;
         left: auto;
       }
-    }
-    h1 .dice-container {
-      position: static !important;
     }
     .container {
       .entrance {
