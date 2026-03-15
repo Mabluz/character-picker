@@ -439,7 +439,7 @@ export default {
       text-align: center;
       .dice-container {
         position: inherit !important;
-        margin: 0 0 !important;
+        margin: 0 -5px !important;
         display: block;
         width: 60px;
         height: 80px;
