@@ -44,7 +44,7 @@
       <router-view />
     </div>
 
-    <div class="footer">
+    <div class="footer" ref="footer">
       <div class="left">
         <div>
           Created by:
@@ -150,11 +150,11 @@ export default {
         kofi.style.opacity = entry.isIntersecting ? "0" : "1";
         kofi.style.pointerEvents = entry.isIntersecting ? "none" : "";
       }
-    });
+    }, { threshold: 0.1 });
 
     this.$nextTick(() => {
-      if (this.$refs.kofiFooter) {
-        this._kofiObserver.observe(this.$refs.kofiFooter);
+      if (this.$refs.footer) {
+        this._kofiObserver.observe(this.$refs.footer);
       }
     });
 
