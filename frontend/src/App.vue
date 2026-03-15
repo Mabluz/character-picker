@@ -109,7 +109,7 @@ export default {
     ...mapState("user", []),
     ...mapGetters("page", ["isLoading", "loadingTime"]),
     installBannerVisible() {
-      return this.showInstallUIAndroid || this.showInstallUIIos;
+      return (this.showInstallUIAndroid && this.isAndroid) || (this.showInstallUIIos && this.isIOS);
     }
   },
   watch: {
