@@ -438,8 +438,8 @@ export default {
       display: block;
       text-align: center;
       .dice-container {
-        position: inherit !important;
-        margin: 0 -5px !important;
+        position: unset !important;
+        margin: 0 auto !important;
         display: block;
         width: 60px;
         height: 80px;
