@@ -1373,10 +1373,9 @@ tr.picked td input {
 
   .content .left .filter-slider {
     position: initial;
-    max-height: 0px;
+    max-height: 0;
     overflow: hidden;
     width: auto;
-    max-height: none;
     -webkit-transition: max-height 0.5s;
     -moz-transition: max-height 0.5s;
     -o-transition: max-height 0.5s;
