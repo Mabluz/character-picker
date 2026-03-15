@@ -354,6 +354,9 @@ body {
   justify-content: center;
   color: #555;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  @media (max-width: 990px) {
+    top: 20px;
+  }
   &:hover {
     background: #f5f5f5;
     color: #000;
