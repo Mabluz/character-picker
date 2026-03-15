@@ -134,29 +134,25 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this._kofiObserver) this._kofiObserver.disconnect();
+    if (this._onScroll) window.removeEventListener("scroll", this._onScroll);
   },
   mounted() {
     if (this.installBannerVisible) {
       document.body.classList.add("install-banner-active");
     }
 
-    this._kofiObserver = new IntersectionObserver(([entry]) => {
+    this._onScroll = () => {
+      const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
       const kofi = document.querySelector(
         ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
       );
       if (kofi) {
         kofi.style.transition = "opacity 0.3s ease";
-        kofi.style.opacity = entry.isIntersecting ? "0" : "1";
-        kofi.style.pointerEvents = entry.isIntersecting ? "none" : "";
+        kofi.style.opacity = atBottom ? "0" : "1";
+        kofi.style.pointerEvents = atBottom ? "none" : "";
       }
-    }, { threshold: 0.1 });
-
-    this.$nextTick(() => {
-      if (this.$refs.footer) {
-        this._kofiObserver.observe(this.$refs.footer);
-      }
-    });
+    };
+    window.addEventListener("scroll", this._onScroll);
 
     const script = document.createElement("script");
     script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
