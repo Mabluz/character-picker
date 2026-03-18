@@ -1,8 +1,27 @@
+# claude --dangerously-skip-permissions
+# Now make a new game following the @NEW_GAME.md and do it for "Root"
+
+# stand on /backend
+# npm run download-images -- games/root/load.json
+# Inspect _pending folder to check images
+# npm run apply-swap -- games/root/load.json
+
 # Games to add
 - Burgle Bros
-- Marvel Champions
 - The Witcher
 - Cuthulu Death may die
+- Marvel Crisis Protocol
+- Scythe
+- Descent: Legends of the Dark
+- Middara
+- Massive Darkness 1
+- Massive Darkness 2
+- Sword & Sorcery
+- 
+- Lords of Hellas / Lords of Ragnarok
+- Talisman
+- Arkham Horror LCG
+- Eldritch Horror
 
 # Character Picker
 
