@@ -1,17 +1,21 @@
 # claude --dangerously-skip-permissions
-# Now make a new game following the @NEW_GAME.md and do it for "Root"
+# Now make a new game following the @NEW_GAME.md and do it for "Cuthulu Death may die"
 
 # stand on /backend
-# npm run download-images -- games/root/load.json
+# npm run download-images -- games/cthulhu-death-may-die/load.json
 # Inspect _pending folder to check images
-# npm run apply-swap -- games/root/load.json
+# npm run apply-swap -- games/cthulhu-death-may-die/load.json
+
+# npm run fetch-affiliate -- "https://amzn.to/4sV5pcB" games/scythe/load.json --limit 12
+
+# npm run compress-images -- games/cthulhu-death-may-die
 
 # Games to add
 - Burgle Bros
 - The Witcher
-- Cuthulu Death may die
+- 
 - Marvel Crisis Protocol
-- Scythe
+- 
 - Descent: Legends of the Dark
 - Middara
 - Massive Darkness 1

@@ -19,8 +19,8 @@ A game does **not** fit if:
 
 What we need to know the game is found in the template below.
 - **Use the BGG proxy endpoint** to look up game info — BGG blocks direct bot requests but the proxy has an approved API key:
-    - Search by title: `http://localhost:1337/bgg/search?query=<game+name>`
-    - Full game details (expansions, description, categories): `http://localhost:1337/bgg/game/<bgg-id>`
+    - Search by title: curl -s "http://localhost:1337/bgg/search?query=<game+name>"
+    - Full game details (expansions, description, categories): curl -s `http://localhost:1337/bgg/game/<bgg-id>`
     - Workflow: search first to get the BGG ID, then fetch full details for the game and each expansion
 
 ---
@@ -116,8 +116,8 @@ When researching characters, note down where good images can be found. Record th
 
 - Rulebook PDFs (search: `"<game name>" rulebook filetype:pdf` or `cdn.1j1ju.com`) are the best source — they list all characters with roles.
 - **Use the BGG proxy endpoint** to look up game info — BGG blocks direct bot requests but the proxy has an approved API key:
-  - Search by title: `http://localhost:1337/bgg/search?query=<game+name>`
-  - Full game details (expansions, description, categories): `http://localhost:1337/bgg/game/<bgg-id>`
+  - Search by title: curl -s `http://localhost:1337/bgg/search?query=<game+name>`
+  - Full game details (expansions, description, categories): curl -s `http://localhost:1337/bgg/game/<bgg-id>`
   - Workflow: search first to get the BGG ID, then fetch full details for the game and each expansion
 - Check `@BLOCKED_SITES.md` before fetching any URL — BGG and Gamefound always 403 when accessed directly.
 - If a 403 is hit on a new domain, add it to `@BLOCKED_SITES.md`.

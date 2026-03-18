@@ -6,10 +6,16 @@
   "scripts": {
     "start": "node app.js",
     "download-images": "node script/download-images.js",
-    "apply-swap": "node script/apply-swap.js"
+    "apply-swap": "node script/apply-swap.js",
+    "fetch-affiliate": "node script/fetch-affiliate.js",
+    "compress-images": "node script/compress-images.js"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "puppeteer": "^24.0.0",
+    "sharp": "^0.33.0"
+  },
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
     "axios": "^0.19.0",
