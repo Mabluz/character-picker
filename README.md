@@ -1,5 +1,5 @@
 # claude --dangerously-skip-permissions
-# Now make a new game following the @NEW_GAME_V2.md and do it for "Burgle Bros 2"
+# Now make a new game following the @NEW_GAME_V2.md and do it for "Sword & Sorcery"
 
 # stand on /backend
 # npm run download-images -- games/too-many-bones/load.json
@@ -18,7 +18,6 @@
 - Middara
 - Massive Darkness 1
 - Massive Darkness 2
-- Sword & Sorcery
 - 
 - Lords of Hellas / Lords of Ragnarok
 - Talisman

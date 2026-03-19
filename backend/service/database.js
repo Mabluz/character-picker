@@ -79,13 +79,15 @@ const autoLoadGames = async () => {
     return fs.statSync(folderPath).isDirectory();
   });
 
+  // Only folders that actually have a load.json are valid games
+  const validIds = new Set(
+    folders.filter(f => fs.existsSync(path.join(gamesDir, f, "load.json")))
+  );
+
   const client = await pool.connect();
   try {
-    for (const folder of folders) {
+    for (const folder of validIds) {
       const loadJsonPath = path.join(gamesDir, folder, "load.json");
-      if (!fs.existsSync(loadJsonPath)) {
-        continue;
-      }
 
       // Load game from file and upsert (insert or update)
       const gameData = JSON.parse(fs.readFileSync(loadJsonPath, "utf-8"));
@@ -113,6 +115,15 @@ const autoLoadGames = async () => {
         ]
       );
       console.log(`Game loaded: ${folder}`);
+    }
+
+    // Remove any DB rows that no longer have a matching folder
+    const dbResult = await client.query("SELECT id FROM main_games");
+    for (const row of dbResult.rows) {
+      if (!validIds.has(row.id)) {
+        await client.query("DELETE FROM main_games WHERE id = $1", [row.id]);
+        console.log(`Game removed (folder gone): ${row.id}`);
+      }
     }
   } finally {
     client.release();

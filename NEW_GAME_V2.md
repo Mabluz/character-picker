@@ -273,6 +273,59 @@ TTS `CardID = deckId * 100 + position`:
 - `col = pos % numWidth`
 - Crop: `x = col * (sheetWidth / numWidth)`, `y = row * (sheetHeight / numHeight)`
 
+### Steam CDN URLs return 403 — use Akamai instead
+
+TTS workshop JSON files store image URLs in the old Steam CDN format:
+```
+http://cloud-3.steamusercontent.com/ugc/<ugc-id>/<hash>/
+```
+
+These return **403 Forbidden** when downloaded directly (e.g. via `curl` or a browser). However, the same assets are accessible via the Akamai CDN that TTS actually uses at runtime:
+```
+https://steamusercontent-a.akamaihd.net/ugc/<ugc-id>/<hash>/
+```
+
+**Fix:** replace `http://cloud-3.steamusercontent.com/` with `https://steamusercontent-a.akamaihd.net/` in any URL before downloading. Node.js `https.get` works fine with the Akamai URL; `curl` may still fail due to DNS/routing differences but the URL is valid.
+
+Note: TTS also caches downloaded images locally at `~/Library/Tabletop Simulator/Mods/Images/` with filenames derived from the resolved URL. Images are only cached once TTS actually renders the object (i.e., you open the bag containing the card). If an image isn't cached, use the Akamai URL conversion instead.
+
+---
+
+### Non-standard mod structures — using build-load.js
+
+`tts-import.js` expects a flat list of `Custom_Model_Bag` containers at the top level of the workshop file. Some games don't fit this pattern:
+
+- Heroes nested inside `Custom_Model_Infinite_Bag` wrappers (e.g. Sword & Sorcery)
+- Characters spread across **multiple workshop files** (e.g. base game + separate expansion mods)
+- Card names all empty — only the bag/tray name identifies the character
+
+When the standard flow doesn't apply, skip the THIS-marking stage entirely and write a **custom `build-load.js`** in the game folder instead. The pattern:
+
+```js
+// backend/games/<game-id>/build-load.js
+const heroes = [
+  { name: "Alice", expansion: "Core Game", cardId: 300,
+    sheetUrl: "https://steamusercontent-a.akamaihd.net/ugc/<id>/<hash>/",
+    numWidth: 6, numHeight: 2 },
+  // ...
+];
+// For each hero: crop from spritesheet using CardID formula, save to heroes/<slug>.jpg
+// Write load.json with local paths
+```
+
+**When to use build-load.js instead of tts-import.js:**
+- Characters are in nested bags (not flat `Custom_Model_Bag` at root level)
+- Characters span multiple workshop files
+- Card nicknames are all empty (names only exist on the bag)
+- All CardIDs are already known from Stage 4 analysis (no THIS-marks needed)
+
+**How to find all CardIDs without THIS-marks:**
+In Stage 4, inspect each hero bag and note the `CardID` values on the hero sheet cards. Use the even-numbered CardID (first class variant) as the representative image. The spritesheet URL comes from `CustomDeck[key].FaceURL`; remember to convert it to the Akamai format above.
+
+See `backend/games/sword-and-sorcery/build-load.js` as a reference implementation.
+
+---
+
 ### Disambiguating duplicate tray names
 
 When two trays share a name (e.g. both a Gearloc and a Tyrant named "Duster"):

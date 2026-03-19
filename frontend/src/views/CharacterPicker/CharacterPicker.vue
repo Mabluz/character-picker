@@ -313,6 +313,27 @@
         </div>
       </transition>
 
+      <div class="copyright-disclaimer" v-if="getOwnerName || getOwnerLink">
+        <p>
+          The information presented on this site about
+          {{ game.background.title }}, both literal and graphical, is
+          copyrighted by
+          <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{
+              getOwnerName || getOwnerLink
+            }}</a
+          ><span v-else>{{ getOwnerName }}</span
+        >.
+        </p>
+        <p>
+          This website is not produced, endorsed, supported, or affiliated with
+          <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{
+              getOwnerName || getOwnerLink
+            }}</a
+          ><span v-else>{{ getOwnerName }}</span
+        >.
+        </p>
+      </div>
+
       <!-- Sentinel: marks where the bottom ads live -->
       <div ref="affiliateSentinel"></div>
 
@@ -344,27 +365,6 @@
         </div>
         <p class="amazon-ads__disclaimer">
           As an Amazon Associate I earn from qualifying purchases.
-        </p>
-      </div>
-
-      <div class="copyright-disclaimer" v-if="getOwnerName || getOwnerLink">
-        <p>
-          The information presented on this site about
-          {{ game.background.title }}, both literal and graphical, is
-          copyrighted by
-          <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{
-            getOwnerName || getOwnerLink
-          }}</a
-          ><span v-else>{{ getOwnerName }}</span
-          >.
-        </p>
-        <p>
-          This website is not produced, endorsed, supported, or affiliated with
-          <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{
-            getOwnerName || getOwnerLink
-          }}</a
-          ><span v-else>{{ getOwnerName }}</span
-          >.
         </p>
       </div>
 
@@ -1184,6 +1184,7 @@ h1 {
   padding: 20px;
   background: #f5f5f5;
   border-bottom: 3px solid #e0e0e0;
+  border-top: 3px solid #e0e0e0;
   text-align: center;
   font-size: 12px;
   color: #888;
