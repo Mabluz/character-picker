@@ -8,7 +8,8 @@
     "download-images": "node script/download-images.js",
     "apply-swap": "node script/apply-swap.js",
     "fetch-affiliate": "node script/fetch-affiliate.js",
-    "compress-images": "node script/compress-images.js"
+    "compress-images": "node script/compress-images.js",
+    "tts-import": "node script/tts-import.js"
   },
   "author": "",
   "license": "ISC",

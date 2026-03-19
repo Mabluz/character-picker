@@ -1,22 +1,20 @@
 # claude --dangerously-skip-permissions
-# Now make a new game following the @NEW_GAME.md and do it for "Cuthulu Death may die"
+# Now make a new game following the @NEW_GAME_V2.md and do it for "Burgle Bros 2"
 
 # stand on /backend
-# npm run download-images -- games/cthulhu-death-may-die/load.json
+# npm run download-images -- games/too-many-bones/load.json
 # Inspect _pending folder to check images
-# npm run apply-swap -- games/cthulhu-death-may-die/load.json
 
-# npm run fetch-affiliate -- "https://amzn.to/4sV5pcB" games/scythe/load.json --limit 12
-
-# npm run compress-images -- games/cthulhu-death-may-die
+# npm run apply-swap -- games/too-many-bones/load.json
+# npm run fetch-affiliate -- "https://amzn.to/4sU1Djt" games/descent-legends-dark/load.json --limit 7
+# npm run compress-images -- games/too-many-bones
 
 # Games to add
-- Burgle Bros
+- 
 - The Witcher
 - 
 - Marvel Crisis Protocol
-- 
-- Descent: Legends of the Dark
+-
 - Middara
 - Massive Darkness 1
 - Massive Darkness 2
