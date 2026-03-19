@@ -164,8 +164,8 @@
                 v-if="!startPicking"
                 @click="triggerToggleSelection"
               >
-                <span v-if="toggleAllOff">Select all</span>
-                <span v-else>Deselect all</span>
+                <span v-if="toggleAllOff">Add all</span>
+                <span v-else>Remove all</span>
               </char-button>
             </div>
 
@@ -1234,6 +1234,7 @@ h1 {
         padding: 20px 20px 20px 0;
         overflow-y: scroll;
         overflow-x: hidden;
+        z-index: 100000001;
       }
     }
 
