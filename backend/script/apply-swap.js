@@ -22,7 +22,7 @@ if (!loadJsonPath) {
   process.exit(1);
 }
 
-const absoluteLoadPath = path.resolve(loadJsonPath);
+const absoluteLoadPath = path.resolve(loadJsonPath.replace(/^[/\\]*backend[/\\]/, ""));
 if (!fs.existsSync(absoluteLoadPath)) {
   console.error(`File not found: ${absoluteLoadPath}`);
   process.exit(1);

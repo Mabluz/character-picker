@@ -36,7 +36,7 @@ async function main() {
     process.exit(1);
   }
 
-  const resolvedPath = path.resolve(loadJsonPath);
+  const resolvedPath = path.resolve(loadJsonPath.replace(/^[/\\]*backend[/\\]/, ""));
   if (!fs.existsSync(resolvedPath)) {
     console.error(`load.json not found: ${resolvedPath}`);
     process.exit(1);

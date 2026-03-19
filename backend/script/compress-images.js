@@ -162,7 +162,7 @@ async function main() {
     process.exit(1);
   }
 
-  const resolvedFolder = path.resolve(gameFolder);
+  const resolvedFolder = path.resolve(gameFolder.replace(/^[/\\]*backend[/\\]/, ""));
   if (!fs.existsSync(resolvedFolder)) {
     console.error(`Folder not found: ${resolvedFolder}`);
     process.exit(1);
