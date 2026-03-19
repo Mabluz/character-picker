@@ -227,7 +227,7 @@
                 <input
                   :id="char.index"
                   v-model="char.remove"
-                  @click="
+                  @click.stop="
                     event => {
                       characterCheckboxChecked(char.index);
                     }
@@ -782,9 +782,10 @@ export default {
       }
     },
     characterCheckboxChecked(index) {
-      this.game.tabs[this.selectedCharacterTabIndex].characters[
-        index
-      ].skipp = document.getElementById(index).checked;
+      const isChecked = document.getElementById(index).checked;
+      this.game.tabs[this.selectedCharacterTabIndex].characters[index].skipp = isChecked;
+      this.thumbnailHide = true;
+      this.thumbnailActive = false;
       this.removingPreformed = true;
       this.reCountAllFilters();
       this.autoSave();
