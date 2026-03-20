@@ -45,19 +45,23 @@
     </h1>
     <h1 class="mobile-heading">
       <spinning-dice class="dice-container"></spinning-dice>
-      Random Boardgame
+      Random Board Game
       <div class="border"></div>
     </h1>
 
     <div class="intro" v-if="!userLoggedIn">
-      <p>Lets play a boardgame!</p>
+      <p>Lets play a board game!</p>
       <p>What heroes should we use? What monsters should we kill?</p>
       <p><b>I know, lets use this web page to figure it out!</b></p>
     </div>
-    <login
-      >Can't find a randomizer for a specific game? Create it yourself!<br />See
-      your games by logging in!</login
-    >
+
+    <div class="create-cta">
+      <h3>Can't find a randomizer for a specific game? Create it yourself!</h3>
+      <char-button v-if="!showLoginBox" @click="showLoginBox = true">Customize games by logging in!</char-button>
+    </div>
+    <div v-if="showLoginBox" class="login-fade-in">
+      <login></login>
+    </div>
     <router-link v-if="isAdmin" to="/admin" class="admin-link"
       >Admin panel</router-link
     >
@@ -183,13 +187,15 @@ import sample from "lodash/sample";
 import shuffle from "lodash/shuffle";
 import config from "../../../config/config";
 import Login from "../Login/Login";
+import CharButton from "../CharButton";
 
 export default {
   name: "GameSelection",
-  components: { Login, SpinningDice, SearchInput },
+  components: { Login, SpinningDice, SearchInput, CharButton },
   data: function() {
     return {
-      searchValue: ""
+      searchValue: "",
+      showLoginBox: false
     };
   },
   head: function() {
@@ -368,6 +374,22 @@ export default {
 </script>
 
 <style scoped lang="less">
+.create-cta {
+  margin: 20px 0 10px;
+  h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 14px;
+    line-height: 1.3;
+  }
+}
+.login-fade-in {
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 .game-selection {
   .search {
     margin: 100px 0 30px 0;

@@ -1,36 +1,3 @@
-# claude --dangerously-skip-permissions
-# Now make a new game following the @NEW_GAME_V2.md and do it for "Talisman"
-
-# stand on /backend
-# npm run download-images -- games/too-many-bones/load.json
-# Inspect _pending folder to check images
-
-# npm run apply-swap -- games/too-many-bones/load.json
-# npm run fetch-affiliate -- "https://amzn.to/4sU1Djt" games/descent-legends-dark/load.json --limit 7
-# npm run compress-images -- games/too-many-bones
-
-# TODO
-- Add more games
-- Connect your BGG account (need to add to our BGG application first and get it approved)
-  - Pick a random game from your collection
-  - Automatically remove the games you don´t own from the character picker
-
-# Games to add
-- Starcadia Quest
-- Rum & Bones
-- Bloodborne
-- The Witcher
-- 7 Wonders
-- Marvel Crisis Protocol
-- 
-- Middara
-- Massive Darkness 1
-- Massive Darkness 2
-- 
-- Lords of Hellas / Lords of Ragnarok
-- Arkham Horror LCG
-- Eldritch Horror
-
 # Character Picker
 
 A web application for randomly picking characters in board games. Perfect for game nights when players can't decide which characters to play.
