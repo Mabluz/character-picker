@@ -45,47 +45,43 @@
     </div>
 
     <div class="footer" ref="footer">
-      <div class="left">
-        <div>
-          Created by:
-          <a href="https://www.linkedin.com/in/mariusflagstad/" target="_blank"
-            >Marius Zell-Flagstad</a
-          >
+      <div class="footer-main">
+        <div class="footer-col footer-about">
+          <div class="footer-creator">
+            Created by
+            <a href="https://www.linkedin.com/in/mariusflagstad/" target="_blank">Marius Zell-Flagstad</a>
+          </div>
+          <p class="footer-bio">
+            I love board games and coding, and randomization is something code
+            handles well. What started as a quick hobby project has grown into
+            something more. Better infrastructure means higher server costs — if
+            you find this site useful, I'd appreciate a donation to help keep it running.
+          </p>
+          <div class="footer-minis">
+            Also, <a href="https://www.facebook.com/pg/mariusminis/photos/" target="_blank">check out my painted minis!</a> :)
+          </div>
         </div>
-        <div class="info">
-          I love board games and coding, and randomization is something code
-          handles well. What started as a quick hobby project built in a few
-          days has grown into something more. Seeing how many people enjoyed it,
-          I rebuilt the entire site to be more robust and lasting. However,
-          better infrastructure means higher server costs. If you find this site
-          useful, I'd appreciate a donation to help keep it running.
-        </div>
-        <div class="painted">
-          Also,
-          <a
-            href="https://www.facebook.com/pg/mariusminis/photos/"
-            target="_blank"
-            >check out my painted minis!</a
-          >
-          :)
+        <div class="footer-col footer-donate">
+          <a ref="kofiFooter" href="https://ko-fi.com/F2F51VYOPV" target="_blank">
+            <img
+              height="60"
+              style="border:0px;height:60px;"
+              src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
+              border="0"
+              alt="Buy Me a Coffee at ko-fi.com"
+            />
+          </a>
+          <p class="donate-text">
+            Thanks for stopping by! If you enjoy this project and want to help
+            keep it alive, I'd really appreciate a small donation. Your support
+            means a lot and helps me keep creating.
+          </p>
         </div>
       </div>
-      <div class="right">
-        <a ref="kofiFooter" href="https://ko-fi.com/F2F51VYOPV" target="_blank">
-          <img
-            height="60"
-            style="border:0px;height:60px;"
-            src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
-            border="0"
-            alt="Buy Me a Coffee at ko-fi.com"
-          />
+      <div class="footer-bottom">
+        <a href="https://boardgamegeek.com" target="_blank" rel="noopener">
+          <img src="/powered_by_bgg.webp" alt="Powered by BoardGameGeek" class="bgg-logo" />
         </a>
-        <p class="donate-text">
-          Thanks for stopping by! If you enjoy this project and want to help
-          keep it alive, I'd really appreciate a small donation. Your support
-          means a lot and helps me keep creating.
-        </p>
-        <!-- <div>A:{{ isAndroid }} - I:{{ isIOS }}</div> -->
       </div>
     </div>
   </div>
@@ -337,8 +333,8 @@ body {
 }
 .kofi-close-btn {
   position: absolute;
-  top: 10px;
-  right: 0;
+  top: 14px;
+  right: -3px;
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -441,42 +437,96 @@ p {
 }
 
 .footer {
-  padding: 50px;
   background: #f76331;
   color: #fff;
   a {
     color: #fff;
   }
+
+  .footer-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 50px 50px 30px;
+
+    @media (max-width: 990px) {
+      flex-direction: column;
+      padding: 40px 30px 20px;
+      gap: 30px;
+    }
+  }
+
+  .footer-col {
+    flex: 0 1 320px;
+  }
+
+  .footer-about {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .footer-creator {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    a {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+
+  .footer-bio {
+    font-size: 12px;
+    line-height: 18px;
+    opacity: 0.85;
+    margin: 0 0 10px;
+  }
+
+  .footer-minis {
+    font-size: 13px;
+    opacity: 0.9;
+    a {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+
+  .footer-donate {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .donate-text {
     font-size: 12px;
-    line-height: 16px;
+    line-height: 17px;
     margin-top: 10px;
     opacity: 0.85;
+    max-width: 280px;
   }
-  .left,
-  .right {
-    width: 50%;
-    display: inline-block;
-    vertical-align: top;
-    .painted {
-      margin-top: 5px;
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 20px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    @media (max-width: 990px) {
+      padding: 20px 30px;
+      justify-content: center;
     }
-    .info {
-      margin: 10px 0;
-      font-size: 12px;
-      line-height: 16px;
-      max-width: 500px;
-      text-align: center;
-      display: inline-block;
-    }
-  }
-  @media (max-width: 990px) {
-    .left,
-    .right {
-      width: 100%;
-    }
-    .right {
-      margin-top: 50px;
+
+    .bgg-logo {
+      height: 40px;
+      width: auto;
+      opacity: 0.9;
+      transition: opacity 0.15s ease;
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 }

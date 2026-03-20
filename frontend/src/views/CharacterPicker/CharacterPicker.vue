@@ -29,7 +29,12 @@
         >
       </div>
       <div class="usergame-container" v-else>
-        <char-button v-if="!showLoginBox" class="user-button" :size="'small'" @click="showLoginBox = true">
+        <char-button
+          v-if="!showLoginBox"
+          class="user-button"
+          :size="'small'"
+          @click="showLoginBox = true"
+        >
           Login to edit game
         </char-button>
         <div class="login-box" v-if="showLoginBox">
@@ -324,18 +329,18 @@
           {{ game.background.title }}, both literal and graphical, is
           copyrighted by
           <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{
-              getOwnerName || getOwnerLink
-            }}</a
+            getOwnerName || getOwnerLink
+          }}</a
           ><span v-else>{{ getOwnerName }}</span
-        >.
+          >.
         </p>
         <p>
           This website is not produced, endorsed, supported, or affiliated with
           <a v-if="getOwnerLink" :href="getOwnerLink" target="_blank">{{
-              getOwnerName || getOwnerLink
-            }}</a
+            getOwnerName || getOwnerLink
+          }}</a
           ><span v-else>{{ getOwnerName }}</span
-        >.
+          >.
         </p>
       </div>
 
@@ -545,23 +550,34 @@ export default {
         : this.game && this.game.background && this.game.background.url
         ? this.game.background.url
         : undefined;
-    if (imgUrl && !imgUrl.startsWith("http")) imgUrl = config.backendServer + "/" + imgUrl;
-    const pageUrl = this.gameId ? config.vueServer + "/game/" + this.gameId : config.vueServer;
+    if (imgUrl && !imgUrl.startsWith("http"))
+      imgUrl = config.backendServer + "/" + imgUrl;
+    const pageUrl = this.gameId
+      ? config.vueServer + "/game/" + this.gameId
+      : config.vueServer;
     const description = this.title
-      ? "Randomly pick characters and heroes for " + this.title + ". Use the randomizer to draft your party."
+      ? "Randomly pick characters and heroes for " +
+        this.title +
+        ". Use the randomizer to draft your party."
       : "Randomly pick characters and heroes for your board games.";
-    head.link = [
-      { rel: "canonical", href: pageUrl }
-    ];
+    head.link = [{ rel: "canonical", href: pageUrl }];
     head.meta = [];
     head.meta.push({ name: "description", content: description });
     head.meta.push({ property: "og:type", content: "website" });
     head.meta.push({ property: "og:url", content: pageUrl });
-    if (this.title) head.meta.push({ property: "og:title", content: this.title + " - randomboardgame" });
+    if (this.title)
+      head.meta.push({
+        property: "og:title",
+        content: this.title + " - randomboardgame"
+      });
     head.meta.push({ property: "og:description", content: description });
     if (imgUrl) head.meta.push({ property: "og:image", content: imgUrl });
     head.meta.push({ name: "twitter:card", content: "summary_large_image" });
-    if (this.title) head.meta.push({ name: "twitter:title", content: this.title + " - randomboardgame" });
+    if (this.title)
+      head.meta.push({
+        name: "twitter:title",
+        content: this.title + " - randomboardgame"
+      });
     head.meta.push({ name: "twitter:description", content: description });
     if (imgUrl) head.meta.push({ name: "twitter:image", content: imgUrl });
 
@@ -570,11 +586,15 @@ export default {
   watch: {
     startPicking(val) {
       document.body.classList.toggle("picking-active", val);
-      document.querySelectorAll(".floatingchat-container-wrap, .floatingchat-container-wrap-mobi").forEach(kofi => {
-        kofi.style.transition = "opacity 0.4s ease";
-        kofi.style.opacity = val ? "0" : "1";
-        kofi.style.pointerEvents = val ? "none" : "";
-      });
+      document
+        .querySelectorAll(
+          ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
+        )
+        .forEach(kofi => {
+          kofi.style.transition = "opacity 0.4s ease";
+          kofi.style.opacity = val ? "0" : "1";
+          kofi.style.pointerEvents = val ? "none" : "";
+        });
     }
   },
   computed: {
@@ -789,7 +809,9 @@ export default {
     },
     characterCheckboxChecked(index) {
       const isChecked = document.getElementById(index).checked;
-      this.game.tabs[this.selectedCharacterTabIndex].characters[index].skipp = isChecked;
+      this.game.tabs[this.selectedCharacterTabIndex].characters[
+        index
+      ].skipp = isChecked;
       this.thumbnailHide = true;
       this.thumbnailActive = false;
       this.removingPreformed = true;
@@ -1182,8 +1204,12 @@ export default {
     animation: fadeIn 0.4s ease;
   }
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 h1 {

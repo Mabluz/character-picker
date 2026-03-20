@@ -197,20 +197,42 @@ export default {
     head.title = {
       inner: "Random Character Picker - randomboardgame"
     };
-    head.link = [
-      { rel: "canonical", href: config.vueServer + "/" }
-    ];
+    head.link = [{ rel: "canonical", href: config.vueServer + "/" }];
     head.meta = [];
-    head.meta.push({ name: "description", content: "Randomly pick characters and heroes for your board games. Supports Gloomhaven, Too Many Bones, Nemesis, and many more." });
+    head.meta.push({
+      name: "description",
+      content:
+        "Randomly pick characters and heroes for your board games. Supports Gloomhaven, Too Many Bones, Nemesis, and many more."
+    });
     head.meta.push({ property: "og:type", content: "website" });
     head.meta.push({ property: "og:url", content: config.vueServer + "/" });
-    head.meta.push({ property: "og:title", content: "Randomize your drafting - randomboardgame" });
-    head.meta.push({ property: "og:description", content: "Randomly pick characters and heroes for your board games. Supports Gloomhaven, Too Many Bones, Nemesis, and many more." });
-    head.meta.push({ property: "og:image", content: config.vueServer + "/randomboardgame.jpg" });
+    head.meta.push({
+      property: "og:title",
+      content: "Randomize your drafting - randomboardgame"
+    });
+    head.meta.push({
+      property: "og:description",
+      content:
+        "Randomly pick characters and heroes for your board games. Supports Gloomhaven, Too Many Bones, Nemesis, and many more."
+    });
+    head.meta.push({
+      property: "og:image",
+      content: config.vueServer + "/randomboardgame.jpg"
+    });
     head.meta.push({ name: "twitter:card", content: "summary_large_image" });
-    head.meta.push({ name: "twitter:title", content: "Randomize your drafting - randomboardgame" });
-    head.meta.push({ name: "twitter:description", content: "Randomly pick characters and heroes for your board games. Supports Gloomhaven, Too Many Bones, Nemesis, and many more." });
-    head.meta.push({ name: "twitter:image", content: config.vueServer + "/randomboardgame.jpg" });
+    head.meta.push({
+      name: "twitter:title",
+      content: "Randomize your drafting - randomboardgame"
+    });
+    head.meta.push({
+      name: "twitter:description",
+      content:
+        "Randomly pick characters and heroes for your board games. Supports Gloomhaven, Too Many Bones, Nemesis, and many more."
+    });
+    head.meta.push({
+      name: "twitter:image",
+      content: config.vueServer + "/randomboardgame.jpg"
+    });
     return head;
   },
   computed: {
@@ -252,10 +274,7 @@ export default {
         .filter(g => g.affiliate && g.affiliate.ads)
         .flatMap(g => g.affiliate.ads)
         .filter(ad => ad.image && ad.partner === "amazon")
-        .filter(ad => {
-          const title = (ad.title || "").toLowerCase();
-          return !(title.includes("card") && title.includes("sleeve"));
-        })
+        .filter(ad => ad.type === "game")
         .filter(ad => {
           if (!ad.title || seenTitles.has(ad.title)) return false;
           seenTitles.add(ad.title);

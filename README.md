@@ -18,7 +18,9 @@
   - Automatically remove the games you don´t own from the character picker
 
 # Games to add
-- 
+- Bloodborne
+- Blood Rage
+- Ankh: Gods of Egypt
 - The Witcher
 - 7 Wonders
 - Marvel Crisis Protocol
