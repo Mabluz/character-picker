@@ -30,6 +30,7 @@ jobs:
         env:
           NODE_ENV: production
           VUE_APP_BACKEND_SERVER: https://randomboardgame.com/api
+          VUE_APP_GOOGLE_CLIENT_ID: 88715776409-7v58f4v03jhuihp2b6jt4j3p9bpckmgt.apps.googleusercontent.com
 
       - name: Upload frontend via SCP
         uses: appleboy/scp-action@v0.1.7
