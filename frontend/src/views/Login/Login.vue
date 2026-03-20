@@ -6,9 +6,14 @@
     </div>
     <div v-else>
       <h2><slot></slot></h2>
+      <div class="google-login-wrapper">
+        <div ref="googleBtn" class="google-btn-container"></div>
+        <div v-if="googleError" class="error">{{ googleError }}</div>
+      </div>
+      <div class="or-separator"><span>or</span></div>
       <div class="go-container">
         <char-button :size="size" @click="toggleOpen">
-          <span v-if="!openLogin">Sure, lets go</span>
+          <span v-if="!openLogin">Sign in / Sign up</span>
           <span v-else>Nah, not now</span>
         </char-button>
       </div>
@@ -115,8 +120,19 @@ export default {
       inputGeneralError: false,
       openLogin: false,
       selectedIndex: 0,
-      passwordResetAnswer: undefined
+      passwordResetAnswer: undefined,
+      googleError: undefined
     };
+  },
+  mounted() {
+    this.initGoogleSignIn();
+  },
+  watch: {
+    userLoggedIn(val) {
+      if (!val) {
+        this.$nextTick(() => this.initGoogleSignIn());
+      }
+    }
   },
   computed: {
     ...mapGetters("user", ["userLoggedIn", "getUserNameByEmail"]),
@@ -128,6 +144,38 @@ export default {
     }
   },
   methods: {
+    initGoogleSignIn() {
+      const tryInit = () => {
+        if (window.google && window.google.accounts) {
+          window.google.accounts.id.initialize({
+            client_id: config.googleClientId,
+            callback: this.handleGoogleCredential
+          });
+          window.google.accounts.id.renderButton(this.$refs.googleBtn, {
+            theme: "outline",
+            size: "large",
+            text: "continue_with",
+            shape: "rectangular",
+            width: 250
+          });
+        } else {
+          setTimeout(tryInit, 200);
+        }
+      };
+      tryInit();
+    },
+    async handleGoogleCredential(response) {
+      this.googleError = undefined;
+      const result = await this.$store.dispatch(
+        "user/googleLogin",
+        response.credential
+      );
+      if (result && result.error) {
+        this.googleError = result.error;
+      } else {
+        await this.$store.dispatch("user/getLoginSession");
+      }
+    },
     async enterPressed(event) {
       if (event && event.keyCode === 13) {
         this.submit();
@@ -329,6 +377,33 @@ label {
   color: @color-input;
   &:after {
     border-bottom-color: @color-input;
+  }
+}
+.google-login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+}
+.google-btn-container {
+  display: flex;
+  justify-content: center;
+}
+.or-separator {
+  display: flex;
+  align-items: center;
+  margin: 12px auto;
+  width: 250px;
+  color: #999;
+  font-size: 13px;
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+  }
+  span {
+    padding: 0 10px;
   }
 }
 .flex-wrap {

@@ -29,7 +29,12 @@
         >
       </div>
       <div class="usergame-container" v-else>
-        <login :size="'small'">Login to edit game</login>
+        <char-button v-if="!showLoginBox" class="user-button" :size="'small'" @click="showLoginBox = true">
+          Login to edit game
+        </char-button>
+        <div class="login-box" v-if="showLoginBox">
+          <login :size="'small'">Login to edit game</login>
+        </div>
       </div>
 
       <h1 :class="{ withcreator: getOwnerLink || getOwnerName }">
@@ -486,6 +491,7 @@ let unknownPerson = "./unknown.png";
 let blankState = () => {
   return {
     title: "Pick random",
+    showLoginBox: false,
     removingPreformed: false,
     toggleAllOff: false,
     selectedCharacterTabIndex: 0,
@@ -1167,6 +1173,17 @@ export default {
   .user-button {
     margin: 5px;
     display: inline-block;
+  }
+  .login-box {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 10px;
+    padding: 10px 16px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 }
 h1 {

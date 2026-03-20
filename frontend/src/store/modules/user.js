@@ -104,6 +104,39 @@ export default {
       });
       return data;
     },
+    async googleLogin({ commit, dispatch }, credential) {
+      let data = await new Promise(resolve => {
+        axios({
+          method: "post",
+          url: config.backendServer + "/user/google-login",
+          data: { credential }
+        })
+          .catch(function(error) {
+            if (
+              error &&
+              error.response &&
+              error.response.data &&
+              error.response.data.error
+            ) {
+              return resolve(error.response.data);
+            }
+            return resolve({ error: "Google login failed. Try again!" });
+          })
+          .then(data => {
+            if (data && data.data && data.data.answer) {
+              dispatch("setCookieLogin", data.data.answer);
+              commit("setUser", data.data.answer);
+              commit("setIsAdmin", data.data.answer.isAdmin);
+              return resolve(true);
+            } else {
+              return resolve({
+                error: "Something went wrong during Google login. Try again!"
+              });
+            }
+          });
+      });
+      return data;
+    },
     async resetPassword(context, userData) {
       let data = await new Promise(resolve => {
         axios({

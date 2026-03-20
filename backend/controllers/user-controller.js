@@ -115,6 +115,21 @@ router.post("/resetpassword", cors(), async (req, res, next) => {
   }
 });
 
+router.post("/google-login", cors(), async (req, res, next) => {
+  const credential = req.body && req.body.credential;
+  if (!credential)
+    return res.status(400).json({ error: "No Google credential provided" });
+
+  try {
+    const result = await userServer.googleLoginOrCreate(credential);
+    if (result.error) return res.status(403).json(result);
+    return res.json(result);
+  } catch (e) {
+    console.error("Google login error:", e.message);
+    return res.status(500).json({ error: "Google login failed" });
+  }
+});
+
 router.post("/validatepasswordreset", cors(), async (req, res, next) => {
   let body = req.body;
   if (!body)

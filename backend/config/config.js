@@ -19,5 +19,6 @@ module.exports = {
   adminAuthPass: process.env.ADMIN_AUTH_PASS,
   adminAuthUser2: process.env.ADMIN_AUTH_USER2,
   adminAuthPass2: process.env.ADMIN_AUTH_PASS2,
-  emailID: process.env.EMAIL_ID
+  emailID: process.env.EMAIL_ID,
+  googleClientId: process.env.GOOGLE_CLIENT_ID
 };

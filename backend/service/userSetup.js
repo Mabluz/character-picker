@@ -4,6 +4,9 @@ const uuid = require("uuid");
 const config = require("../config/config");
 const database = require("./database");
 let emailService = require("./emailSetup");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client(config.googleClientId);
 
 let c = new Cache(config.cacheForMinutes);
 
@@ -303,6 +306,74 @@ const setUserAdmin = async (userId, isAdmin) => {
   }
 };
 
+const getUserAccountByGoogleId = async googleId => {
+  const result = await database.query(
+    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked,
+            COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
+     FROM users u
+     LEFT JOIN user_games ug ON u.id = ug.user_id
+     WHERE u.google_id = $1
+     GROUP BY u.id`,
+    [googleId]
+  );
+  if (result.rows.length === 0) return { error: "User not found" };
+  const row = result.rows[0];
+  return {
+    userId: row.id,
+    email: row.email,
+    userKey: row.user_key,
+    token: row.token,
+    tokenTime: row.token_time ? parseInt(row.token_time) : null,
+    newUserData: row.new_user_data,
+    isAdmin: row.is_admin || false,
+    isBlocked: row.is_blocked || false,
+    data: row.data || []
+  };
+};
+
+const googleLoginOrCreate = async credential => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken: credential,
+    audience: config.googleClientId
+  });
+  const payload = ticket.getPayload();
+  const googleId = payload.sub;
+  const email = payload.email.toLowerCase().trim();
+
+  // Try to find by google_id
+  let user = await getUserAccountByGoogleId(googleId);
+  if (!user.error) {
+    if (user.isBlocked) return { error: "This account has been blocked." };
+    return newLogin(user);
+  }
+
+  // Try to find by email and link google_id
+  user = await getUserAccount(email);
+  if (!user.error) {
+    if (user.isBlocked) return { error: "This account has been blocked." };
+    await database.query(
+      `UPDATE users SET google_id = $1, updated_at = NOW() WHERE id = $2`,
+      [googleId, user.userId]
+    );
+    clearUserCache(email);
+    return newLogin(user);
+  }
+
+  // Create new Google user (no password)
+  const token = uuid();
+  const tokenTime = new Date().getTime();
+  await database.query(
+    `INSERT INTO users (email, user_key, google_id, token, token_time)
+     VALUES ($1, NULL, $2, $3, $4)`,
+    [email, googleId, token, tokenTime]
+  );
+  clearUserCache(email);
+  emailService.sendWelcome(email);
+
+  user = await getUserAccount(email);
+  return newLogin(user);
+};
+
 module.exports = {
   generateUserKey,
   getUserAccount,
@@ -314,5 +385,6 @@ module.exports = {
   clearUserCache,
   adminGetAllUsers,
   setUserAdmin,
-  setUserBlocked
+  setUserBlocked,
+  googleLoginOrCreate
 };

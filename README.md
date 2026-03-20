@@ -9,12 +9,20 @@
 # npm run fetch-affiliate -- "https://amzn.to/4sU1Djt" games/descent-legends-dark/load.json --limit 7
 # npm run compress-images -- games/too-many-bones
 
+# TODO
+- Login with Google Auth
+- Add more games
+- Add the Powered by BGG logo
+- Connect your BGG account (need to add to our BGG application first and get it approved)
+  - Pick a random game from your collection
+  - Automatically remove the games you don´t own from the character picker
+
 # Games to add
 - 
 - The Witcher
-- 
+- 7 Wonders
 - Marvel Crisis Protocol
--
+- 
 - Middara
 - Massive Darkness 1
 - Massive Darkness 2
