@@ -5,10 +5,15 @@ const path = require("path");
 const gamesDir = path.join(__dirname, "..", "games");
 
 const getType = title => {
-  const t = (title || "").toLowerCase();
-  if (t.includes("card") && t.includes("sleeve")) return "sleeves";
-  if (t.includes("expansion") || t.includes("pack")) return "expansion";
-  if (t.includes("organizer") || t.includes("coins")) return "other";
+  const words = (title || "").toLowerCase().split(/\W+/);
+  for (const word of words) {
+    if (word === "sleeve" || word === "sleeves") return "sleeves";
+    if (word === "expansion" || word === "expansions") return "expansion";
+    if (word === "pack" || word === "packs") return "expansion";
+    if (word === "organizer" || word === "organizers") return "other";
+    if (word === "dice") return "other";
+    if (word === "coin" || word === "coins") return "other";
+  }
   return "game";
 };
 
