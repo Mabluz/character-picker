@@ -137,11 +137,25 @@ async function main() {
 
   console.log(`Found ${products.length} product(s).`);
 
+  const getType = title => {
+    const words = (title || "").toLowerCase().split(/\W+/);
+    for (const word of words) {
+      if (word === "sleeve" || word === "sleeves") return "sleeves";
+      if (word === "expansion" || word === "expansions") return "expansion";
+      if (word === "pack" || word === "packs") return "expansion";
+      if (word === "organizer" || word === "organizers") return "other";
+      if (word === "dice") return "other";
+      if (word === "coin" || word === "coins") return "other";
+    }
+    return "game";
+  };
+
   const ads = products.slice(0, limit).map(({ title, image }) => ({
     partner: "amazon",
     title,
     link: affiliateLink,
     image,
+    type: getType(title),
   }));
 
   // Read and update load.json

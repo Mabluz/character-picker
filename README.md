@@ -1,5 +1,5 @@
 # claude --dangerously-skip-permissions
-# Now make a new game following the @NEW_GAME_V2.md and do it for "Sword & Sorcery"
+# Now make a new game following the @NEW_GAME_V2.md and do it for "Talisman"
 
 # stand on /backend
 # npm run download-images -- games/too-many-bones/load.json
@@ -10,17 +10,15 @@
 # npm run compress-images -- games/too-many-bones
 
 # TODO
-- Login with Google Auth
 - Add more games
-- Add the Powered by BGG logo
 - Connect your BGG account (need to add to our BGG application first and get it approved)
   - Pick a random game from your collection
   - Automatically remove the games you don´t own from the character picker
 
 # Games to add
+- Starcadia Quest
+- Rum & Bones
 - Bloodborne
-- Blood Rage
-- Ankh: Gods of Egypt
 - The Witcher
 - 7 Wonders
 - Marvel Crisis Protocol
@@ -30,7 +28,6 @@
 - Massive Darkness 2
 - 
 - Lords of Hellas / Lords of Ragnarok
-- Talisman
 - Arkham Horror LCG
 - Eldritch Horror
 
