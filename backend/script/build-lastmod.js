@@ -24,7 +24,19 @@ const folders = fs.readdirSync(gamesDir).filter(f => {
   );
 });
 
+const repoRoot = path.join(__dirname, "..", "..");
 const lastmod = {};
+
+// Homepage — based on GameSelection.vue in the main repo
+try {
+  const date = execSync(
+    `git log -1 --format=%aI -- "frontend/src/views/GameSelection/GameSelection.vue"`,
+    { cwd: repoRoot, encoding: "utf-8" }
+  ).trim();
+  lastmod["_homepage"] = date || null;
+} catch {
+  lastmod["_homepage"] = null;
+}
 
 for (const folder of folders) {
   try {
