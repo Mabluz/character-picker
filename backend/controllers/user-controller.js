@@ -4,6 +4,10 @@ const router = app.Router();
 const cors = require("cors");
 const config = require("../config/config");
 const userServer = require("../service/userSetup");
+const database = require("../service/database");
+const uuid = require("uuid");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(config.googleClientId);
 
 /*
 router.get("*", cors(), async (req, res, next) => {
@@ -127,6 +131,149 @@ router.post("/google-login", cors(), async (req, res, next) => {
   } catch (e) {
     console.error("Google login error:", e.message);
     return res.status(500).json({ error: "Google login failed" });
+  }
+});
+
+router.post("/local-login", cors(), async (req, res, next) => {
+  const localToken = req.body && req.body.localToken;
+  if (!localToken) return res.status(400).json({ error: "No localToken provided" });
+
+  try {
+    let user = await userServer.getUserAccountByLocalToken(localToken);
+    if (user.error) {
+      // Create new local user
+      const token = uuid();
+      const tokenTime = new Date().getTime();
+      await database.query(
+        `INSERT INTO users (email, user_key, google_id, local_token, token, token_time)
+         VALUES (NULL, NULL, NULL, $1, $2, $3)`,
+        [localToken, token, tokenTime]
+      );
+      user = await userServer.getUserAccountByLocalToken(localToken);
+    }
+    if (user.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+    const result = await userServer.newLogin(user);
+    return res.json(result);
+  } catch (e) {
+    console.error("Local login error:", e.message);
+    return res.status(500).json({ error: "Local login failed" });
+  }
+});
+
+router.post("/link-google", cors(), async (req, res, next) => {
+  const { localToken, credential } = req.body || {};
+  if (!localToken) return res.status(400).json({ error: "No localToken provided" });
+  if (!credential) return res.status(400).json({ error: "No Google credential provided" });
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: config.googleClientId
+    });
+    const payload = ticket.getPayload();
+    const googleId = payload.sub;
+    const email = payload.email.toLowerCase().trim();
+
+    const localUser = await userServer.getUserAccountByLocalToken(localToken);
+    if (localUser.error) return res.status(404).json({ error: "Local user not found" });
+    if (localUser.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+
+    // Check if this Google account already has a full account (by google_id or email)
+    let existingByGoogleId = await userServer.getUserAccountByGoogleId(googleId);
+    let existingByEmail = existingByGoogleId.error ? await userServer.getUserAccount(email) : null;
+    const existingAccount = !existingByGoogleId.error ? existingByGoogleId
+                          : (existingByEmail && !existingByEmail.error) ? existingByEmail
+                          : null;
+
+    if (existingAccount) {
+      // Merge: transfer local user's games into the existing account, then delete the local user
+      await database.query(
+        `UPDATE user_games SET user_id = $1 WHERE user_id = $2`,
+        [existingAccount.userId, localUser.userId]
+      );
+      await database.query(`DELETE FROM users WHERE id = $1`, [localUser.userId]);
+      // Ensure google_id is set on the existing account
+      await database.query(
+        `UPDATE users SET google_id = $1, updated_at = NOW() WHERE id = $2`,
+        [googleId, existingAccount.userId]
+      );
+      userServer.clearUserCache(existingAccount.email);
+      const merged = await userServer.getUserAccount(email);
+      const result = await userServer.newLogin(merged);
+      return res.json(result);
+    }
+
+    // No existing account — upgrade local user to Google account
+    await database.query(
+      `UPDATE users SET email = $1, google_id = $2, local_token = NULL, updated_at = NOW() WHERE id = $3`,
+      [email, googleId, localUser.userId]
+    );
+
+    const updated = await userServer.getUserAccount(email);
+    const result = await userServer.newLogin(updated);
+    return res.json(result);
+  } catch (e) {
+    console.error("Link Google error:", e.message);
+    return res.status(500).json({ error: "Failed to link Google account" });
+  }
+});
+
+router.post("/link-email", cors(), async (req, res, next) => {
+  const { localToken, email, password, repeat } = req.body || {};
+  if (!localToken) return res.status(400).json({ error: "No localToken provided" });
+  if (!email) return res.status(400).json({ error: "No email provided" });
+  if (!password) return res.status(400).json({ error: "No password provided" });
+  if (!repeat) return res.status(400).json({ error: "No repeat password provided" });
+  if (password !== repeat) return res.status(400).json({ error: "Passwords do not match" });
+  if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+
+  const emailRe = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (!emailRe.test(email)) return res.status(400).json({ error: "Invalid email address" });
+
+  try {
+    // Guard: check email not already taken
+    const existing = await userServer.getUserAccount(email);
+    if (!existing.error) {
+      return res.status(409).json({ error: "This email is already registered." });
+    }
+
+    const user = await userServer.getUserAccountByLocalToken(localToken);
+    if (user.error) return res.status(404).json({ error: "Local user not found" });
+    if (user.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+
+    const userKey = userServer.generateUserKey(email, password);
+    await database.query(
+      `UPDATE users SET email = $1, user_key = $2, local_token = NULL, updated_at = NOW() WHERE id = $3`,
+      [email.toLowerCase().trim(), userKey, user.userId]
+    );
+
+    const updated = await userServer.getUserAccount(email);
+    const result = await userServer.newLogin(updated);
+    return res.json(result);
+  } catch (e) {
+    console.error("Link email error:", e.message);
+    return res.status(500).json({ error: "Failed to link email account" });
+  }
+});
+
+router.delete("/local-account", cors(), async (req, res, next) => {
+  const token = req.body && req.body.token;
+  if (!token) return res.status(400).json({ error: "No token provided" });
+
+  try {
+    // Only delete if it's actually a local user (has local_token, no email)
+    const result = await database.query(
+      `DELETE FROM users WHERE token = $1 AND email IS NULL AND local_token IS NOT NULL
+       RETURNING id`,
+      [token]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Local account not found" });
+    }
+    return res.json({ deleted: true });
+  } catch (e) {
+    console.error("Delete local account error:", e.message);
+    return res.status(500).json({ error: "Failed to delete account" });
   }
 });
 

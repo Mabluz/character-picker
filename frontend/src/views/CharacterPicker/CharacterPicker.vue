@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="character-picker">
     <div v-if="game" :class="{ mobile: isMobile }">
       <page-tabs
         :currentPage="game.background.title"
@@ -38,7 +38,7 @@
           Login to edit game
         </char-button>
         <div class="login-box" v-if="showLoginBox">
-          <login :size="'small'">Login to edit game</login>
+          <login no-button-margin="true">Login to edit game</login>
         </div>
       </div>
 
@@ -1103,52 +1103,54 @@ export default {
 </script>
 
 <style lang="less">
-.buttons-row {
-  .draw {
-    display: inline-block;
-    margin-left: 30px;
-    &:first-child {
-      margin-left: 0;
-    }
-    @media (max-width: 650px) {
-      margin-left: 0;
+.character-picker {
+  .buttons-row {
+    .draw {
+      display: inline-block;
+      margin-left: 30px;
+      &:first-child {
+        margin-left: 0;
+      }
+      @media (max-width: 650px) {
+        margin-left: 0;
+      }
     }
   }
-}
-.button-container {
-  margin-bottom: 20px;
-  &.fixed {
-    position: fixed;
-    left: 20px;
-    top: 100px;
-    width: 126px;
-    z-index: 1;
-    .draw {
-      margin-left: 0;
-      &.filter {
-        display: none;
-      }
-      &.toggle-selection a {
-        font-size: 16px;
-        background: white;
-        &:hover {
-          background: #bdbdbd;
+  .button-container {
+    margin-bottom: 20px;
+    &.fixed {
+      position: fixed;
+      left: 20px;
+      top: 100px;
+      width: 126px;
+      z-index: 1;
+      .draw {
+        margin-left: 0;
+        &.filter {
+          display: none;
+        }
+        &.toggle-selection a {
+          font-size: 16px;
+          background: white;
+          &:hover {
+            background: #bdbdbd;
+          }
         }
       }
-    }
-    .button-container {
-      margin-bottom: 0;
-      a {
-        min-width: 120px !important;
-        margin-bottom: 20px;
-        padding: 15px 10px;
+      .button-container {
+        margin-bottom: 0;
+        a {
+          min-width: 120px !important;
+          margin-bottom: 20px;
+          padding: 15px 10px;
+        }
       }
-    }
-    .usergame-container {
-      .user-button {
-        width: 126px;
-        margin: 0;
-        display: inline-block;
+      .usergame-container {
+        .user-button {
+          width: 126px;
+          margin: 0;
+          display: inline-block;
+        }
       }
     }
   }

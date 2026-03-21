@@ -1,8 +1,14 @@
 <template>
-  <div :class="size">
+  <div :class="[size, { 'no-btn-margin': noButtonMargin }]">
     <div v-if="userLoggedIn">
       <h2>Hi {{ getUserNameByEmail }}</h2>
-      <char-button :size="size" @click="logOut">Log out</char-button>
+      <char-button v-if="!isLocalUser" :size="size" @click="logOut">Log out</char-button>
+      <char-button v-else :size="size" color="black" @click="confirmDeleteLocal">Delete account</char-button>
+      <div v-if="showDeleteWarning" class="delete-warning">
+        <p>This will permanently delete your local account and all saved games. This cannot be undone.</p>
+        <char-button class="delete-confirm-btn" color="black" @click="logOut">Yes, delete everything</char-button>
+        <char-button @click="showDeleteWarning = false">Cancel</char-button>
+      </div>
     </div>
     <div v-else>
       <h2><slot></slot></h2>
@@ -17,30 +23,29 @@
           <span v-else>Nah, not now</span>
         </char-button>
       </div>
-
       <div class="login-container" :class="{ closed: !openLogin }">
         <!-- Credit to form html: https://codemyui.com/one-form-register-login-forgot-password-css/ -->
         <div class="flex-wrap">
           <fieldset>
             <form action novalidate>
               <input
-                type="radio"
-                name="rg"
-                @click="selectRadio(0)"
-                id="sign-in"
-                checked
+                  type="radio"
+                  name="rg"
+                  @click="selectRadio(0)"
+                  id="sign-in"
+                  checked
               />
               <input
-                type="radio"
-                name="rg"
-                @click="selectRadio(1)"
-                id="sign-up"
+                  type="radio"
+                  name="rg"
+                  @click="selectRadio(1)"
+                  id="sign-up"
               />
               <input
-                type="radio"
-                name="rg"
-                @click="selectRadio(2)"
-                id="reset"
+                  type="radio"
+                  name="rg"
+                  @click="selectRadio(2)"
+                  id="reset"
               />
 
               <label for="sign-in">Sign in</label>
@@ -48,11 +53,11 @@
               <label for="reset">Reset</label>
 
               <input
-                class="sign-up sign-in reset"
-                type="email"
-                placeholder="Your Email"
-                v-model="inputEmail"
-                @keyup="enterPressed"
+                  class="sign-up sign-in reset"
+                  type="email"
+                  placeholder="Your Email"
+                  v-model="inputEmail"
+                  @keyup="enterPressed"
               />
               <div class="error" v-if="inputEmailError">
                 {{ inputEmailError }}
@@ -61,21 +66,21 @@
                 Choose your new password
               </div>
               <input
-                class="sign-up sign-in reset"
-                type="password"
-                placeholder="Your Password"
-                v-model="inputPassword"
-                @keyup="enterPressed"
+                  class="sign-up sign-in reset"
+                  type="password"
+                  placeholder="Your Password"
+                  v-model="inputPassword"
+                  @keyup="enterPressed"
               />
               <div class="error" v-if="inputPasswordError">
                 {{ inputPasswordError }}
               </div>
               <input
-                class="sign-up reset"
-                type="password"
-                placeholder="Repeat Password"
-                v-model="inputRepeat"
-                @keyup="enterPressed"
+                  class="sign-up reset"
+                  type="password"
+                  placeholder="Repeat Password"
+                  v-model="inputRepeat"
+                  @keyup="enterPressed"
               />
               <div class="error" v-if="inputRepeatError">
                 {{ inputRepeatError }}
@@ -84,12 +89,12 @@
                 {{ inputGeneralError }}
               </div>
               <char-button color="black" @click="submit">{{
-                getButtonText
-              }}</char-button>
+                  getButtonText
+                }}</char-button>
 
               <div
-                class="password-reset-answer"
-                v-if="passwordResetAnswer && this.selectedIndex === 2"
+                  class="password-reset-answer"
+                  v-if="passwordResetAnswer && this.selectedIndex === 2"
               >
                 {{ passwordResetAnswer }}
               </div>
@@ -97,6 +102,12 @@
           </fieldset>
         </div>
       </div>
+      <div class="or-separator"><span>or</span></div>
+      <div class="go-container">
+        <char-button color="black" @click="saveLocally">Save locally (no account)</char-button>
+      </div>
+      <div class="local-login-hint">Your account is only saved in this browser. Link to an online (email/google) account later.</div>
+      <div v-if="localLoginError" class="error">{{ localLoginError }}</div>
     </div>
   </div>
 </template>
@@ -107,7 +118,7 @@ import CharButton from "../CharButton";
 import config from "../../../config/config";
 export default {
   name: "Login",
-  props: ["size"],
+  props: ["size", "noButtonMargin"],
   components: { CharButton },
   data() {
     return {
@@ -121,7 +132,9 @@ export default {
       openLogin: false,
       selectedIndex: 0,
       passwordResetAnswer: undefined,
-      googleError: undefined
+      googleError: undefined,
+      localLoginError: undefined,
+      showDeleteWarning: false
     };
   },
   mounted() {
@@ -135,7 +148,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("user", ["userLoggedIn", "getUserNameByEmail"]),
+    ...mapGetters("user", ["userLoggedIn", "getUserNameByEmail", "isLocalUser"]),
     getButtonText() {
       if (this.selectedIndex === 0) return "Sign In";
       if (this.selectedIndex === 1) return "Sign Up";
@@ -252,6 +265,16 @@ export default {
         }
         self.inputEmailError = undefined;
         return true;
+      }
+    },
+    confirmDeleteLocal() {
+      this.showDeleteWarning = true;
+    },
+    async saveLocally() {
+      this.localLoginError = undefined;
+      const result = await this.$store.dispatch("user/localLogin");
+      if (result && result.error) {
+        this.localLoginError = result.error;
       }
     },
     logOut() {
@@ -405,6 +428,34 @@ label {
   span {
     padding: 0 10px;
   }
+}
+.delete-warning {
+  margin-top: 12px;
+  padding: 12px;
+  border-top: 2px solid #f76331;
+  border-bottom: 2px solid #f76331;
+  background: #fff5f2;
+  p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  button + button {
+    margin-left: 8px;
+  }
+  .delete-confirm-btn {
+    margin-bottom: 20px;
+  }
+}
+.no-btn-margin .button-container {
+  margin-bottom: 0;
+}
+.local-login-hint {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  max-width: 350px;
+  margin: 8px auto 8px;
 }
 .flex-wrap {
   display: flex;

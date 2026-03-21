@@ -95,6 +95,46 @@
     </div>
 
     <search-input @search="filterSearch" class="search"></search-input>
+    <div v-if="isLocalUser" class="save-to-cloud-banner">
+      <p>Your account (and access to your games) are saved locally in this browser only.<br/>Deleting your browser cache will make you loose your games forever.</p>
+      <char-button
+        v-if="!showLinkForm"
+        size="small"
+        @click="showLinkForm = true"
+        >Link an online account to sync your games</char-button
+      >
+      <p v-else class="save-to-cloud-hint">
+        Link an online account to sync your games
+      </p>
+      <div v-if="showLinkForm" class="link-form-fade">
+        <div ref="googleLinkBtn" class="google-link-btn"></div>
+        <div class="or-separator"><span>or</span></div>
+        <div class="link-email-form">
+          <input
+            v-model="linkEmail"
+            type="email"
+            placeholder="Email"
+            class="link-input"
+          />
+          <input
+            v-model="linkPassword"
+            type="password"
+            placeholder="Password"
+            class="link-input"
+          />
+          <input
+            v-model="linkRepeat"
+            type="password"
+            placeholder="Repeat password"
+            class="link-input"
+          />
+          <char-button class="link-submit-btn" @click="linkWithEmail"
+            >Create account &amp; save to cloud</char-button
+          >
+          <div v-if="linkError" class="link-error">{{ linkError }}</div>
+        </div>
+      </div>
+    </div>
     <div class="container user-games" v-if="userLoggedIn">
       <div class="heading">Your games</div>
       <div class="entrance">
@@ -195,8 +235,22 @@ export default {
   data: function() {
     return {
       searchValue: "",
-      showLoginBox: false
+      showLoginBox: false,
+      linkEmail: "",
+      linkPassword: "",
+      linkRepeat: "",
+      linkError: undefined,
+      showLinkForm: false
     };
+  },
+  mounted() {},
+  watch: {
+    isLocalUser(val) {
+      if (val && this.showLinkForm) this.$nextTick(() => this.initGoogleLinkButton());
+    },
+    showLinkForm(val) {
+      if (val) this.$nextTick(() => this.initGoogleLinkButton());
+    }
   },
   head: function() {
     let head = {};
@@ -243,7 +297,7 @@ export default {
   },
   computed: {
     ...mapState("game", ["gameOverview", "userGames"]),
-    ...mapGetters("user", ["userLoggedIn", "isAdmin"]),
+    ...mapGetters("user", ["userLoggedIn", "isAdmin", "isLocalUser"]),
     filteredUserGames() {
       if (!this.userGames) return [];
       let userGames = this.userGames;
@@ -328,6 +382,67 @@ export default {
     }
   },
   methods: {
+    initGoogleLinkButton() {
+      const tryInit = () => {
+        if (
+          window.google &&
+          window.google.accounts &&
+          this.$refs.googleLinkBtn
+        ) {
+          window.google.accounts.id.initialize({
+            client_id: config.googleClientId,
+            callback: this.handleGoogleLink
+          });
+          window.google.accounts.id.renderButton(this.$refs.googleLinkBtn, {
+            theme: "outline",
+            size: "large",
+            text: "continue_with",
+            shape: "rectangular",
+            width: 250
+          });
+        } else {
+          setTimeout(tryInit, 200);
+        }
+      };
+      tryInit();
+    },
+    async handleGoogleLink(response) {
+      this.linkError = undefined;
+      const result = await this.$store.dispatch(
+        "user/linkToGoogle",
+        response.credential
+      );
+      if (result && result.error) {
+        this.linkError = result.error;
+      }
+    },
+    async linkWithEmail() {
+      this.linkError = undefined;
+      if (!this.linkEmail) {
+        this.linkError = "Please enter an email";
+        return;
+      }
+      if (!this.linkPassword) {
+        this.linkError = "Please enter a password";
+        return;
+      }
+      if (!this.linkRepeat) {
+        this.linkError = "Please repeat your password";
+        return;
+      }
+      if (this.linkPassword !== this.linkRepeat) {
+        this.linkError = "Passwords do not match";
+        return;
+      }
+      const result = await this.$store.dispatch("user/linkToEmail", {
+        email: this.linkEmail,
+        password: this.linkPassword,
+        repeat: this.linkRepeat
+      });
+      if (result && result.error) {
+        this.linkError = result.error;
+      }
+    },
     filterSearch(searchValue) {
       this.searchValue = searchValue;
     },
@@ -374,6 +489,76 @@ export default {
 </script>
 
 <style scoped lang="less">
+.link-submit-btn {
+  margin-top: 10px;
+}
+.link-form-fade {
+  animation: fadeIn 0.4s ease;
+}
+.save-to-cloud-banner {
+  background: #fffbf0;
+  border-top: 2px solid #f76331;
+  border-bottom: 2px solid #f76331;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+  p {
+    margin: 4px 0;
+  }
+  .save-to-cloud-hint {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 14px;
+  }
+  .google-link-btn {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  .or-separator {
+    display: flex;
+    align-items: center;
+    margin: 12px auto;
+    width: 250px;
+    color: #999;
+    font-size: 13px;
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #ddd;
+    }
+    span {
+      padding: 0 10px;
+    }
+  }
+  .link-email-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .link-input {
+    appearance: none;
+    background-color: #eee;
+    display: block;
+    border-radius: 7px;
+    border: 0;
+    padding: 10px;
+    width: 250px;
+    font-size: 16px;
+    text-align: center;
+    outline: 0;
+    &:focus {
+      background-color: #ddd;
+    }
+  }
+  .link-error {
+    color: #f76331;
+    margin-top: 6px;
+    font-size: 14px;
+  }
+}
 .create-cta {
   margin: 20px 0 10px;
   h3 {
@@ -387,8 +572,12 @@ export default {
   animation: fadeIn 0.4s ease;
 }
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .game-selection {
   .search {

@@ -4,10 +4,13 @@ import cookie from "vue-cookies";
 
 let userCookieName = "charPickerLogin";
 
+let localTokenKey = "charPickerLocalToken";
+
 const blankState = () => {
   return {
     user: undefined,
-    isAdmin: false
+    isAdmin: false,
+    isLocalUser: false
   };
 };
 
@@ -20,17 +23,23 @@ export default {
     },
     setIsAdmin(state, isAdmin) {
       state.isAdmin = isAdmin || false;
+    },
+    setIsLocalUser(state, isLocalUser) {
+      state.isLocalUser = isLocalUser || false;
     }
   },
   getters: {
     userLoggedIn: state => {
-      if (state.user && state.user.email && state.user.token) {
-        return true;
+      if (state.user && state.user.token) {
+        if (state.user.email) return true;
+        if (state.isLocalUser) return true;
       }
       return false;
     },
     isAdmin: state => state.isAdmin,
+    isLocalUser: state => state.isLocalUser,
     getUserNameByEmail: state => {
+      if (state.isLocalUser) return "Unknown User";
       if (state.user && state.user.email) {
         let email = state.user.email.split("@");
         email = email[0];
@@ -195,18 +204,128 @@ export default {
       });
       return data;
     },
-    logout({ commit }) {
+    async logout({ commit, state }) {
+      if (state.isLocalUser && state.user && state.user.token) {
+        // Delete the local account from the backend
+        try {
+          await axios({
+            method: "delete",
+            url: config.backendServer + "/user/local-account",
+            data: { token: state.user.token }
+          });
+        } catch (e) {
+          // Proceed with logout regardless
+        }
+        localStorage.removeItem(localTokenKey);
+      }
       cookie.set(userCookieName, "", 0);
       commit("setUser", undefined);
       commit("setIsAdmin", false);
+      commit("setIsLocalUser", false);
       commit("game/setUserGames", undefined, { root: true });
     },
     setCookieLogin(context, userData) {
       cookie.set(
         userCookieName,
-        userData.email + "|||" + userData.token,
+        (userData.email || "") + "|||" + userData.token,
         "14d"
       );
+    },
+    async localLogin({ commit, dispatch }) {
+      let localToken = localStorage.getItem(localTokenKey);
+      if (!localToken) {
+        localToken = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+          const r = (Math.random() * 16) | 0;
+          return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+        });
+        localStorage.setItem(localTokenKey, localToken);
+      }
+      let data = await new Promise(resolve => {
+        axios({
+          method: "post",
+          url: config.backendServer + "/user/local-login",
+          data: { localToken }
+        })
+          .catch(function(error) {
+            if (error && error.response && error.response.data && error.response.data.error) {
+              return resolve(error.response.data);
+            }
+            return resolve({ error: "Local login failed. Try again!" });
+          })
+          .then(data => {
+            if (data && data.data && data.data.answer) {
+              dispatch("setCookieLogin", data.data.answer);
+              commit("setUser", data.data.answer);
+              commit("setIsAdmin", data.data.answer.isAdmin);
+              commit("setIsLocalUser", true);
+              commit("game/setUserGames", data.data.answer.data || [], { root: true });
+              return resolve(true);
+            } else {
+              return resolve({ error: "Something went wrong during local login. Try again!" });
+            }
+          });
+      });
+      return data;
+    },
+    async linkToGoogle({ commit, dispatch }, credential) {
+      const localToken = localStorage.getItem(localTokenKey);
+      if (!localToken) return { error: "No local token found" };
+      let data = await new Promise(resolve => {
+        axios({
+          method: "post",
+          url: config.backendServer + "/user/link-google",
+          data: { localToken, credential }
+        })
+          .catch(function(error) {
+            if (error && error.response && error.response.data && error.response.data.error) {
+              return resolve(error.response.data);
+            }
+            return resolve({ error: "Failed to link Google account. Try again!" });
+          })
+          .then(data => {
+            if (data && data.data && data.data.answer) {
+              localStorage.removeItem(localTokenKey);
+              dispatch("setCookieLogin", data.data.answer);
+              commit("setUser", data.data.answer);
+              commit("setIsAdmin", data.data.answer.isAdmin);
+              commit("setIsLocalUser", false);
+              return resolve(true);
+            } else {
+              return resolve({ error: "Something went wrong. Try again!" });
+            }
+          });
+      });
+      return data;
+    },
+    async linkToEmail({ commit, dispatch }, { email, password, repeat }) {
+      const localToken = localStorage.getItem(localTokenKey);
+      if (!localToken) return { error: "No local token found" };
+      let data = await new Promise(resolve => {
+        axios({
+          method: "post",
+          url: config.backendServer + "/user/link-email",
+          data: { localToken, email, password, repeat }
+        })
+          .catch(function(error) {
+            if (error && error.response && error.response.data && error.response.data.error) {
+              return resolve(error.response.data);
+            }
+            return resolve({ error: "Failed to create account. Try again!" });
+          })
+          .then(data => {
+            if (data && data.data && data.data.answer) {
+              localStorage.removeItem(localTokenKey);
+              dispatch("setCookieLogin", data.data.answer);
+              commit("setUser", data.data.answer);
+              commit("setIsAdmin", data.data.answer.isAdmin);
+              commit("setIsLocalUser", false);
+              return resolve(true);
+            } else {
+              return resolve({ error: "Something went wrong. Try again!" });
+            }
+          });
+      });
+      return data;
     },
     async adminGetUsers({ state }) {
       const { email, token } = state.user || {};
@@ -301,35 +420,46 @@ export default {
       });
       return response.data;
     },
-    async getLoginSession({ commit }) {
+    async getLoginSession({ commit, dispatch }) {
       let data = cookie.get(userCookieName);
       if (data) {
         data = data.split("|||");
         if (data.length > 1) {
-          data = {
-            email: data[0],
-            token: data[1]
-          };
+          const email = data[0] || "";
+          const token = data[1];
+          const isLocal = !email;
+
           axios({
             method: "post",
             url: config.backendServer + "/user/validate",
-            data: data
+            data: { email: email || undefined, token }
           })
             .catch(function() {
               cookie.set(userCookieName, "", 0);
-              commit("setUser", blankState());
+              commit("setUser", undefined);
+              commit("setIsAdmin", false);
+              commit("setIsLocalUser", false);
               commit("game/setUserGames", undefined, { root: true });
             })
-            .then(answer => {
+            .then(async answer => {
               if (answer && answer.data && answer.data.login) {
                 commit("game/setUserGames", answer.data.data, { root: true });
-                commit("setUser", { email: data.email, token: data.token });
+                commit("setUser", { email: email || null, token });
                 commit("setIsAdmin", answer.data.isAdmin);
+                commit("setIsLocalUser", isLocal);
               } else {
                 cookie.set(userCookieName, "", 0);
-                commit("setUser", undefined);
-                commit("setIsAdmin", false);
-                commit("game/setUserGames", undefined, { root: true });
+                // Fallback: try localStorage token for local users
+                const storedLocalToken = localStorage.getItem(localTokenKey);
+                if (storedLocalToken) {
+                  commit("game/setUserGames", undefined, { root: true });
+                  await dispatch("localLogin");
+                } else {
+                  commit("setUser", undefined);
+                  commit("setIsAdmin", false);
+                  commit("setIsLocalUser", false);
+                  commit("game/setUserGames", undefined, { root: true });
+                }
               }
             });
         }

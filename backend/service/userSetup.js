@@ -85,7 +85,7 @@ let getUserAccount = async userEmail => {
 
   console.log("User PostgreSQL used");
   const result = await database.query(
-    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked,
+    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked, u.local_token,
             COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
      FROM users u
      LEFT JOIN user_games ug ON u.id = ug.user_id
@@ -102,6 +102,7 @@ let getUserAccount = async userEmail => {
   const userData = {
     userId: row.id,
     email: row.email,
+    localToken: row.local_token,
     userKey: row.user_key,
     token: row.token,
     tokenTime: row.token_time ? parseInt(row.token_time) : null,
@@ -113,6 +114,32 @@ let getUserAccount = async userEmail => {
 
   c.put(cacheKey, userData);
   return userData;
+};
+
+const getUserAccountByLocalToken = async localToken => {
+  const result = await database.query(
+    `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked, u.local_token,
+            COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
+     FROM users u
+     LEFT JOIN user_games ug ON u.id = ug.user_id
+     WHERE u.local_token = $1
+     GROUP BY u.id`,
+    [localToken]
+  );
+  if (result.rows.length === 0) return { error: "User not found" };
+  const row = result.rows[0];
+  return {
+    userId: row.id,
+    email: row.email,
+    localToken: row.local_token,
+    userKey: row.user_key,
+    token: row.token,
+    tokenTime: row.token_time ? parseInt(row.token_time) : null,
+    newUserData: row.new_user_data,
+    isAdmin: row.is_admin || false,
+    isBlocked: row.is_blocked || false,
+    data: row.data || []
+  };
 };
 
 let signUpUser = async (userEmail, userPassword) => {
@@ -185,6 +212,7 @@ const preformPasswordReset = async data => {
 };
 
 let clearUserCache = userEmail => {
+  if (!userEmail) return;
   const cacheKey = config.userPrefix + userEmail.toLowerCase().trim();
   c.put(cacheKey, false);
 };
@@ -211,8 +239,9 @@ let newLogin = async data => {
 
   return {
     answer: {
-      email: data.email,
+      email: data.email || null,
       token: token,
+      localToken: data.localToken || null,
       isAdmin: data.isAdmin || false,
       data: games
     }
@@ -236,6 +265,40 @@ let validateUser = async (email, token, onlyGetData = true) => {
           data: onlyGetData ? userAccount.data : userAccount
         };
       }
+    }
+  } else if (!email && token) {
+    // Local user: look up by session token
+    const result = await database.query(
+      `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.is_admin, u.is_blocked, u.local_token,
+              COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
+       FROM users u
+       LEFT JOIN user_games ug ON u.id = ug.user_id
+       WHERE u.token = $1
+       GROUP BY u.id`,
+      [token]
+    );
+    if (result.rows.length === 0) return { login: false };
+    const row = result.rows[0];
+    if (row.is_blocked) return { login: false, blocked: true };
+    const date = new Date().getTime();
+    const tokenTime = row.token_time ? parseInt(row.token_time) : 0;
+    const timeDiff = date - tokenTime;
+    if (timeDiff < 1000 * 60 * 60 * 24 * 14) {
+      return {
+        login: true,
+        isAdmin: row.is_admin || false,
+        localToken: row.local_token,
+        data: onlyGetData ? (row.data || []) : {
+          userId: row.id,
+          email: row.email,
+          localToken: row.local_token,
+          token: row.token,
+          tokenTime: tokenTime,
+          isAdmin: row.is_admin || false,
+          isBlocked: row.is_blocked || false,
+          data: row.data || []
+        }
+      };
     }
   }
   return {
@@ -377,6 +440,8 @@ const googleLoginOrCreate = async credential => {
 module.exports = {
   generateUserKey,
   getUserAccount,
+  getUserAccountByLocalToken,
+  getUserAccountByGoogleId,
   signUpUser,
   resetPassword,
   preformPasswordReset,
