@@ -84,6 +84,12 @@ const autoLoadGames = async () => {
     folders.filter(f => fs.existsSync(path.join(gamesDir, f, "load.json")))
   );
 
+  // Load git-based last-modified dates if available
+  const lastmodPath = path.join(gamesDir, "lastmod.json");
+  const lastmodDates = fs.existsSync(lastmodPath)
+    ? JSON.parse(fs.readFileSync(lastmodPath, "utf-8"))
+    : {};
+
   const client = await pool.connect();
   try {
     for (const folder of validIds) {
@@ -94,8 +100,8 @@ const autoLoadGames = async () => {
       const title = gameData.background?.title || folder.replace(/-/g, " ");
 
       await client.query(
-        `INSERT INTO main_games (id, title, characters, tabs, background, settings, affiliate)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `INSERT INTO main_games (id, title, characters, tabs, background, settings, affiliate, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          ON CONFLICT (id) DO UPDATE SET
            title = $2,
            characters = $3,
@@ -103,7 +109,7 @@ const autoLoadGames = async () => {
            background = $5,
            settings = $6,
            affiliate = $7,
-           updated_at = NOW()`,
+           updated_at = $8`,
         [
           folder,
           title,
@@ -111,7 +117,8 @@ const autoLoadGames = async () => {
           gameData.tabs ? JSON.stringify(gameData.tabs) : null,
           JSON.stringify(gameData.background || {}),
           JSON.stringify(gameData.settings || {}),
-          gameData.affiliate ? JSON.stringify(gameData.affiliate) : null
+          gameData.affiliate ? JSON.stringify(gameData.affiliate) : null,
+          lastmodDates[folder] || new Date()
         ]
       );
       console.log(`Game loaded: ${folder}`);

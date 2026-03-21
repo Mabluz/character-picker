@@ -18,12 +18,6 @@ const PasswordReset = () =>
   );
 const NotFound = () =>
   import(/* webpackChunkName: "not-found" */ "./views/NotFound/NotFound");
-const DonatePage = () =>
-  import(/* webpackChunkName: "donate" */ "./views/Donate/Donate");
-const DonateThanks = () =>
-  import(/* webpackChunkName: "donate-thanks" */ "./views/Donate/DonateThanks");
-const DonateCancel = () =>
-  import(/* webpackChunkName: "donate-cancel" */ "./views/Donate/DonateCancel");
 const AdminPage = () =>
   import(/* webpackChunkName: "admin" */ "./views/Admin/Admin");
 const AdminEmails = () =>
@@ -61,21 +55,6 @@ export default new Router({
       path: "/password-reset/",
       name: "PasswordReset",
       component: PasswordReset
-    },
-    {
-      path: "/donate",
-      name: "DonatePage",
-      component: DonatePage
-    },
-    {
-      path: "/donate/thanks",
-      name: "DonateThanks",
-      component: DonateThanks
-    },
-    {
-      path: "/donate/cancel",
-      name: "DonateCancel",
-      component: DonateCancel
     },
     {
       path: "/admin",

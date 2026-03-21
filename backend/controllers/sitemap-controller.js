@@ -1,9 +1,26 @@
 "use strict";
 const app = require("express");
 const router = app.Router();
+const { execSync } = require("child_process");
+const path = require("path");
 const database = require("../service/database");
 
 const BASE_URL = "https://randomboardgame.com";
+
+const getGitDate = relPath => {
+  try {
+    const repoRoot = path.join(__dirname, "..", "..");
+    const date = execSync(`git log -1 --format=%aI -- "${relPath}"`, {
+      cwd: repoRoot,
+      encoding: "utf-8"
+    }).trim();
+    return date
+      ? new Date(date).toISOString().split("T")[0]
+      : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 router.get("/sitemap.xml", async (req, res) => {
   try {
@@ -12,8 +29,11 @@ router.get("/sitemap.xml", async (req, res) => {
     );
 
     const staticUrls = [
-      { loc: `${BASE_URL}/`, priority: "1.0" },
-      { loc: `${BASE_URL}/donate`, priority: "0.3" }
+      {
+        loc: `${BASE_URL}/`,
+        lastmod: getGitDate("frontend/src/views/GameSelection/GameSelection.vue"),
+        priority: "1.0"
+      }
     ];
 
     const gameUrls = result.rows.map(row => ({
