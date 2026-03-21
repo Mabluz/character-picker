@@ -85,7 +85,7 @@ const autoLoadGames = async () => {
   );
 
   // Load git-based last-modified dates if available
-  const lastmodPath = path.join(gamesDir, "lastmod.json");
+  const lastmodPath = path.join(__dirname, "..", "lastmod.json");
   const lastmodDates = fs.existsSync(lastmodPath)
     ? JSON.parse(fs.readFileSync(lastmodPath, "utf-8"))
     : {};

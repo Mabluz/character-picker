@@ -14,7 +14,7 @@ const fs = require("fs");
 const path = require("path");
 
 const gamesDir = path.join(__dirname, "..", "games");
-const outPath = path.join(gamesDir, "lastmod.json");
+const outPath = path.join(__dirname, "..", "lastmod.json");
 
 const folders = fs.readdirSync(gamesDir).filter(f => {
   const folderPath = path.join(gamesDir, f);
