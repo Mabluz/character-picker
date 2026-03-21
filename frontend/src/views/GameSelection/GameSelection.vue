@@ -57,9 +57,9 @@
 
     <div class="create-cta">
       <h3>Can't find a randomizer for a specific game? Create it yourself!</h3>
-      <char-button v-if="!showLoginBox" @click="showLoginBox = true">Customize games by logging in!</char-button>
+      <char-button v-if="!showLoginBox && !userLoggedIn" @click="showLoginBox = true">Customize games by logging in!</char-button>
     </div>
-    <div v-if="showLoginBox" class="login-fade-in">
+    <div v-if="showLoginBox || userLoggedIn" class="login-fade-in">
       <login></login>
     </div>
     <router-link v-if="isAdmin" to="/admin" class="admin-link"

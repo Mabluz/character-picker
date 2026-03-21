@@ -11,6 +11,7 @@ const getType = title => {
     if (word === "expansion" || word === "expansions") return "expansion";
     if (word === "pack" || word === "packs") return "expansion";
     if (word === "organizer" || word === "organizers") return "other";
+    if (word === "insert" || word === "inserts") return "other";
     if (word === "dice") return "other";
     if (word === "coin" || word === "coins") return "other";
   }

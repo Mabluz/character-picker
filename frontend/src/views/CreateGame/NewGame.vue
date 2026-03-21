@@ -26,7 +26,7 @@
       <div class="input-container">
         <label
           >Background image url (optional, link to an image hosted somewhere.
-          Like Imgur, Dropbox og Google image search.)</label
+          Like Imgur, Dropbox or Google image search.)</label
         >
         <input
           :class="{
@@ -295,6 +295,7 @@
           <input
             type="text"
             name="name"
+            placeholder="Character Name"
             v-model="char.name"
             @input="char.name = filterPipeChar(char.name)"
             @focus="storeChange(char.name, char.uuid[1])"
@@ -305,6 +306,7 @@
           <input
             type="text"
             name="type"
+            placeholder="Character Type"
             v-model="char.type"
             @input="char.type = filterPipeChar(char.type)"
             @focus="storeChange(char.type, char.uuid[3])"
@@ -315,6 +317,7 @@
           <input
             type="text"
             name="container"
+            placeholder="Character From (e.g. what expansion)"
             v-model="char.container"
             @input="char.container = filterPipeChar(char.container)"
             @focus="storeChange(char.container, char.uuid[2])"
@@ -325,6 +328,7 @@
           <input
             type="text"
             name="image"
+            placeholder="Character Image URL (e.g use imgur.com)"
             v-model="char.image"
             @input="char.image = filterPipeChar(char.image)"
             @focus="storeChange(char.image, char.uuid[4])"
@@ -957,6 +961,14 @@ export default {
         padding-left: 10px;
       }
     }
+    tr:nth-child(2) {
+      td {
+        input:placeholder-shown {
+          background: #ffe4bd;
+          animation: inputPulse 2s ease-in-out infinite;
+        }
+      }
+    }
     td {
       text-align: center;
       border-bottom: 1px solid #222;
@@ -1030,5 +1042,9 @@ export default {
       }
     }
   }
+}
+@keyframes inputPulse {
+  0%, 100% { background: #ffe4bd; }
+  50% { background: transparent; }
 }
 </style>
