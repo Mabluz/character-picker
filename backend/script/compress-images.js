@@ -50,11 +50,17 @@ async function compressToTarget(filePath) {
     for (let quality = 80; quality >= 10; quality -= 10) {
       let buffer;
       if (ext === ".webp") {
-        buffer = await sharp(filePath).webp({ quality }).toBuffer();
+        buffer = await sharp(filePath)
+          .webp({ quality })
+          .toBuffer();
       } else if (ext === ".avif") {
-        buffer = await sharp(filePath).avif({ quality }).toBuffer();
+        buffer = await sharp(filePath)
+          .avif({ quality })
+          .toBuffer();
       } else {
-        buffer = await sharp(filePath).jpeg({ quality, progressive: true }).toBuffer();
+        buffer = await sharp(filePath)
+          .jpeg({ quality, progressive: true })
+          .toBuffer();
       }
 
       if (buffer.length <= THRESHOLD_BYTES) {
@@ -62,24 +68,40 @@ async function compressToTarget(filePath) {
       }
     }
     // Still too large — convert to WebP at low quality as last resort
-    const buffer = await sharp(filePath).webp({ quality: 10 }).toBuffer();
+    const buffer = await sharp(filePath)
+      .webp({ quality: 10 })
+      .toBuffer();
     return { buffer, note: "quality 10 (WebP fallback)", newExt: ".webp" };
   }
 
   // PNG: try max compression, then convert to WebP if still over threshold
   if (ext === ".png") {
-    const buffer = await sharp(filePath).png({ compressionLevel: 9, effort: 10 }).toBuffer();
+    const buffer = await sharp(filePath)
+      .png({ compressionLevel: 9, effort: 10 })
+      .toBuffer();
     if (buffer.length <= THRESHOLD_BYTES) {
       return { buffer, note: "PNG max compression" };
     }
     for (let quality = 80; quality >= 10; quality -= 10) {
-      const webpBuffer = await sharp(filePath).webp({ quality }).toBuffer();
+      const webpBuffer = await sharp(filePath)
+        .webp({ quality })
+        .toBuffer();
       if (webpBuffer.length <= THRESHOLD_BYTES) {
-        return { buffer: webpBuffer, note: `converted to WebP quality ${quality}`, newExt: ".webp" };
+        return {
+          buffer: webpBuffer,
+          note: `converted to WebP quality ${quality}`,
+          newExt: ".webp"
+        };
       }
     }
-    const webpBuffer = await sharp(filePath).webp({ quality: 10 }).toBuffer();
-    return { buffer: webpBuffer, note: "converted to WebP quality 10", newExt: ".webp" };
+    const webpBuffer = await sharp(filePath)
+      .webp({ quality: 10 })
+      .toBuffer();
+    return {
+      buffer: webpBuffer,
+      note: "converted to WebP quality 10",
+      newExt: ".webp"
+    };
   }
 
   // GIF: best effort, no quality knob
@@ -110,11 +132,15 @@ function updateJsonRefs(gameFolder, oldName, newName) {
     let changed = false;
 
     for (const tab of loadJson.tabs || []) {
-      tab.characters = (tab.characters || []).map((entry) => {
+      tab.characters = (tab.characters || []).map(entry => {
         const parts = entry.split("|");
         const imgField = parts[3];
         // Only update local paths (not http/https URLs)
-        if (imgField && !imgField.startsWith("http://") && !imgField.startsWith("https://")) {
+        if (
+          imgField &&
+          !imgField.startsWith("http://") &&
+          !imgField.startsWith("https://")
+        ) {
           const updated = imgField.split(oldName).join(newName);
           if (updated !== imgField) {
             parts[3] = updated;
@@ -162,7 +188,9 @@ async function main() {
     process.exit(1);
   }
 
-  const resolvedFolder = path.resolve(gameFolder.replace(/^[/\\]*backend[/\\]/, ""));
+  const resolvedFolder = path.resolve(
+    gameFolder.replace(/^[/\\]*backend[/\\]/, "")
+  );
   if (!fs.existsSync(resolvedFolder)) {
     console.error(`Folder not found: ${resolvedFolder}`);
     process.exit(1);
@@ -181,7 +209,9 @@ async function main() {
     const rel = path.relative(resolvedFolder, filePath);
 
     if (originalSize <= THRESHOLD_BYTES) {
-      console.log(`  SKIP  ${rel} (${formatSize(originalSize)} — already under 0.5 MB)`);
+      console.log(
+        `  SKIP  ${rel} (${formatSize(originalSize)} — already under 0.5 MB)`
+      );
       alreadySmall++;
       continue;
     }
@@ -214,7 +244,9 @@ async function main() {
       totalSaved += saved;
       compressed++;
 
-      const sizeLabel = `${formatSize(originalSize)} → ${formatSize(buffer.length)}`;
+      const sizeLabel = `${formatSize(originalSize)} → ${formatSize(
+        buffer.length
+      )}`;
       const targetLabel = underTarget ? "" : " [WARNING: still over 0.5 MB]";
       console.log(`  OK    ${rel} — ${sizeLabel} (${note})${targetLabel}`);
     } catch (err) {
@@ -224,11 +256,13 @@ async function main() {
   }
 
   console.log(
-    `\nDone. Compressed: ${compressed}, Already small: ${alreadySmall}, Failed: ${failed}, Total saved: ${formatSize(totalSaved)}`
+    `\nDone. Compressed: ${compressed}, Already small: ${alreadySmall}, Failed: ${failed}, Total saved: ${formatSize(
+      totalSaved
+    )}`
   );
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error("Error:", err.message);
   process.exit(1);
 });

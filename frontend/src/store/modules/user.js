@@ -100,6 +100,12 @@ export default {
           })
           .then(data => {
             if (data && data.data && data.data.answer) {
+              if (data.data.answer.unverified) {
+                return resolve({
+                  unverified: true,
+                  email: data.data.answer.email
+                });
+              }
               dispatch("setCookieLogin", data.data.answer);
               commit("setUser", data.data.answer);
               commit("setIsAdmin", data.data.answer.isAdmin);
@@ -234,10 +240,13 @@ export default {
     async localLogin({ commit, dispatch }) {
       let localToken = localStorage.getItem(localTokenKey);
       if (!localToken) {
-        localToken = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-          const r = (Math.random() * 16) | 0;
-          return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-        });
+        localToken = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          c => {
+            const r = (Math.random() * 16) | 0;
+            return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+          }
+        );
         localStorage.setItem(localTokenKey, localToken);
       }
       let data = await new Promise(resolve => {
@@ -247,7 +256,12 @@ export default {
           data: { localToken }
         })
           .catch(function(error) {
-            if (error && error.response && error.response.data && error.response.data.error) {
+            if (
+              error &&
+              error.response &&
+              error.response.data &&
+              error.response.data.error
+            ) {
               return resolve(error.response.data);
             }
             return resolve({ error: "Local login failed. Try again!" });
@@ -258,10 +272,14 @@ export default {
               commit("setUser", data.data.answer);
               commit("setIsAdmin", data.data.answer.isAdmin);
               commit("setIsLocalUser", true);
-              commit("game/setUserGames", data.data.answer.data || [], { root: true });
+              commit("game/setUserGames", data.data.answer.data || [], {
+                root: true
+              });
               return resolve(true);
             } else {
-              return resolve({ error: "Something went wrong during local login. Try again!" });
+              return resolve({
+                error: "Something went wrong during local login. Try again!"
+              });
             }
           });
       });
@@ -277,10 +295,17 @@ export default {
           data: { localToken, credential }
         })
           .catch(function(error) {
-            if (error && error.response && error.response.data && error.response.data.error) {
+            if (
+              error &&
+              error.response &&
+              error.response.data &&
+              error.response.data.error
+            ) {
               return resolve(error.response.data);
             }
-            return resolve({ error: "Failed to link Google account. Try again!" });
+            return resolve({
+              error: "Failed to link Google account. Try again!"
+            });
           })
           .then(data => {
             if (data && data.data && data.data.answer) {
@@ -307,19 +332,82 @@ export default {
           data: { localToken, email, password, repeat }
         })
           .catch(function(error) {
-            if (error && error.response && error.response.data && error.response.data.error) {
+            if (
+              error &&
+              error.response &&
+              error.response.data &&
+              error.response.data.error
+            ) {
               return resolve(error.response.data);
             }
             return resolve({ error: "Failed to create account. Try again!" });
           })
           .then(data => {
             if (data && data.data && data.data.answer) {
+              if (data.data.answer.unverified) {
+                return resolve({
+                  unverified: true,
+                  email: data.data.answer.email
+                });
+              }
               localStorage.removeItem(localTokenKey);
               dispatch("setCookieLogin", data.data.answer);
               commit("setUser", data.data.answer);
               commit("setIsAdmin", data.data.answer.isAdmin);
               commit("setIsLocalUser", false);
               return resolve(true);
+            } else {
+              return resolve({ error: "Something went wrong. Try again!" });
+            }
+          });
+      });
+      return data;
+    },
+    async verifyEmail({ commit, dispatch }, token) {
+      let data = await new Promise(resolve => {
+        axios({
+          method: "post",
+          url: config.backendServer + "/user/verify-email",
+          data: { token }
+        })
+          .catch(function(error) {
+            if (error && error.response && error.response.data) {
+              return resolve(error.response.data);
+            }
+            return resolve({ error: "Verification failed. Try again!" });
+          })
+          .then(data => {
+            if (data && data.data && data.data.answer) {
+              dispatch("setCookieLogin", data.data.answer);
+              commit("setUser", data.data.answer);
+              commit("setIsAdmin", data.data.answer.isAdmin);
+              commit("setIsLocalUser", false);
+              return resolve(true);
+            } else {
+              return resolve({
+                error: "Something went wrong during verification."
+              });
+            }
+          });
+      });
+      return data;
+    },
+    async resendVerification(context, email) {
+      let data = await new Promise(resolve => {
+        axios({
+          method: "post",
+          url: config.backendServer + "/user/resend-verification",
+          data: { email }
+        })
+          .catch(function(error) {
+            if (error && error.response && error.response.data) {
+              return resolve(error.response.data);
+            }
+            return resolve({ error: "Failed to resend. Try again!" });
+          })
+          .then(data => {
+            if (data && data.data && data.data.answer) {
+              return resolve(data.data);
             } else {
               return resolve({ error: "Something went wrong. Try again!" });
             }

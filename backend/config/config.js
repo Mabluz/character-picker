@@ -13,8 +13,11 @@ module.exports = {
   cacheForMinutes: 1000 * 60 * 180,
   emailFrom: process.env.EMAIL_FROM,
   emailLandingPagePasswordReset: debug
-    ? "http://localhost:8080/#/password-reset/"
+    ? "http://localhost:8080/password-reset/"
     : "https://randomboardgame.com/password-reset/",
+  emailLandingPageEmailVerification: debug
+    ? "http://localhost:8080/?verifyEmail="
+    : "https://randomboardgame.com/?verifyEmail=",
   adminAuthUser: process.env.ADMIN_AUTH_USER,
   adminAuthPass: process.env.ADMIN_AUTH_PASS,
   adminAuthUser2: process.env.ADMIN_AUTH_USER2,

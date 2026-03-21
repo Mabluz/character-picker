@@ -13,24 +13,176 @@
   },
   "_note": "Non-standard structure: heroes are in nested bags across 3 workshop files. Extracted via build-load.js instead of tts-import.js.",
   "heroes": [
-    { "name": "Auriel",   "expansion": "Core Game",          "workshopId": "1354916634", "cardId": 300,  "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/", "numWidth": 6, "numHeight": 2 },
-    { "name": "Ecarus",   "expansion": "Core Game",          "workshopId": "1354916634", "cardId": 302,  "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/", "numWidth": 6, "numHeight": 2 },
-    { "name": "Laegon",   "expansion": "Core Game",          "workshopId": "1354916634", "cardId": 304,  "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/", "numWidth": 6, "numHeight": 2 },
-    { "name": "Shae",     "expansion": "Core Game",          "workshopId": "1354916634", "cardId": 306,  "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/", "numWidth": 6, "numHeight": 2 },
-    { "name": "Thorgar",  "expansion": "Core Game",          "workshopId": "1354916634", "cardId": 308,  "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/", "numWidth": 6, "numHeight": 2 },
-    { "name": "Kroghan",  "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4000, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Morrigan", "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4002, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Onamor",   "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4004, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Ryld",     "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4006, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Samyria",  "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4008, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Skeld",    "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4010, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Tristan",  "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4012, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Victoria", "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4014, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Volkor",   "expansion": "Darkness Falls",     "workshopId": "2273843095", "cardId": 4016, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/", "numWidth": 7, "numHeight": 3 },
-    { "name": "Thorgren", "expansion": "Ancient Chronicles", "workshopId": "2956016443", "cardId": 5600, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/", "numWidth": 5, "numHeight": 2 },
-    { "name": "Robin",    "expansion": "Ancient Chronicles", "workshopId": "2956016443", "cardId": 5602, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/", "numWidth": 5, "numHeight": 2 },
-    { "name": "Jeanne",   "expansion": "Ancient Chronicles", "workshopId": "2956016443", "cardId": 5604, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/", "numWidth": 5, "numHeight": 2 },
-    { "name": "Xantares", "expansion": "Ancient Chronicles", "workshopId": "2956016443", "cardId": 5606, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/", "numWidth": 5, "numHeight": 2 },
-    { "name": "Artemis",  "expansion": "Ancient Chronicles", "workshopId": "2956016443", "cardId": 5608, "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/", "numWidth": 5, "numHeight": 2 }
+    {
+      "name": "Auriel",
+      "expansion": "Core Game",
+      "workshopId": "1354916634",
+      "cardId": 300,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/",
+      "numWidth": 6,
+      "numHeight": 2
+    },
+    {
+      "name": "Ecarus",
+      "expansion": "Core Game",
+      "workshopId": "1354916634",
+      "cardId": 302,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/",
+      "numWidth": 6,
+      "numHeight": 2
+    },
+    {
+      "name": "Laegon",
+      "expansion": "Core Game",
+      "workshopId": "1354916634",
+      "cardId": 304,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/",
+      "numWidth": 6,
+      "numHeight": 2
+    },
+    {
+      "name": "Shae",
+      "expansion": "Core Game",
+      "workshopId": "1354916634",
+      "cardId": 306,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/",
+      "numWidth": 6,
+      "numHeight": 2
+    },
+    {
+      "name": "Thorgar",
+      "expansion": "Core Game",
+      "workshopId": "1354916634",
+      "cardId": 308,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/930431869905679525/A96146AA36711AD9985C0158D3254845301E6746/",
+      "numWidth": 6,
+      "numHeight": 2
+    },
+    {
+      "name": "Kroghan",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4000,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Morrigan",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4002,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Onamor",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4004,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Ryld",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4006,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Samyria",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4008,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Skeld",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4010,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Tristan",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4012,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Victoria",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4014,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Volkor",
+      "expansion": "Darkness Falls",
+      "workshopId": "2273843095",
+      "cardId": 4016,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1695003250945754183/6628BAA9644C5CCF3804467B80A4D0A81FD78B6C/",
+      "numWidth": 7,
+      "numHeight": 3
+    },
+    {
+      "name": "Thorgren",
+      "expansion": "Ancient Chronicles",
+      "workshopId": "2956016443",
+      "cardId": 5600,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/",
+      "numWidth": 5,
+      "numHeight": 2
+    },
+    {
+      "name": "Robin",
+      "expansion": "Ancient Chronicles",
+      "workshopId": "2956016443",
+      "cardId": 5602,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/",
+      "numWidth": 5,
+      "numHeight": 2
+    },
+    {
+      "name": "Jeanne",
+      "expansion": "Ancient Chronicles",
+      "workshopId": "2956016443",
+      "cardId": 5604,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/",
+      "numWidth": 5,
+      "numHeight": 2
+    },
+    {
+      "name": "Xantares",
+      "expansion": "Ancient Chronicles",
+      "workshopId": "2956016443",
+      "cardId": 5606,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/",
+      "numWidth": 5,
+      "numHeight": 2
+    },
+    {
+      "name": "Artemis",
+      "expansion": "Ancient Chronicles",
+      "workshopId": "2956016443",
+      "cardId": 5608,
+      "sheetUrl": "https://steamusercontent-a.akamaihd.net/ugc/1997943525755895063/D5A5EB6BA8ABE196F66CE0867603DEB0E5F5FD05/",
+      "numWidth": 5,
+      "numHeight": 2
+    }
   ]
 }

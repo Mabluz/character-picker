@@ -49,20 +49,35 @@
         <div class="footer-col footer-about">
           <div class="footer-creator">
             Created by
-            <a href="https://www.linkedin.com/in/mariusflagstad/" target="_blank">Marius Zell-Flagstad</a>
+            <a
+              href="https://www.linkedin.com/in/mariusflagstad/"
+              target="_blank"
+              >Marius Zell-Flagstad</a
+            >
           </div>
           <p class="footer-bio">
             I love board games and coding, and randomization is something code
             handles well. What started as a quick hobby project has grown into
             something more. Better infrastructure means higher server costs — if
-            you find this site useful, I'd appreciate a donation to help keep it running.
+            you find this site useful, I'd appreciate a donation to help keep it
+            running.
           </p>
           <div class="footer-minis">
-            Also, <a href="https://www.facebook.com/pg/mariusminis/photos/" target="_blank">check out my painted minis!</a> :)
+            Also,
+            <a
+              href="https://www.facebook.com/pg/mariusminis/photos/"
+              target="_blank"
+              >check out my painted minis!</a
+            >
+            :)
           </div>
         </div>
         <div class="footer-col footer-donate">
-          <a ref="kofiFooter" href="https://ko-fi.com/F2F51VYOPV" target="_blank">
+          <a
+            ref="kofiFooter"
+            href="https://ko-fi.com/F2F51VYOPV"
+            target="_blank"
+          >
             <img
               height="60"
               style="border:0px;height:60px;"
@@ -80,7 +95,11 @@
       </div>
       <div class="footer-bottom">
         <a href="https://boardgamegeek.com" target="_blank" rel="noopener">
-          <img src="/powered_by_bgg.webp" alt="Powered by BoardGameGeek" class="bgg-logo" />
+          <img
+            src="/powered_by_bgg.webp"
+            alt="Powered by BoardGameGeek"
+            class="bgg-logo"
+          />
         </a>
       </div>
     </div>
@@ -105,7 +124,10 @@ export default {
     ...mapState("user", []),
     ...mapGetters("page", ["isLoading", "loadingTime"]),
     installBannerVisible() {
-      return (this.showInstallUIAndroid && this.isAndroid) || (this.showInstallUIIos && this.isIOS);
+      return (
+        (this.showInstallUIAndroid && this.isAndroid) ||
+        (this.showInstallUIIos && this.isIOS)
+      );
     }
   },
   watch: {
@@ -139,7 +161,8 @@ export default {
 
     this._onScroll = () => {
       if (sessionStorage.getItem("kofiDismissed")) return;
-      const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
       const kofi = document.querySelector(
         ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi"
       );
@@ -217,6 +240,17 @@ export default {
       console.log("PWA was installed");
     });
     await this.$store.dispatch("user/getLoginSession");
+
+    const params = new URLSearchParams(window.location.search);
+    const verifyToken = params.get("verifyEmail");
+    if (verifyToken) {
+      await this.$store.dispatch("user/verifyEmail", verifyToken);
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname + window.location.hash
+      );
+    }
   }
 };
 </script>
@@ -349,7 +383,7 @@ body {
   align-items: center;
   justify-content: center;
   color: #555;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   @media (max-width: 990px) {
     top: 0;
   }

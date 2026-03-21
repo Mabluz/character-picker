@@ -32,11 +32,15 @@ async function main() {
   const [affiliateLink, loadJsonPath] = args;
 
   if (!affiliateLink || !loadJsonPath) {
-    console.error("Usage: node fetch-affiliate.js <affiliate-link> <path-to-load.json> [--limit N]");
+    console.error(
+      "Usage: node fetch-affiliate.js <affiliate-link> <path-to-load.json> [--limit N]"
+    );
     process.exit(1);
   }
 
-  const resolvedPath = path.resolve(loadJsonPath.replace(/^[/\\]*backend[/\\]/, ""));
+  const resolvedPath = path.resolve(
+    loadJsonPath.replace(/^[/\\]*backend[/\\]/, "")
+  );
   if (!fs.existsSync(resolvedPath)) {
     console.error(`load.json not found: ${resolvedPath}`);
     process.exit(1);
@@ -63,17 +67,21 @@ async function main() {
   await page.goto(affiliateLink, { waitUntil: "networkidle2", timeout: 30000 });
 
   // Wait a moment for lazy-loaded images
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 2000));
 
   const products = await page.evaluate(() => {
     const results = [];
 
     // Amazon search results — each result is [data-component-type="s-search-result"]
-    const searchItems = document.querySelectorAll('[data-component-type="s-search-result"]');
+    const searchItems = document.querySelectorAll(
+      '[data-component-type="s-search-result"]'
+    );
 
     if (searchItems.length > 0) {
       for (const item of searchItems) {
-        const brandEl = item.querySelector("h2.a-size-mini span, h2.a-color-secondary span");
+        const brandEl = item.querySelector(
+          "h2.a-size-mini span, h2.a-color-secondary span"
+        );
         const productEl =
           item.querySelector("h2.a-color-base.a-text-normal span") ||
           item.querySelector("h2[aria-label]") ||
@@ -82,10 +90,15 @@ async function main() {
 
         const brand = brandEl ? brandEl.textContent.trim() : null;
         const product = productEl
-          ? (productEl.getAttribute("aria-label") || productEl.textContent).trim()
+          ? (
+              productEl.getAttribute("aria-label") || productEl.textContent
+            ).trim()
           : null;
-        const title = brand && product ? `${brand} - ${product}` : (product || brand);
-        const image = imgEl ? (imgEl.getAttribute("src") || imgEl.getAttribute("data-src")) : null;
+        const title =
+          brand && product ? `${brand} - ${product}` : product || brand;
+        const image = imgEl
+          ? imgEl.getAttribute("src") || imgEl.getAttribute("data-src")
+          : null;
 
         if (title && image) {
           results.push({ title, image });
@@ -131,7 +144,9 @@ async function main() {
   await browser.close();
 
   if (products.length === 0) {
-    console.error("No products found on the page. The page structure may have changed or access was blocked.");
+    console.error(
+      "No products found on the page. The page structure may have changed or access was blocked."
+    );
     process.exit(1);
   }
 
@@ -156,7 +171,7 @@ async function main() {
     title,
     link: affiliateLink,
     image,
-    type: getType(title),
+    type: getType(title)
   }));
 
   // Read and update load.json
@@ -168,7 +183,7 @@ async function main() {
   ads.forEach((ad, i) => console.log(`  [${i + 1}] ${ad.title}`));
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error("Error:", err.message);
   process.exit(1);
 });

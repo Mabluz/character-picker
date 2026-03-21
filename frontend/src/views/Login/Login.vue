@@ -2,11 +2,20 @@
   <div :class="[size, { 'no-btn-margin': noButtonMargin }]">
     <div v-if="userLoggedIn">
       <h2>Hi {{ getUserNameByEmail }}</h2>
-      <char-button v-if="!isLocalUser" :size="size" @click="logOut">Log out</char-button>
-      <char-button v-else :size="size" color="black" @click="confirmDeleteLocal">Delete account</char-button>
+      <char-button v-if="!isLocalUser" :size="size" @click="logOut"
+        >Log out</char-button
+      >
+      <char-button v-else :size="size" color="black" @click="confirmDeleteLocal"
+        >Delete account</char-button
+      >
       <div v-if="showDeleteWarning" class="delete-warning">
-        <p>This will permanently delete your local account and all saved games. This cannot be undone.</p>
-        <char-button class="delete-confirm-btn" color="black" @click="logOut">Yes, delete everything</char-button>
+        <p>
+          This will permanently delete your local account and all saved games.
+          This cannot be undone.
+        </p>
+        <char-button class="delete-confirm-btn" color="black" @click="logOut"
+          >Yes, delete everything</char-button
+        >
         <char-button @click="showDeleteWarning = false">Cancel</char-button>
       </div>
     </div>
@@ -29,35 +38,42 @@
           <fieldset>
             <form action novalidate>
               <input
-                  type="radio"
-                  name="rg"
-                  @click="selectRadio(0)"
-                  id="sign-in"
-                  checked
+                type="radio"
+                name="rg"
+                @click="selectRadio(0)"
+                id="sign-in"
+                checked
               />
               <input
-                  type="radio"
-                  name="rg"
-                  @click="selectRadio(1)"
-                  id="sign-up"
+                type="radio"
+                name="rg"
+                @click="selectRadio(1)"
+                id="sign-up"
               />
               <input
-                  type="radio"
-                  name="rg"
-                  @click="selectRadio(2)"
-                  id="reset"
+                type="radio"
+                name="rg"
+                @click="selectRadio(2)"
+                id="reset"
+              />
+              <input
+                type="radio"
+                name="rg"
+                @click="selectRadio(3)"
+                id="verify"
               />
 
               <label for="sign-in">Sign in</label>
               <label for="sign-up">Sign up</label>
               <label for="reset">Reset</label>
+              <label for="verify">Verify</label>
 
               <input
-                  class="sign-up sign-in reset"
-                  type="email"
-                  placeholder="Your Email"
-                  v-model="inputEmail"
-                  @keyup="enterPressed"
+                class="sign-up sign-in reset verify"
+                type="email"
+                placeholder="Your Email"
+                v-model="inputEmail"
+                @keyup="enterPressed"
               />
               <div class="error" v-if="inputEmailError">
                 {{ inputEmailError }}
@@ -66,21 +82,21 @@
                 Choose your new password
               </div>
               <input
-                  class="sign-up sign-in reset"
-                  type="password"
-                  placeholder="Your Password"
-                  v-model="inputPassword"
-                  @keyup="enterPressed"
+                class="sign-up sign-in reset"
+                type="password"
+                placeholder="Your Password"
+                v-model="inputPassword"
+                @keyup="enterPressed"
               />
               <div class="error" v-if="inputPasswordError">
                 {{ inputPasswordError }}
               </div>
               <input
-                  class="sign-up reset"
-                  type="password"
-                  placeholder="Repeat Password"
-                  v-model="inputRepeat"
-                  @keyup="enterPressed"
+                class="sign-up reset"
+                type="password"
+                placeholder="Repeat Password"
+                v-model="inputRepeat"
+                @keyup="enterPressed"
               />
               <div class="error" v-if="inputRepeatError">
                 {{ inputRepeatError }}
@@ -88,13 +104,23 @@
               <div class="error" v-if="inputGeneralError">
                 {{ inputGeneralError }}
               </div>
+              <div
+                class="reset-text"
+                :class="{ show: selectedIndex === 3 }"
+              ></div>
               <char-button color="black" @click="submit">{{
-                  getButtonText
-                }}</char-button>
+                getButtonText
+              }}</char-button>
+              <div class="reset-text" :class="{ show: selectedIndex === 3 }">
+                Send a new verification link to your email
+              </div>
 
               <div
-                  class="password-reset-answer"
-                  v-if="passwordResetAnswer && this.selectedIndex === 2"
+                class="password-reset-answer"
+                v-if="
+                  passwordResetAnswer &&
+                    (this.selectedIndex === 2 || this.selectedIndex === 3)
+                "
               >
                 {{ passwordResetAnswer }}
               </div>
@@ -104,9 +130,14 @@
       </div>
       <div class="or-separator"><span>or</span></div>
       <div class="go-container">
-        <char-button color="black" @click="saveLocally">Save locally (no account)</char-button>
+        <char-button color="black" @click="saveLocally"
+          >Save locally (no account)</char-button
+        >
       </div>
-      <div class="local-login-hint">Your account is only saved in this browser. Link to an online (email/google) account later.</div>
+      <div class="local-login-hint">
+        Your account is only saved in this browser. Link to an online
+        (email/google) account later.
+      </div>
       <div v-if="localLoginError" class="error">{{ localLoginError }}</div>
     </div>
   </div>
@@ -148,11 +179,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("user", ["userLoggedIn", "getUserNameByEmail", "isLocalUser"]),
+    ...mapGetters("user", [
+      "userLoggedIn",
+      "getUserNameByEmail",
+      "isLocalUser"
+    ]),
     getButtonText() {
       if (this.selectedIndex === 0) return "Sign In";
       if (this.selectedIndex === 1) return "Sign Up";
       if (this.selectedIndex === 2) return "Reset password";
+      if (this.selectedIndex === 3) return "Resend email";
       return "";
     }
   },
@@ -210,6 +246,18 @@ export default {
       } else if (this.selectedIndex === 2) {
         if (!validateEmail()) return;
         url = "user/resetPassword";
+      } else if (this.selectedIndex === 3) {
+        if (!validateEmail()) return;
+        const result = await this.$store.dispatch(
+          "user/resendVerification",
+          this.inputEmail
+        );
+        if (result && result.error) {
+          this.inputGeneralError = result.error;
+        } else if (result && result.answer) {
+          this.passwordResetAnswer = result.answer;
+        }
+        return;
       }
 
       let response = await this.$store.dispatch(url, {
@@ -220,6 +268,16 @@ export default {
 
       if (response && response.error) {
         this.inputGeneralError = response.error;
+        if (response.unverified) {
+          this.inputEmail = this.inputEmail;
+          this.selectRadio(3);
+          document.getElementById("verify").checked = true;
+        }
+      } else if (response && response.unverified) {
+        this.passwordResetAnswer =
+          "Account created! Check your email to verify before logging in.";
+        this.selectRadio(3);
+        document.getElementById("verify").checked = true;
       } else if (this.selectedIndex === 2 && response.answer) {
         this.passwordResetAnswer = response.answer;
       } else {
@@ -346,7 +404,7 @@ input:not([type="radio"]) {
   margin: 0;
   padding: 0 10px;
   overflow: hidden;
-  width: 250px;
+  width: calc(100% - 0.625em - 0.75em);
   opacity: 0;
   font-size: 16px;
   text-align: center;
@@ -384,7 +442,7 @@ label {
   cursor: pointer;
   color: @color-accent;
   transition: 300ms ease;
-  width: calc(100% / 3 - 4px);
+  width: calc(100% / 4 - 4px);
   &:after {
     content: "";
     border: 10px solid transparent;
@@ -396,10 +454,20 @@ label {
 }
 [id="sign-in"]:checked ~ [for="sign-in"],
 [id="sign-up"]:checked ~ [for="sign-up"],
-[id="reset"]:checked ~ [for="reset"] {
+[id="reset"]:checked ~ [for="reset"],
+[id="verify"]:checked ~ [for="verify"] {
   color: @color-input;
   &:after {
     border-bottom-color: @color-input;
+  }
+}
+[id="verify"]:checked ~ input.verify {
+  max-height: 40px;
+  padding: 10px;
+  margin: 10px 0;
+  opacity: 1;
+  &[type="email"] {
+    margin-bottom: 0;
   }
 }
 .google-login-wrapper {
@@ -471,5 +539,6 @@ label {
   display: inline-block;
   font-size: 18px;
   line-height: 24px;
+  margin-top: 10px;
 }
 </style>

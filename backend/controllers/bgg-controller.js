@@ -10,9 +10,9 @@ const BGG_API_KEY = process.env.BGG_API_KEY;
 
 const BGG_HEADERS = {
   "User-Agent": "Mozilla/5.0 (compatible; randomboardgame.zellflagstad.com)",
-  "Accept": "text/xml,application/xml,*/*",
+  Accept: "text/xml,application/xml,*/*",
   "Accept-Language": "en-US,en;q=0.9",
-  ...(BGG_API_KEY ? { "Authorization": `Bearer ${BGG_API_KEY}` } : {})
+  ...(BGG_API_KEY ? { Authorization: `Bearer ${BGG_API_KEY}` } : {})
 };
 
 async function fetchXml(url) {
@@ -33,7 +33,10 @@ async function fetchXml(url) {
 }
 
 async function parseXml(xml) {
-  return xml2js.parseStringPromise(xml, { explicitArray: false, mergeAttrs: true });
+  return xml2js.parseStringPromise(xml, {
+    explicitArray: false,
+    mergeAttrs: true
+  });
 }
 
 // GET /bgg/search?query=Nemesis
@@ -43,7 +46,9 @@ router.get("/bgg/search", cors(), async (req, res) => {
 
   try {
     const xml = await fetchXml(
-      `${BGG_API}/search?query=${encodeURIComponent(query)}&type=boardgame,boardgameexpansion`
+      `${BGG_API}/search?query=${encodeURIComponent(
+        query
+      )}&type=boardgame,boardgameexpansion`
     );
     const parsed = await parseXml(xml);
     const items = parsed.items && parsed.items.item;
@@ -64,14 +69,17 @@ router.get("/bgg/search", cors(), async (req, res) => {
     res.json({ results });
   } catch (err) {
     console.error("BGG search error:", err.message);
-    res.status(502).json({ error: "Failed to fetch from BGG", detail: err.message });
+    res
+      .status(502)
+      .json({ error: "Failed to fetch from BGG", detail: err.message });
   }
 });
 
 // GET /bgg/game/:id  — full details for a specific BGG game/expansion
 router.get("/bgg/game/:id", cors(), async (req, res) => {
   const id = req.params.id;
-  if (!/^\d+(,\d+)*$/.test(id)) return res.status(400).json({ error: "Invalid id" });
+  if (!/^\d+(,\d+)*$/.test(id))
+    return res.status(400).json({ error: "Invalid id" });
 
   try {
     const xml = await fetchXml(`${BGG_API}/thing?id=${id}&stats=1`);
@@ -81,17 +89,30 @@ router.get("/bgg/game/:id", cors(), async (req, res) => {
 
     const items = Array.isArray(raw) ? raw : [raw];
     const results = items.map(item => {
-      const names = item.name ? (Array.isArray(item.name) ? item.name : [item.name]) : [];
+      const names = item.name
+        ? Array.isArray(item.name)
+          ? item.name
+          : [item.name]
+        : [];
       const primaryName = names.find(n => n.type === "primary") || names[0];
 
-      const links = item.link ? (Array.isArray(item.link) ? item.link : [item.link]) : [];
-      const groupLinks = type => links.filter(l => l.type === type).map(l => ({ id: l.id, name: l.value }));
+      const links = item.link
+        ? Array.isArray(item.link)
+          ? item.link
+          : [item.link]
+        : [];
+      const groupLinks = type =>
+        links
+          .filter(l => l.type === type)
+          .map(l => ({ id: l.id, name: l.value }));
 
       return {
         id: item.id,
         type: item.type,
         name: primaryName ? primaryName.value : null,
-        alternateNames: names.filter(n => n.type !== "primary").map(n => n.value),
+        alternateNames: names
+          .filter(n => n.type !== "primary")
+          .map(n => n.value),
         yearpublished: item.yearpublished ? item.yearpublished.value : null,
         description: item.description || null,
         minplayers: item.minplayers ? item.minplayers.value : null,
@@ -104,24 +125,35 @@ router.get("/bgg/game/:id", cors(), async (req, res) => {
         publishers: groupLinks("boardgamepublisher"),
         expansions: groupLinks("boardgameexpansion"),
         implementations: groupLinks("boardgameimplementation"),
-        rating: item.statistics && item.statistics.ratings
-          ? {
-              average: item.statistics.ratings.average ? item.statistics.ratings.average.value : null,
-              usersrated: item.statistics.ratings.usersrated ? item.statistics.ratings.usersrated.value : null,
-              bggrank: item.statistics.ratings.ranks && item.statistics.ratings.ranks.rank
-                ? (Array.isArray(item.statistics.ratings.ranks.rank)
-                    ? item.statistics.ratings.ranks.rank.find(r => r.name === "boardgame")
-                    : item.statistics.ratings.ranks.rank)
-                : null
-            }
-          : null
+        rating:
+          item.statistics && item.statistics.ratings
+            ? {
+                average: item.statistics.ratings.average
+                  ? item.statistics.ratings.average.value
+                  : null,
+                usersrated: item.statistics.ratings.usersrated
+                  ? item.statistics.ratings.usersrated.value
+                  : null,
+                bggrank:
+                  item.statistics.ratings.ranks &&
+                  item.statistics.ratings.ranks.rank
+                    ? Array.isArray(item.statistics.ratings.ranks.rank)
+                      ? item.statistics.ratings.ranks.rank.find(
+                          r => r.name === "boardgame"
+                        )
+                      : item.statistics.ratings.ranks.rank
+                    : null
+              }
+            : null
       };
     });
 
     res.json({ results });
   } catch (err) {
     console.error("BGG game error:", err.message);
-    res.status(502).json({ error: "Failed to fetch from BGG", detail: err.message });
+    res
+      .status(502)
+      .json({ error: "Failed to fetch from BGG", detail: err.message });
   }
 });
 

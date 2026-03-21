@@ -28,7 +28,9 @@ router.get("/sitemap.xml", async (req, res) => {
 
     const urlEntries = allUrls
       .map(url => {
-        const lastmod = url.lastmod ? `\n    <lastmod>${url.lastmod}</lastmod>` : "";
+        const lastmod = url.lastmod
+          ? `\n    <lastmod>${url.lastmod}</lastmod>`
+          : "";
         return `  <url>
     <loc>${url.loc}</loc>${lastmod}
     <priority>${url.priority}</priority>

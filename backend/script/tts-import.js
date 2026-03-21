@@ -43,9 +43,14 @@ const TTS_SAVES_DIR = path.join(
  *   byTray[trayName]       -> marked object  (for cards traced back to a tray via GUID)
  */
 function loadThisMarks(workshopData) {
-  const saveFiles = ["TS_AutoSave.json", "TS_AutoSave_2.json", "TS_AutoSave_3.json",
-                     "TS_Save_1.json", "TS_Save_2.json"]
-    .map((f) => path.join(TTS_SAVES_DIR, f))
+  const saveFiles = [
+    "TS_AutoSave.json",
+    "TS_AutoSave_2.json",
+    "TS_AutoSave_3.json",
+    "TS_Save_1.json",
+    "TS_Save_2.json"
+  ]
+    .map(f => path.join(TTS_SAVES_DIR, f))
     .filter(fs.existsSync)
     .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
 
@@ -89,14 +94,21 @@ function loadThisMarks(workshopData) {
     }
   }
 
-  console.log(`  THIS marks: ${Object.keys(byName).length} by name, ${Object.keys(byTray).length} by tray\n`);
+  console.log(
+    `  THIS marks: ${Object.keys(byName).length} by name, ${
+      Object.keys(byTray).length
+    } by tray\n`
+  );
   return { byName, byTray };
 }
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
 function slug(name) {
-  return name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 function getNestedField(obj, fieldPath) {
@@ -106,12 +118,18 @@ function getNestedField(obj, fieldPath) {
 function downloadBuffer(url) {
   return new Promise((resolve, reject) => {
     const get = url.startsWith("https") ? https.get : http.get;
-    get(url, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return downloadBuffer(res.headers.location).then(resolve).catch(reject);
+    get(url, res => {
+      if (
+        res.statusCode >= 300 &&
+        res.statusCode < 400 &&
+        res.headers.location
+      ) {
+        return downloadBuffer(res.headers.location)
+          .then(resolve)
+          .catch(reject);
       }
       const chunks = [];
-      res.on("data", (c) => chunks.push(c));
+      res.on("data", c => chunks.push(c));
       res.on("end", () => resolve(Buffer.concat(chunks)));
       res.on("error", reject);
     }).on("error", reject);
@@ -125,9 +143,17 @@ function downloadBuffer(url) {
  *   row     = Math.floor(cardPos / numWidth)
  *   col     = cardPos % numWidth
  */
-async function cropSpritesheetCard(sheetUrl, cardId, numWidth, numHeight, outPath) {
+async function cropSpritesheetCard(
+  sheetUrl,
+  cardId,
+  numWidth,
+  numHeight,
+  outPath
+) {
   let sharp;
-  try { sharp = require("sharp"); } catch {
+  try {
+    sharp = require("sharp");
+  } catch {
     throw new Error("sharp is not installed. Run: npm install sharp");
   }
 
@@ -135,7 +161,9 @@ async function cropSpritesheetCard(sheetUrl, cardId, numWidth, numHeight, outPat
   const row = Math.floor(pos / numWidth);
   const col = pos % numWidth;
 
-  console.log(`    Downloading spritesheet for crop (row ${row}, col ${col})...`);
+  console.log(
+    `    Downloading spritesheet for crop (row ${row}, col ${col})...`
+  );
   const sheetBuf = await downloadBuffer(sheetUrl);
   const meta = await sharp(sheetBuf).metadata();
 
@@ -143,7 +171,12 @@ async function cropSpritesheetCard(sheetUrl, cardId, numWidth, numHeight, outPat
   const cardH = Math.floor(meta.height / numHeight);
 
   await sharp(sheetBuf)
-    .extract({ left: col * cardW, top: row * cardH, width: cardW, height: cardH })
+    .extract({
+      left: col * cardW,
+      top: row * cardH,
+      width: cardW,
+      height: cardH
+    })
     .jpeg({ quality: 90 })
     .toFile(outPath);
 }
@@ -152,21 +185,26 @@ async function cropSpritesheetCard(sheetUrl, cardId, numWidth, numHeight, outPat
 
 function findTray(objectStates, trayName, pickMode) {
   const matches = objectStates.filter(
-    (o) => o.Name === "Custom_Model_Bag" && o.Nickname === trayName
+    o => o.Name === "Custom_Model_Bag" && o.Nickname === trayName
   );
   if (matches.length === 0) return null;
   if (matches.length === 1) return matches[0];
 
   // Multiple trays with the same name — disambiguate
   if (pickMode === "hasGearloc") {
-    return matches.find((t) =>
-      t.ContainedObjects.some((o) => o.Name === "Custom_Tile" && o.Nickname)
-    ) || matches[0];
+    return (
+      matches.find(t =>
+        t.ContainedObjects.some(o => o.Name === "Custom_Tile" && o.Nickname)
+      ) || matches[0]
+    );
   }
   if (pickMode === "noGearloc") {
-    return matches.find((t) =>
-      !t.ContainedObjects.some((o) => o.Name === "Custom_Tile" && o.Nickname)
-    ) || matches[0];
+    return (
+      matches.find(
+        t =>
+          !t.ContainedObjects.some(o => o.Name === "Custom_Tile" && o.Nickname)
+      ) || matches[0]
+    );
   }
   return matches[0];
 }
@@ -174,7 +212,7 @@ function findTray(objectStates, trayName, pickMode) {
 function getCharacterName(tray, nameFrom) {
   if (nameFrom === "Custom_Tile") {
     const tile = tray.ContainedObjects.find(
-      (o) => o.Name === "Custom_Tile" && o.Nickname
+      o => o.Name === "Custom_Tile" && o.Nickname
     );
     if (tile) return tile.Nickname;
   }
@@ -186,7 +224,7 @@ function getCharacterName(tray, nameFrom) {
 
 async function extractCustomTile(tray, trayConfig, tab, gameId, thisMarks) {
   const tile = tray.ContainedObjects.find(
-    (o) => o.Name === "Custom_Tile" && o.Nickname
+    o => o.Name === "Custom_Tile" && o.Nickname
   );
   const name = (tile && tile.Nickname) || tray.Nickname.replace(/ tray$/i, "");
 
@@ -194,55 +232,109 @@ async function extractCustomTile(tray, trayConfig, tab, gameId, thisMarks) {
   const marked = thisMarks.byName[name.toLowerCase()];
   if (marked) {
     const imageUrl = getNestedField(marked, tab.source.imageField);
-    if (imageUrl) return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: imageUrl };
+    if (imageUrl)
+      return {
+        name,
+        expansion: trayConfig.expansion,
+        tag: tab.tag,
+        imagePath: imageUrl
+      };
   }
 
   if (!tile) {
     console.warn(`  WARN  No named Custom_Tile in "${tray.Nickname}"`);
-    return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: `${gameId}/${slug(name)}.jpg` };
+    return {
+      name,
+      expansion: trayConfig.expansion,
+      tag: tab.tag,
+      imagePath: `${gameId}/${slug(name)}.jpg`
+    };
   }
   const imageUrl = getNestedField(tile, tab.source.imageField);
-  if (!imageUrl) console.warn(`  WARN  No image at ${tab.source.imageField} on tile in "${tray.Nickname}"`);
-  return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: imageUrl || `${gameId}/${slug(name)}.jpg` };
+  if (!imageUrl)
+    console.warn(
+      `  WARN  No image at ${tab.source.imageField} on tile in "${tray.Nickname}"`
+    );
+  return {
+    name,
+    expansion: trayConfig.expansion,
+    tag: tab.tag,
+    imagePath: imageUrl || `${gameId}/${slug(name)}.jpg`
+  };
 }
 
 async function extractCustomModel(tray, trayConfig, tab, gameId, gameFolder) {
   const name = getCharacterName(tray, tab.source.nameFrom);
   const model = tray.ContainedObjects.find(
-    (o) => o.Name === "Custom_Model" && getNestedField(o, tab.source.imageField)
+    o => o.Name === "Custom_Model" && getNestedField(o, tab.source.imageField)
   );
   if (!model) {
-    console.warn(`  WARN  No Custom_Model with ${tab.source.imageField} in "${tray.Nickname}"`);
-    return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: `${gameId}/${slug(name)}.jpg` };
+    console.warn(
+      `  WARN  No Custom_Model with ${tab.source.imageField} in "${tray.Nickname}"`
+    );
+    return {
+      name,
+      expansion: trayConfig.expansion,
+      tag: tab.tag,
+      imagePath: `${gameId}/${slug(name)}.jpg`
+    };
   }
   const imageUrl = getNestedField(model, tab.source.imageField);
-  return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: imageUrl };
+  return {
+    name,
+    expansion: trayConfig.expansion,
+    tag: tab.tag,
+    imagePath: imageUrl
+  };
 }
 
-async function extractCard(tray, trayConfig, tab, gameId, gameFolder, thisMarks) {
+async function extractCard(
+  tray,
+  trayConfig,
+  tab,
+  gameId,
+  gameFolder,
+  thisMarks
+) {
   const name = getCharacterName(tray, tab.source.nameFrom);
 
   // THIS-mark by tray takes priority over config cardId and first-card fallback
   const markedObj = thisMarks.byTray[tray.Nickname];
   const pinnedCardId = markedObj ? markedObj.CardID : trayConfig.cardId;
 
-  const card = pinnedCardId != null
-    ? tray.ContainedObjects.find(
-        (o) => (o.Name === "Card" || o.Name === "CardCustom") && o.CardID === pinnedCardId
-      ) || tray.ContainedObjects.find((o) => (o.Name === "Card" || o.Name === "CardCustom") && o.CustomDeck)
-    : tray.ContainedObjects.find(
-        (o) => (o.Name === "Card" || o.Name === "CardCustom") && o.CustomDeck
-      );
+  const card =
+    pinnedCardId != null
+      ? tray.ContainedObjects.find(
+          o =>
+            (o.Name === "Card" || o.Name === "CardCustom") &&
+            o.CardID === pinnedCardId
+        ) ||
+        tray.ContainedObjects.find(
+          o => (o.Name === "Card" || o.Name === "CardCustom") && o.CustomDeck
+        )
+      : tray.ContainedObjects.find(
+          o => (o.Name === "Card" || o.Name === "CardCustom") && o.CustomDeck
+        );
   if (!card) {
     console.warn(`  WARN  No Card in "${tray.Nickname}"`);
-    return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: `${gameId}/${slug(name)}.jpg` };
+    return {
+      name,
+      expansion: trayConfig.expansion,
+      tag: tab.tag,
+      imagePath: `${gameId}/${slug(name)}.jpg`
+    };
   }
 
   const deck = Object.values(card.CustomDeck)[0];
 
   // 1×1 means it's an individual image — use directly
   if (deck.NumWidth === 1 && deck.NumHeight === 1) {
-    return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: deck.FaceURL };
+    return {
+      name,
+      expansion: trayConfig.expansion,
+      tag: tab.tag,
+      imagePath: deck.FaceURL
+    };
   }
 
   // Spritesheet — crop and save locally
@@ -253,14 +345,30 @@ async function extractCard(tray, trayConfig, tab, gameId, gameFolder, thisMarks)
   const localPath = `${gameId}/${tab.title.toLowerCase()}/${filename}`;
 
   try {
-    await cropSpritesheetCard(deck.FaceURL, card.CardID, deck.NumWidth, deck.NumHeight, outPath);
+    await cropSpritesheetCard(
+      deck.FaceURL,
+      card.CardID,
+      deck.NumWidth,
+      deck.NumHeight,
+      outPath
+    );
     console.log(`    Saved: ${localPath}`);
   } catch (err) {
     console.error(`    ERROR cropping "${name}": ${err.message}`);
-    return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: `${gameId}/${slug(name)}.jpg` };
+    return {
+      name,
+      expansion: trayConfig.expansion,
+      tag: tab.tag,
+      imagePath: `${gameId}/${slug(name)}.jpg`
+    };
   }
 
-  return { name, expansion: trayConfig.expansion, tag: tab.tag, imagePath: localPath };
+  return {
+    name,
+    expansion: trayConfig.expansion,
+    tag: tab.tag,
+    imagePath: localPath
+  };
 }
 
 // ─── main ────────────────────────────────────────────────────────────────────
@@ -287,7 +395,9 @@ async function main() {
   const workshopPath = path.join(TTS_WORKSHOP_DIR, `${workshopId}.json`);
   if (!fs.existsSync(workshopPath)) {
     console.error(`TTS workshop file not found: ${workshopPath}`);
-    console.error(`Make sure you have downloaded the mod in Tabletop Simulator.`);
+    console.error(
+      `Make sure you have downloaded the mod in Tabletop Simulator.`
+    );
     process.exit(1);
   }
 
@@ -314,11 +424,30 @@ async function main() {
 
       let entry;
       if (tabConfig.source.type === "Custom_Tile") {
-        entry = await extractCustomTile(tray, trayConfig, tabConfig, gameId, thisMarks);
+        entry = await extractCustomTile(
+          tray,
+          trayConfig,
+          tabConfig,
+          gameId,
+          thisMarks
+        );
       } else if (tabConfig.source.type === "Custom_Model") {
-        entry = await extractCustomModel(tray, trayConfig, tabConfig, gameId, gameFolder);
+        entry = await extractCustomModel(
+          tray,
+          trayConfig,
+          tabConfig,
+          gameId,
+          gameFolder
+        );
       } else if (tabConfig.source.type === "Card") {
-        entry = await extractCard(tray, trayConfig, tabConfig, gameId, gameFolder, thisMarks);
+        entry = await extractCard(
+          tray,
+          trayConfig,
+          tabConfig,
+          gameId,
+          gameFolder,
+          thisMarks
+        );
       } else {
         console.warn(`  WARN  Unknown source type: ${tabConfig.source.type}`);
         continue;
@@ -337,21 +466,33 @@ async function main() {
     tabs,
     settings: config.settings || {},
     background: config.background || {},
-    id: gameId,
+    id: gameId
   };
 
   const loadJsonPath = path.join(gameFolder, "load.json");
   fs.writeFileSync(loadJsonPath, JSON.stringify(loadJson, null, 2), "utf8");
 
   console.log(`\nWritten: ${loadJsonPath}`);
-  console.log(`Total characters: ${tabs.reduce((s, t) => s + t.characters.length, 0)}`);
+  console.log(
+    `Total characters: ${tabs.reduce((s, t) => s + t.characters.length, 0)}`
+  );
   console.log(`\nNext steps:`);
   console.log(`  - Review load.json and verify expansion names`);
-  console.log(`  - For URL-based images, run: npm run download-images -- ${path.relative(process.cwd(), loadJsonPath)}`);
-  console.log(`  - Then: npm run apply-swap -- ${path.relative(process.cwd(), loadJsonPath)}`);
+  console.log(
+    `  - For URL-based images, run: npm run download-images -- ${path.relative(
+      process.cwd(),
+      loadJsonPath
+    )}`
+  );
+  console.log(
+    `  - Then: npm run apply-swap -- ${path.relative(
+      process.cwd(),
+      loadJsonPath
+    )}`
+  );
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error("Error:", err.message);
   process.exit(1);
 });

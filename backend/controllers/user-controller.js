@@ -4,6 +4,7 @@ const router = app.Router();
 const cors = require("cors");
 const config = require("../config/config");
 const userServer = require("../service/userSetup");
+const emailService = require("../service/emailSetup");
 const database = require("../service/database");
 const uuid = require("uuid");
 const { OAuth2Client } = require("google-auth-library");
@@ -76,9 +77,18 @@ router.post("/login", cors(), async (req, res, next) => {
   let userAccuout = await userServer.getUserAccount(body.email);
 
   if (userAccuout.error) return res.status(500).json(userAccuout);
-  if (userAccuout.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+  if (userAccuout.isBlocked)
+    return res.status(403).json({ error: "This account has been blocked." });
   if (userKey !== userAccuout.userKey)
     return res.status(500).json({ error: "Incorrect password" });
+  if (!userAccuout.emailVerified) {
+    return res
+      .status(403)
+      .json({
+        error: "Please verify your email before logging in.",
+        unverified: true
+      });
+  }
 
   let user = await userServer.newLogin(userAccuout);
   return res.json(user);
@@ -136,7 +146,8 @@ router.post("/google-login", cors(), async (req, res, next) => {
 
 router.post("/local-login", cors(), async (req, res, next) => {
   const localToken = req.body && req.body.localToken;
-  if (!localToken) return res.status(400).json({ error: "No localToken provided" });
+  if (!localToken)
+    return res.status(400).json({ error: "No localToken provided" });
 
   try {
     let user = await userServer.getUserAccountByLocalToken(localToken);
@@ -151,7 +162,8 @@ router.post("/local-login", cors(), async (req, res, next) => {
       );
       user = await userServer.getUserAccountByLocalToken(localToken);
     }
-    if (user.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+    if (user.isBlocked)
+      return res.status(403).json({ error: "This account has been blocked." });
     const result = await userServer.newLogin(user);
     return res.json(result);
   } catch (e) {
@@ -162,8 +174,10 @@ router.post("/local-login", cors(), async (req, res, next) => {
 
 router.post("/link-google", cors(), async (req, res, next) => {
   const { localToken, credential } = req.body || {};
-  if (!localToken) return res.status(400).json({ error: "No localToken provided" });
-  if (!credential) return res.status(400).json({ error: "No Google credential provided" });
+  if (!localToken)
+    return res.status(400).json({ error: "No localToken provided" });
+  if (!credential)
+    return res.status(400).json({ error: "No Google credential provided" });
 
   try {
     const ticket = await googleClient.verifyIdToken({
@@ -175,15 +189,23 @@ router.post("/link-google", cors(), async (req, res, next) => {
     const email = payload.email.toLowerCase().trim();
 
     const localUser = await userServer.getUserAccountByLocalToken(localToken);
-    if (localUser.error) return res.status(404).json({ error: "Local user not found" });
-    if (localUser.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+    if (localUser.error)
+      return res.status(404).json({ error: "Local user not found" });
+    if (localUser.isBlocked)
+      return res.status(403).json({ error: "This account has been blocked." });
 
     // Check if this Google account already has a full account (by google_id or email)
-    let existingByGoogleId = await userServer.getUserAccountByGoogleId(googleId);
-    let existingByEmail = existingByGoogleId.error ? await userServer.getUserAccount(email) : null;
-    const existingAccount = !existingByGoogleId.error ? existingByGoogleId
-                          : (existingByEmail && !existingByEmail.error) ? existingByEmail
-                          : null;
+    let existingByGoogleId = await userServer.getUserAccountByGoogleId(
+      googleId
+    );
+    let existingByEmail = existingByGoogleId.error
+      ? await userServer.getUserAccount(email)
+      : null;
+    const existingAccount = !existingByGoogleId.error
+      ? existingByGoogleId
+      : existingByEmail && !existingByEmail.error
+      ? existingByEmail
+      : null;
 
     if (existingAccount) {
       // Merge: transfer local user's games into the existing account, then delete the local user
@@ -191,7 +213,9 @@ router.post("/link-google", cors(), async (req, res, next) => {
         `UPDATE user_games SET user_id = $1 WHERE user_id = $2`,
         [existingAccount.userId, localUser.userId]
       );
-      await database.query(`DELETE FROM users WHERE id = $1`, [localUser.userId]);
+      await database.query(`DELETE FROM users WHERE id = $1`, [
+        localUser.userId
+      ]);
       // Ensure google_id is set on the existing account
       await database.query(
         `UPDATE users SET google_id = $1, updated_at = NOW() WHERE id = $2`,
@@ -220,36 +244,58 @@ router.post("/link-google", cors(), async (req, res, next) => {
 
 router.post("/link-email", cors(), async (req, res, next) => {
   const { localToken, email, password, repeat } = req.body || {};
-  if (!localToken) return res.status(400).json({ error: "No localToken provided" });
+  if (!localToken)
+    return res.status(400).json({ error: "No localToken provided" });
   if (!email) return res.status(400).json({ error: "No email provided" });
   if (!password) return res.status(400).json({ error: "No password provided" });
-  if (!repeat) return res.status(400).json({ error: "No repeat password provided" });
-  if (password !== repeat) return res.status(400).json({ error: "Passwords do not match" });
-  if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+  if (!repeat)
+    return res.status(400).json({ error: "No repeat password provided" });
+  if (password !== repeat)
+    return res.status(400).json({ error: "Passwords do not match" });
+  if (password.length < 6)
+    return res
+      .status(400)
+      .json({ error: "Password must be at least 6 characters" });
 
   const emailRe = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (!emailRe.test(email)) return res.status(400).json({ error: "Invalid email address" });
+  if (!emailRe.test(email))
+    return res.status(400).json({ error: "Invalid email address" });
 
   try {
     // Guard: check email not already taken
     const existing = await userServer.getUserAccount(email);
     if (!existing.error) {
-      return res.status(409).json({ error: "This email is already registered." });
+      return res
+        .status(409)
+        .json({ error: "This email is already registered." });
     }
 
     const user = await userServer.getUserAccountByLocalToken(localToken);
-    if (user.error) return res.status(404).json({ error: "Local user not found" });
-    if (user.isBlocked) return res.status(403).json({ error: "This account has been blocked." });
+    if (user.error)
+      return res.status(404).json({ error: "Local user not found" });
+    if (user.isBlocked)
+      return res.status(403).json({ error: "This account has been blocked." });
 
     const userKey = userServer.generateUserKey(email, password);
+    const verificationToken = uuid();
     await database.query(
-      `UPDATE users SET email = $1, user_key = $2, local_token = NULL, updated_at = NOW() WHERE id = $3`,
-      [email.toLowerCase().trim(), userKey, user.userId]
+      `UPDATE users SET email = $1, user_key = $2, local_token = NULL,
+       email_verified = false, email_verification_token = $3, updated_at = NOW()
+       WHERE id = $4`,
+      [email.toLowerCase().trim(), userKey, verificationToken, user.userId]
     );
 
-    const updated = await userServer.getUserAccount(email);
-    const result = await userServer.newLogin(updated);
-    return res.json(result);
+    emailService.sendEmailVerification(
+      email.toLowerCase().trim(),
+      verificationToken
+    );
+    return res.json({
+      answer: {
+        unverified: true,
+        email: email.toLowerCase().trim(),
+        message: "Check your email to verify your account."
+      }
+    });
   } catch (e) {
     console.error("Link email error:", e.message);
     return res.status(500).json({ error: "Failed to link email account" });
@@ -275,6 +321,22 @@ router.delete("/local-account", cors(), async (req, res, next) => {
     console.error("Delete local account error:", e.message);
     return res.status(500).json({ error: "Failed to delete account" });
   }
+});
+
+router.post("/verify-email", cors(), async (req, res, next) => {
+  const { token } = req.body || {};
+  if (!token) return res.status(400).json({ error: "No token provided" });
+  const result = await userServer.verifyEmailToken(token);
+  if (result.error) return res.status(400).json(result);
+  return res.json(result);
+});
+
+router.post("/resend-verification", cors(), async (req, res, next) => {
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ error: "No email provided" });
+  const result = await userServer.resendVerificationEmail(email);
+  if (result.error) return res.status(400).json(result);
+  return res.json(result);
 });
 
 router.post("/validatepasswordreset", cors(), async (req, res, next) => {

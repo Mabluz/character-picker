@@ -22,7 +22,9 @@ if (!loadJsonPath) {
   process.exit(1);
 }
 
-const absoluteLoadPath = path.resolve(loadJsonPath.replace(/^[/\\]*backend[/\\]/, ""));
+const absoluteLoadPath = path.resolve(
+  loadJsonPath.replace(/^[/\\]*backend[/\\]/, "")
+);
 if (!fs.existsSync(absoluteLoadPath)) {
   console.error(`File not found: ${absoluteLoadPath}`);
   process.exit(1);
@@ -43,14 +45,17 @@ const swap = JSON.parse(fs.readFileSync(swapJsonPath, "utf8"));
 console.log(`Loaded swap.json with ${swap.length} entries.\n`);
 
 let loadJsonText = fs.readFileSync(absoluteLoadPath, "utf8");
-let applied = 0, missing = 0;
+let applied = 0,
+  missing = 0;
 
 for (const { character, url, filename, relativePath } of swap) {
   const srcPath = path.join(pendingDir, filename);
   const destPath = path.join(gamesDir, relativePath);
 
   if (!fs.existsSync(srcPath)) {
-    console.log(`[MISSING]  ${character}: _pending/${filename} not found, skipping`);
+    console.log(
+      `[MISSING]  ${character}: _pending/${filename} not found, skipping`
+    );
     missing++;
     continue;
   }
@@ -75,5 +80,7 @@ if (missing === 0) {
   fs.unlinkSync(swapJsonPath);
   console.log("Cleaned up _pending/ and swap.json.");
 } else {
-  console.log(`\nWarning: ${missing} entries were missing. _pending/ and swap.json kept for retry.`);
+  console.log(
+    `\nWarning: ${missing} entries were missing. _pending/ and swap.json kept for retry.`
+  );
 }

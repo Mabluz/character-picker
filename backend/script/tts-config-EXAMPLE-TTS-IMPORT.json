@@ -22,24 +22,31 @@
         "nameFrom": "Custom_Tile"
       },
       "trays": [
-        { "name": "Boomer tray",    "expansion": "Core Game" },
-        { "name": "Ghillie tray",   "expansion": "Core Game" },
-        { "name": "Nugget tray",    "expansion": "Core Game" },
-        { "name": "Patches tray",   "expansion": "Core Game" },
-        { "name": "Picket tray",    "expansion": "Core Game" },
-        { "name": "Tantrum tray",   "expansion": "Core Game" },
-        { "name": "Stanza tray",    "expansion": "Core Game" },
-        { "name": "Gaskey tray",    "expansion": "Too Many Bones: Gasket" },
-        { "name": "Tink tray",      "expansion": "Too Many Bones: Tink" },
-        { "name": "Dart tray",      "expansion": "Too Many Bones: Dart" },
-        { "name": "Lab Rats tray",  "expansion": "Too Many Bones: Lab Rats" },
-        { "name": "Riffle tray",    "expansion": "Too Many Bones: Riffle" },
-        { "name": "Carcass tray",   "expansion": "Too Many Bones: Carcass" },
-        { "name": "Polaris tray",   "expansion": "Too Many Bones: Polaris" },
-        { "name": "Static tray",    "expansion": "Too Many Bones: Static" },
-        { "name": "Figment tray",   "expansion": "Too Many Bones: Rage of Tyranny" },
-        { "name": "Gale tray",      "expansion": "Too Many Bones: Rage of Tyranny" },
-        { "name": "Duster tray",    "expansion": "Too Many Bones: Unbreakable", "pickTray": "hasGearloc" }
+        { "name": "Boomer tray", "expansion": "Core Game" },
+        { "name": "Ghillie tray", "expansion": "Core Game" },
+        { "name": "Nugget tray", "expansion": "Core Game" },
+        { "name": "Patches tray", "expansion": "Core Game" },
+        { "name": "Picket tray", "expansion": "Core Game" },
+        { "name": "Tantrum tray", "expansion": "Core Game" },
+        { "name": "Stanza tray", "expansion": "Core Game" },
+        { "name": "Gaskey tray", "expansion": "Too Many Bones: Gasket" },
+        { "name": "Tink tray", "expansion": "Too Many Bones: Tink" },
+        { "name": "Dart tray", "expansion": "Too Many Bones: Dart" },
+        { "name": "Lab Rats tray", "expansion": "Too Many Bones: Lab Rats" },
+        { "name": "Riffle tray", "expansion": "Too Many Bones: Riffle" },
+        { "name": "Carcass tray", "expansion": "Too Many Bones: Carcass" },
+        { "name": "Polaris tray", "expansion": "Too Many Bones: Polaris" },
+        { "name": "Static tray", "expansion": "Too Many Bones: Static" },
+        {
+          "name": "Figment tray",
+          "expansion": "Too Many Bones: Rage of Tyranny"
+        },
+        { "name": "Gale tray", "expansion": "Too Many Bones: Rage of Tyranny" },
+        {
+          "name": "Duster tray",
+          "expansion": "Too Many Bones: Unbreakable",
+          "pickTray": "hasGearloc"
+        }
       ]
     },
     {
@@ -51,28 +58,80 @@
         "nameFrom": "tray"
       },
       "trays": [
-        { "name": "Nom tray",         "expansion": "Core Game",                        "cardId": 2008 },
-        { "name": "Barnacle tray",    "expansion": "Core Game",                        "cardId": 2035 },
-        { "name": "Kollossum tray",   "expansion": "Core Game",                        "cardId": 2114 },
-        { "name": "Mulmesh tray",     "expansion": "Core Game",                        "cardId": 2039 },
-        { "name": "Marrow tray",      "expansion": "Core Game",                        "cardId": 2036 },
-        { "name": "Nobulous tray",    "expansion": "Core Game",                        "cardId": 2029 },
-        { "name": "Blobulous tray",   "expansion": "Core Game",                        "cardId": 2059 },
-        { "name": "Gendricks tray",   "expansion": "Core Game",                        "cardId": 2123 },
-        { "name": "Goblin King tray", "expansion": "Core Game",                        "cardId": 2117 },
-        { "name": "Goblin Queen tray","expansion": "Core Game",                        "cardId": 2043 },
-        { "name": "Amanight tray",    "expansion": "Too Many Bones: Age of Tyranny" },
-        { "name": "Drellen tray",     "expansion": "Too Many Bones: Age of Tyranny",   "cardId": 2125 },
-        { "name": "Leech tray",       "expansion": "Too Many Bones: Age of Tyranny" },
-        { "name": "Locgear tray",     "expansion": "Too Many Bones: Age of Tyranny",   "cardId": 2111 },
-        { "name": "Oxide tray",       "expansion": "Too Many Bones: Age of Tyranny",   "cardId": 2062 },
-        { "name": "Volkesh tray",     "expansion": "Too Many Bones: Age of Tyranny",   "cardId": 2005 },
-        { "name": "Rok and Rol tray", "expansion": "Too Many Bones: Rage of Tyranny",  "cardId": 5400 },
-        { "name": "Cinder tray",      "expansion": "Too Many Bones: Rage of Tyranny",  "cardId": 5405 },
-        { "name": "Domina tray",      "expansion": "Too Many Bones: Rage of Tyranny",  "cardId": 5509 },
-        { "name": "Nexus tray",       "expansion": "Too Many Bones: Rage of Tyranny",  "cardId": 5419 },
-        { "name": "Gavenkog tray",    "expansion": "Too Many Bones: Rage of Tyranny",  "cardId": 5415 },
-        { "name": "Duster tray",      "expansion": "Too Many Bones: Unbreakable",       "cardId": 2032, "pickTray": "noGearloc" }
+        { "name": "Nom tray", "expansion": "Core Game", "cardId": 2008 },
+        { "name": "Barnacle tray", "expansion": "Core Game", "cardId": 2035 },
+        { "name": "Kollossum tray", "expansion": "Core Game", "cardId": 2114 },
+        { "name": "Mulmesh tray", "expansion": "Core Game", "cardId": 2039 },
+        { "name": "Marrow tray", "expansion": "Core Game", "cardId": 2036 },
+        { "name": "Nobulous tray", "expansion": "Core Game", "cardId": 2029 },
+        { "name": "Blobulous tray", "expansion": "Core Game", "cardId": 2059 },
+        { "name": "Gendricks tray", "expansion": "Core Game", "cardId": 2123 },
+        {
+          "name": "Goblin King tray",
+          "expansion": "Core Game",
+          "cardId": 2117
+        },
+        {
+          "name": "Goblin Queen tray",
+          "expansion": "Core Game",
+          "cardId": 2043
+        },
+        {
+          "name": "Amanight tray",
+          "expansion": "Too Many Bones: Age of Tyranny"
+        },
+        {
+          "name": "Drellen tray",
+          "expansion": "Too Many Bones: Age of Tyranny",
+          "cardId": 2125
+        },
+        { "name": "Leech tray", "expansion": "Too Many Bones: Age of Tyranny" },
+        {
+          "name": "Locgear tray",
+          "expansion": "Too Many Bones: Age of Tyranny",
+          "cardId": 2111
+        },
+        {
+          "name": "Oxide tray",
+          "expansion": "Too Many Bones: Age of Tyranny",
+          "cardId": 2062
+        },
+        {
+          "name": "Volkesh tray",
+          "expansion": "Too Many Bones: Age of Tyranny",
+          "cardId": 2005
+        },
+        {
+          "name": "Rok and Rol tray",
+          "expansion": "Too Many Bones: Rage of Tyranny",
+          "cardId": 5400
+        },
+        {
+          "name": "Cinder tray",
+          "expansion": "Too Many Bones: Rage of Tyranny",
+          "cardId": 5405
+        },
+        {
+          "name": "Domina tray",
+          "expansion": "Too Many Bones: Rage of Tyranny",
+          "cardId": 5509
+        },
+        {
+          "name": "Nexus tray",
+          "expansion": "Too Many Bones: Rage of Tyranny",
+          "cardId": 5419
+        },
+        {
+          "name": "Gavenkog tray",
+          "expansion": "Too Many Bones: Rage of Tyranny",
+          "cardId": 5415
+        },
+        {
+          "name": "Duster tray",
+          "expansion": "Too Many Bones: Unbreakable",
+          "cardId": 2032,
+          "pickTray": "noGearloc"
+        }
       ]
     }
   ]

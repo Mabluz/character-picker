@@ -18,9 +18,9 @@ const getType = title => {
   return "game";
 };
 
-const folders = fs.readdirSync(gamesDir).filter(f =>
-  fs.statSync(path.join(gamesDir, f)).isDirectory()
-);
+const folders = fs
+  .readdirSync(gamesDir)
+  .filter(f => fs.statSync(path.join(gamesDir, f)).isDirectory());
 
 let totalUpdated = 0;
 
@@ -47,4 +47,6 @@ for (const folder of folders) {
   }
 }
 
-console.log(`\nDone. ${totalUpdated} ads updated across ${folders.length} games.`);
+console.log(
+  `\nDone. ${totalUpdated} ads updated across ${folders.length} games.`
+);

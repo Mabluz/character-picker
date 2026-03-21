@@ -1044,7 +1044,12 @@ export default {
   }
 }
 @keyframes inputPulse {
-  0%, 100% { background: #ffe4bd; }
-  50% { background: transparent; }
+  0%,
+  100% {
+    background: #ffe4bd;
+  }
+  50% {
+    background: transparent;
+  }
 }
 </style>

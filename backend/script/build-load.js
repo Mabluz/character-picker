@@ -21,12 +21,18 @@ const OUT_DIR = __dirname;
 function downloadBuffer(url) {
   return new Promise((resolve, reject) => {
     const get = url.startsWith("https") ? https.get : http.get;
-    get(url, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return downloadBuffer(res.headers.location).then(resolve).catch(reject);
+    get(url, res => {
+      if (
+        res.statusCode >= 300 &&
+        res.statusCode < 400 &&
+        res.headers.location
+      ) {
+        return downloadBuffer(res.headers.location)
+          .then(resolve)
+          .catch(reject);
       }
       const chunks = [];
-      res.on("data", (c) => chunks.push(c));
+      res.on("data", c => chunks.push(c));
       res.on("end", () => resolve(Buffer.concat(chunks)));
       res.on("error", reject);
     }).on("error", reject);
@@ -35,7 +41,9 @@ function downloadBuffer(url) {
 
 async function cropCard(sheetUrl, cardId, numWidth, numHeight, outPath) {
   let sharp;
-  try { sharp = require("sharp"); } catch {
+  try {
+    sharp = require("sharp");
+  } catch {
     throw new Error("sharp not installed. Run: npm install sharp");
   }
 
@@ -51,7 +59,12 @@ async function cropCard(sheetUrl, cardId, numWidth, numHeight, outPath) {
   const cardH = Math.floor(meta.height / numHeight);
 
   await sharp(buf)
-    .extract({ left: col * cardW, top: row * cardH, width: cardW, height: cardH })
+    .extract({
+      left: col * cardW,
+      top: row * cardH,
+      width: cardW,
+      height: cardH
+    })
     .jpeg({ quality: 90 })
     .toFile(outPath);
 }
@@ -76,7 +89,13 @@ async function main() {
     console.log(`Processing: ${hero.name} [${hero.expansion}]`);
 
     try {
-      await cropCard(hero.sheetUrl, hero.cardId, hero.numWidth, hero.numHeight, outPath);
+      await cropCard(
+        hero.sheetUrl,
+        hero.cardId,
+        hero.numWidth,
+        hero.numHeight,
+        outPath
+      );
       console.log(`  Saved: ${localPath}`);
     } catch (err) {
       console.error(`  ERROR: ${err.message}`);
@@ -89,7 +108,7 @@ async function main() {
     tabs: [{ title: "Heroes", characters }],
     settings: config.settings,
     background: config.background,
-    id: gameId,
+    id: gameId
   };
 
   const outPath = path.join(OUT_DIR, "load.json");
@@ -99,7 +118,7 @@ async function main() {
   console.log(`Total heroes: ${characters.length}`);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error("Error:", err.message);
   process.exit(1);
 });

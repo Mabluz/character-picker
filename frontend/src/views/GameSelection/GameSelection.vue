@@ -57,7 +57,11 @@
 
     <div class="create-cta">
       <h3>Can't find a randomizer for a specific game? Create it yourself!</h3>
-      <char-button v-if="!showLoginBox && !userLoggedIn" @click="showLoginBox = true">Customize games by logging in!</char-button>
+      <char-button
+        v-if="!showLoginBox && !userLoggedIn"
+        @click="showLoginBox = true"
+        >Customize games by logging in!</char-button
+      >
     </div>
     <div v-if="showLoginBox || userLoggedIn" class="login-fade-in">
       <login></login>
@@ -96,7 +100,11 @@
 
     <search-input @search="filterSearch" class="search"></search-input>
     <div v-if="isLocalUser" class="save-to-cloud-banner">
-      <p>Your account (and access to your games) are saved locally in this browser only.<br/>Deleting your browser cache will make you loose your games forever.</p>
+      <p>
+        Your account (and access to your games) are saved locally in this
+        browser only.<br />Deleting your browser cache will make you loose your
+        games forever.
+      </p>
       <char-button
         v-if="!showLinkForm"
         size="small"
@@ -246,7 +254,8 @@ export default {
   mounted() {},
   watch: {
     isLocalUser(val) {
-      if (val && this.showLinkForm) this.$nextTick(() => this.initGoogleLinkButton());
+      if (val && this.showLinkForm)
+        this.$nextTick(() => this.initGoogleLinkButton());
     },
     showLinkForm(val) {
       if (val) this.$nextTick(() => this.initGoogleLinkButton());
@@ -439,7 +448,9 @@ export default {
         password: this.linkPassword,
         repeat: this.linkRepeat
       });
-      if (result && result.error) {
+      if (result && result.unverified) {
+        this.linkError = `Check your email (${result.email}) to verify your account. You'll be logged in once verified.`;
+      } else if (result && result.error) {
         this.linkError = result.error;
       }
     },

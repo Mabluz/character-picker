@@ -40,6 +40,25 @@ const sendWelcome = userEmail => {
   sendEmail(userEmail, "Welcome to Random Board Game!", text, html);
 };
 
+const sendEmailVerification = (userEmail, token) => {
+  let url = config.emailLandingPageEmailVerification + token;
+  let text =
+    "Please verify your email address for Random Board Game.\r\n" +
+    "Click this link to verify: " +
+    url +
+    "\r\n" +
+    "If you didn't create an account, you can safely ignore this email.";
+
+  let html =
+    "<p>Please verify your email address for Random Board Game.</p>" +
+    "<p><a href='" +
+    url +
+    "'>Click here to verify your email</a></p>" +
+    "<p>If you didn't create an account, you can safely ignore this email.</p>";
+
+  sendEmail(userEmail, "Verify your email - Random Board Game", text, html);
+};
+
 const sendResetPassword = (userEmail, token) => {
   let url = config.emailLandingPagePasswordReset;
   let text =
@@ -92,7 +111,12 @@ const sendEmail = async (emailTo, subject, text, html) => {
   });
   if (error) {
     console.error("Resend send error:", error);
-    await logSendError(emailTo, subject, error.message || JSON.stringify(error), error.name);
+    await logSendError(
+      emailTo,
+      subject,
+      error.message || JSON.stringify(error),
+      error.name
+    );
   }
 };
 
@@ -101,5 +125,6 @@ module.exports = {
   sendEmail,
   logSendError,
   sendResetPassword,
-  sendWelcome
+  sendWelcome,
+  sendEmailVerification
 };

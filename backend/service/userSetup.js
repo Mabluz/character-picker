@@ -86,6 +86,7 @@ let getUserAccount = async userEmail => {
   console.log("User PostgreSQL used");
   const result = await database.query(
     `SELECT u.id, u.email, u.user_key, u.token, u.token_time, u.new_user_data, u.is_admin, u.is_blocked, u.local_token,
+            u.email_verified, u.email_verification_token,
             COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
      FROM users u
      LEFT JOIN user_games ug ON u.id = ug.user_id
@@ -109,6 +110,8 @@ let getUserAccount = async userEmail => {
     newUserData: row.new_user_data,
     isAdmin: row.is_admin || false,
     isBlocked: row.is_blocked || false,
+    emailVerified: row.email_verified || false,
+    emailVerificationToken: row.email_verification_token || null,
     data: row.data || []
   };
 
@@ -145,25 +148,23 @@ const getUserAccountByLocalToken = async localToken => {
 let signUpUser = async (userEmail, userPassword) => {
   const email = userEmail.toLowerCase().trim();
   const userKey = generateUserKey(userEmail, userPassword);
-  const token = uuid();
-  const tokenTime = new Date().getTime();
+  const verificationToken = uuid();
 
-  const result = await database.query(
-    `INSERT INTO users (email, user_key, token, token_time)
-     VALUES ($1, $2, $3, $4)
+  await database.query(
+    `INSERT INTO users (email, user_key, email_verified, email_verification_token)
+     VALUES ($1, $2, false, $3)
      RETURNING id`,
-    [email, userKey, token, tokenTime]
+    [email, userKey, verificationToken]
   );
 
   clearUserCache(email);
-  emailService.sendWelcome(email);
+  emailService.sendEmailVerification(email, verificationToken);
 
   return {
     answer: {
+      unverified: true,
       email: email,
-      token: token,
-      isAdmin: false,
-      data: []
+      message: "Check your email to verify your account before logging in."
     }
   };
 };
@@ -248,11 +249,64 @@ let newLogin = async data => {
   };
 };
 
+const verifyEmailToken = async token => {
+  const result = await database.query(
+    `SELECT u.id, u.email, u.is_admin, u.is_blocked, u.local_token,
+            COALESCE(json_agg(ug.game_data) FILTER (WHERE ug.id IS NOT NULL), '[]') as data
+     FROM users u
+     LEFT JOIN user_games ug ON u.id = ug.user_id
+     WHERE u.email_verification_token = $1
+     GROUP BY u.id`,
+    [token]
+  );
+
+  if (result.rows.length === 0) {
+    return { error: "Invalid or expired verification link." };
+  }
+
+  const row = result.rows[0];
+  await database.query(
+    `UPDATE users SET email_verified = true, email_verification_token = NULL, updated_at = NOW()
+     WHERE id = $1`,
+    [row.id]
+  );
+
+  clearUserCache(row.email);
+
+  const user = await getUserAccount(row.email);
+  const loginResult = await newLogin(user);
+  emailService.sendWelcome(row.email);
+  return loginResult;
+};
+
+const resendVerificationEmail = async userEmail => {
+  const user = await getUserAccount(userEmail);
+  if (user.error) {
+    return { error: "Email not found." };
+  }
+  if (user.emailVerified) {
+    return { error: "This email is already verified." };
+  }
+
+  const newToken = uuid();
+  await database.query(
+    `UPDATE users SET email_verification_token = $1, updated_at = NOW() WHERE id = $2`,
+    [newToken, user.userId]
+  );
+
+  clearUserCache(user.email);
+  emailService.sendEmailVerification(user.email, newToken);
+  return { answer: "Verification email sent. Check your inbox." };
+};
+
 let validateUser = async (email, token, onlyGetData = true) => {
   if (email && token) {
     let userAccount = await getUserAccount(email);
     if (userAccount.isBlocked) {
       return { login: false, blocked: true };
+    }
+    if (!userAccount.emailVerified) {
+      return { login: false, unverified: true };
     }
     if (userAccount.email === email && userAccount.token === token) {
       let date = new Date().getTime();
@@ -288,16 +342,18 @@ let validateUser = async (email, token, onlyGetData = true) => {
         login: true,
         isAdmin: row.is_admin || false,
         localToken: row.local_token,
-        data: onlyGetData ? (row.data || []) : {
-          userId: row.id,
-          email: row.email,
-          localToken: row.local_token,
-          token: row.token,
-          tokenTime: tokenTime,
-          isAdmin: row.is_admin || false,
-          isBlocked: row.is_blocked || false,
-          data: row.data || []
-        }
+        data: onlyGetData
+          ? row.data || []
+          : {
+              userId: row.id,
+              email: row.email,
+              localToken: row.local_token,
+              token: row.token,
+              tokenTime: tokenTime,
+              isAdmin: row.is_admin || false,
+              isBlocked: row.is_blocked || false,
+              data: row.data || []
+            }
       };
     }
   }
@@ -346,10 +402,9 @@ const setUserBlocked = async (userId, isBlocked) => {
     `UPDATE users SET is_blocked = $1, updated_at = NOW() WHERE id = $2`,
     [isBlocked, userId]
   );
-  const result = await database.query(
-    `SELECT email FROM users WHERE id = $1`,
-    [userId]
-  );
+  const result = await database.query(`SELECT email FROM users WHERE id = $1`, [
+    userId
+  ]);
   if (result.rows.length > 0) {
     clearUserCache(result.rows[0].email);
   }
@@ -360,10 +415,9 @@ const setUserAdmin = async (userId, isAdmin) => {
     `UPDATE users SET is_admin = $1, updated_at = NOW() WHERE id = $2`,
     [isAdmin, userId]
   );
-  const result = await database.query(
-    `SELECT email FROM users WHERE id = $1`,
-    [userId]
-  );
+  const result = await database.query(`SELECT email FROM users WHERE id = $1`, [
+    userId
+  ]);
   if (result.rows.length > 0) {
     clearUserCache(result.rows[0].email);
   }
@@ -415,19 +469,19 @@ const googleLoginOrCreate = async credential => {
   if (!user.error) {
     if (user.isBlocked) return { error: "This account has been blocked." };
     await database.query(
-      `UPDATE users SET google_id = $1, updated_at = NOW() WHERE id = $2`,
+      `UPDATE users SET google_id = $1, email_verified = true, updated_at = NOW() WHERE id = $2`,
       [googleId, user.userId]
     );
     clearUserCache(email);
     return newLogin(user);
   }
 
-  // Create new Google user (no password)
+  // Create new Google user (no password) — Google vouches for the email
   const token = uuid();
   const tokenTime = new Date().getTime();
   await database.query(
-    `INSERT INTO users (email, user_key, google_id, token, token_time)
-     VALUES ($1, NULL, $2, $3, $4)`,
+    `INSERT INTO users (email, user_key, google_id, token, token_time, email_verified)
+     VALUES ($1, NULL, $2, $3, $4, true)`,
     [email, googleId, token, tokenTime]
   );
   clearUserCache(email);
@@ -451,5 +505,7 @@ module.exports = {
   adminGetAllUsers,
   setUserAdmin,
   setUserBlocked,
-  googleLoginOrCreate
+  googleLoginOrCreate,
+  verifyEmailToken,
+  resendVerificationEmail
 };

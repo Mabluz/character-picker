@@ -26,7 +26,9 @@ if (!loadJsonPath) {
   process.exit(1);
 }
 
-const absoluteLoadPath = path.resolve(loadJsonPath.replace(/^[/\\]*backend[/\\]/, ""));
+const absoluteLoadPath = path.resolve(
+  loadJsonPath.replace(/^[/\\]*backend[/\\]/, "")
+);
 if (!fs.existsSync(absoluteLoadPath)) {
   console.error(`File not found: ${absoluteLoadPath}`);
   process.exit(1);
@@ -52,12 +54,15 @@ const CONTENT_TYPE_EXT = {
   "image/webp": ".webp",
   "image/gif": ".gif",
   "image/avif": ".avif",
-  "image/bmp": ".bmp",
+  "image/bmp": ".bmp"
 };
 
 function extFromContentType(contentType) {
   if (!contentType) return null;
-  const mime = contentType.split(";")[0].trim().toLowerCase();
+  const mime = contentType
+    .split(";")[0]
+    .trim()
+    .toLowerCase();
   return CONTENT_TYPE_EXT[mime] || null;
 }
 
@@ -94,7 +99,14 @@ if (loadJson.tabs) {
       }
       usedSlugs.add(slug);
 
-      entries.push({ character: charName, url: ref, tabTitle, tabSlug, slug, urlExt });
+      entries.push({
+        character: charName,
+        url: ref,
+        tabTitle,
+        tabSlug,
+        slug,
+        urlExt
+      });
     }
   }
 }
@@ -108,7 +120,11 @@ if (bgUrl && (bgUrl.startsWith("http://") || bgUrl.startsWith("https://"))) {
 }
 
 const totalCount = entries.length + (backgroundEntry ? 1 : 0);
-console.log(`Found ${entries.length} unique HTTP(S) character image URLs${backgroundEntry ? " + 1 background" : ""}.\n`);
+console.log(
+  `Found ${entries.length} unique HTTP(S) character image URLs${
+    backgroundEntry ? " + 1 background" : ""
+  }.\n`
+);
 
 if (totalCount === 0) {
   console.log("Nothing to download.");
@@ -126,27 +142,37 @@ function downloadUrl(url, destPath, redirects = 0) {
     const file = fs.createWriteStream(destPath);
     const protocol = url.startsWith("https") ? https : http;
 
-    const request = protocol.get(url, { headers: { "User-Agent": "Mozilla/5.0" } }, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        file.close();
-        if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
-        return downloadUrl(res.headers.location, destPath, redirects + 1).then(resolve).catch(reject);
+    const request = protocol.get(
+      url,
+      { headers: { "User-Agent": "Mozilla/5.0" } },
+      res => {
+        if (
+          res.statusCode >= 300 &&
+          res.statusCode < 400 &&
+          res.headers.location
+        ) {
+          file.close();
+          if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+          return downloadUrl(res.headers.location, destPath, redirects + 1)
+            .then(resolve)
+            .catch(reject);
+        }
+        if (res.statusCode !== 200) {
+          file.close();
+          if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+          return reject(new Error(`HTTP ${res.statusCode}`));
+        }
+        const contentType = res.headers["content-type"] || "";
+        res.pipe(file);
+        file.on("finish", () => file.close(() => resolve(contentType)));
+        file.on("error", err => {
+          if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+          reject(err);
+        });
       }
-      if (res.statusCode !== 200) {
-        file.close();
-        if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
-        return reject(new Error(`HTTP ${res.statusCode}`));
-      }
-      const contentType = res.headers["content-type"] || "";
-      res.pipe(file);
-      file.on("finish", () => file.close(() => resolve(contentType)));
-      file.on("error", (err) => {
-        if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
-        reject(err);
-      });
-    });
+    );
 
-    request.on("error", (err) => {
+    request.on("error", err => {
       if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
       reject(err);
     });
@@ -162,7 +188,10 @@ function downloadUrl(url, destPath, redirects = 0) {
 function findExistingFile(dir, slug) {
   if (!fs.existsSync(dir)) return null;
   const files = fs.readdirSync(dir);
-  const match = files.find((f) => path.basename(f, path.extname(f)) === slug && path.extname(f) !== ".tmp");
+  const match = files.find(
+    f =>
+      path.basename(f, path.extname(f)) === slug && path.extname(f) !== ".tmp"
+  );
   return match ? path.join(dir, match) : null;
 }
 
@@ -173,7 +202,8 @@ async function downloadEntry(url, tabSubdir, slug, urlExt) {
     // Known extension — straightforward
     const filename = `${slug}${urlExt}`;
     const destPath = path.join(tabPendingDir, filename);
-    if (fs.existsSync(destPath)) return { filename: `${tabSubdir}/${filename}`, skipped: true };
+    if (fs.existsSync(destPath))
+      return { filename: `${tabSubdir}/${filename}`, skipped: true };
     const contentType = await downloadUrl(url, destPath);
     return { filename: `${tabSubdir}/${filename}`, contentType };
   } else {
@@ -204,23 +234,37 @@ function checkAlreadyPending(tabSubdir, slug, urlExt) {
 
 async function run() {
   const swap = [];
-  let downloaded = 0, skipped = 0, failed = 0;
+  let downloaded = 0,
+    skipped = 0,
+    failed = 0;
 
   for (const { character, url, tabTitle, tabSlug, slug, urlExt } of entries) {
     const alreadyPending = checkAlreadyPending(tabSlug, slug, urlExt);
 
     if (alreadyPending) {
-      console.log(`[SKIP]     _pending/${alreadyPending}  (already in _pending/)`);
+      console.log(
+        `[SKIP]     _pending/${alreadyPending}  (already in _pending/)`
+      );
       skipped++;
-      swap.push({ character, url, filename: alreadyPending, relativePath: `${gameId}/${alreadyPending}` });
+      swap.push({
+        character,
+        url,
+        filename: alreadyPending,
+        relativePath: `${gameId}/${alreadyPending}`
+      });
       continue;
     }
 
-    process.stdout.write(`[DOWNLOAD] [${tabTitle}] ${character}: ${url}\n           -> _pending/${tabSlug}/${slug}${urlExt || ".<ext>"} ... `);
+    process.stdout.write(
+      `[DOWNLOAD] [${tabTitle}] ${character}: ${url}\n           -> _pending/${tabSlug}/${slug}${urlExt ||
+        ".<ext>"} ... `
+    );
     let result;
     try {
       result = await downloadEntry(url, tabSlug, slug, urlExt);
-      const extNote = !urlExt ? ` (detected ${result.contentType.split(";")[0].trim()})` : "";
+      const extNote = !urlExt
+        ? ` (detected ${result.contentType.split(";")[0].trim()})`
+        : "";
       console.log(`OK${extNote}`);
       downloaded++;
     } catch (err) {
@@ -230,7 +274,12 @@ async function run() {
     }
 
     const { filename } = result;
-    swap.push({ character, url, filename, relativePath: `${gameId}/${filename}` });
+    swap.push({
+      character,
+      url,
+      filename,
+      relativePath: `${gameId}/${filename}`
+    });
   }
 
   // Background
@@ -239,17 +288,34 @@ async function run() {
     const alreadyPending = checkAlreadyPending("background", slug, urlExt);
 
     if (alreadyPending) {
-      console.log(`[SKIP]     _pending/${alreadyPending}  (already in _pending/)`);
+      console.log(
+        `[SKIP]     _pending/${alreadyPending}  (already in _pending/)`
+      );
       skipped++;
-      swap.push({ character: "background", url, filename: alreadyPending, relativePath: `${gameId}/${alreadyPending}` });
+      swap.push({
+        character: "background",
+        url,
+        filename: alreadyPending,
+        relativePath: `${gameId}/${alreadyPending}`
+      });
     } else {
-      process.stdout.write(`[DOWNLOAD] background: ${url}\n           -> _pending/background/${slug}${urlExt || ".<ext>"} ... `);
+      process.stdout.write(
+        `[DOWNLOAD] background: ${url}\n           -> _pending/background/${slug}${urlExt ||
+          ".<ext>"} ... `
+      );
       try {
         const result = await downloadEntry(url, "background", slug, urlExt);
-        const extNote = !urlExt ? ` (detected ${result.contentType.split(";")[0].trim()})` : "";
+        const extNote = !urlExt
+          ? ` (detected ${result.contentType.split(";")[0].trim()})`
+          : "";
         console.log(`OK${extNote}`);
         downloaded++;
-        swap.push({ character: "background", url, filename: result.filename, relativePath: `${gameId}/${result.filename}` });
+        swap.push({
+          character: "background",
+          url,
+          filename: result.filename,
+          relativePath: `${gameId}/${result.filename}`
+        });
       } catch (err) {
         console.log(`FAILED (${err.message})`);
         failed++;
@@ -258,12 +324,18 @@ async function run() {
   }
 
   fs.writeFileSync(swapJsonPath, JSON.stringify(swap, null, 2));
-  console.log(`\nswap.json written with ${swap.length} entries -> ${swapJsonPath}`);
-  console.log(`Done. Downloaded: ${downloaded}, Skipped: ${skipped}, Failed: ${failed}`);
-  console.log("\nInspect _pending/ images, then run: node apply-swap.js <path-to-load.json>");
+  console.log(
+    `\nswap.json written with ${swap.length} entries -> ${swapJsonPath}`
+  );
+  console.log(
+    `Done. Downloaded: ${downloaded}, Skipped: ${skipped}, Failed: ${failed}`
+  );
+  console.log(
+    "\nInspect _pending/ images, then run: node apply-swap.js <path-to-load.json>"
+  );
 }
 
-run().catch((err) => {
+run().catch(err => {
   console.error("Unexpected error:", err);
   process.exit(1);
 });
