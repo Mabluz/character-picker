@@ -194,6 +194,10 @@
               </template>
             </table>
           </div>
+          <div
+            v-if="fixedScrolling"
+            :style="{ height: buttonContainerHeight + 'px' }"
+          ></div>
           <div class="button-container" ref="buttonContainer" :class="{ fixed: fixedScrolling }">
             <char-button
               class="draw"
@@ -568,6 +572,7 @@ let blankState = () => {
     displayPicked: false,
     animateDown: false,
     fixedScrolling: false,
+    buttonContainerHeight: 0,
     showFilter: false,
     showFilterHint: true,
     filterMode: "exclude",
@@ -1210,9 +1215,13 @@ export default {
         this.autoSave();
 
         const buttonsRow = self.$refs.buttonsRow;
-        const fixedThreshold = buttonsRow
-          ? buttonsRow.offsetTop
-          : 130;
+        const fixedThreshold = buttonsRow ? buttonsRow.offsetTop : 130;
+        const buttonContainer = self.$refs.buttonContainer;
+        if (buttonContainer) {
+          const style = window.getComputedStyle(buttonContainer);
+          const marginBottom = parseInt(style.marginBottom) || 0;
+          self.buttonContainerHeight = buttonContainer.offsetHeight + marginBottom;
+        }
 
         document.addEventListener("scroll", () => {
           self.fixedScrolling = window.pageYOffset > fixedThreshold;
