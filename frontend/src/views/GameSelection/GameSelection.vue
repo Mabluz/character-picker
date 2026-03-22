@@ -39,7 +39,7 @@
       </a>
     </div>
     <h1 class="desktop-heading">
-      <span class="border"></span>Random Boardgame<spinning-dice
+      <span class="border"></span>Random Board Game<spinning-dice
         class="dice-container"
       ></spinning-dice>
     </h1>

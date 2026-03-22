@@ -15,7 +15,7 @@
       </button>
       <div class="install-body">
         <div class="install-text">
-          Install <strong>Random Boardgame</strong> as an app on your Android
+          Install <strong>Random Board Game</strong> as an app on your Android
           device.
         </div>
         <button class="install-btn" @click="installApp">Install</button>
@@ -31,7 +31,7 @@
       </button>
       <div class="install-body">
         <div class="install-text">
-          Add <strong>Random Boardgame</strong> to your iOS home screen:
+          Add <strong>Random Board Game</strong> to your iOS home screen:
           <span class="install-steps">Share &rarr; Add to Home Screen</span>
           <a href="https://www.youtube.com/watch?v=bV8xE6lOdoY" target="_blank"
             >See how on YouTube</a
