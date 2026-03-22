@@ -98,7 +98,7 @@
         :style="getContainerHeight"
       >
         <div class="left">
-          <div class="filter-button" @click="triggerShowFilter">
+          <div v-if="showFilter || !isMobile" class="filter-button" @click="triggerShowFilter">
             <span v-if="!showFilter">Show Filter</span>
             <span v-else>Close filter</span>
           </div>
@@ -1652,7 +1652,7 @@ tr.picked td input {
   }
 
   .content .left .filter-slider.active {
-    max-height: 1000px;
+    max-height: 20000px;
     padding: 20px;
     margin-bottom: 20px;
     overflow: hidden;
