@@ -112,32 +112,68 @@
                   {{ availableCount }}
                 </td>
               </tr>
-              <tr>
-                <th>Remove</th>
-                <th>Filter</th>
-                <th>Available</th>
-              </tr>
-              <tr
-                v-for="(item, index) in getAllCategories"
-                :key="'category_' + index"
-                :class="{ remove: item.checked }"
-                :id="'filter_' + index"
-              >
-                <td>
-                  <input
-                    type="checkbox"
-                    :value="item.value"
-                    @change="
-                      event => {
-                        filterCheckboxChecked(event, 'filter_' + index);
-                      }
-                    "
-                    v-model="item.checked"
-                  />
-                </td>
-                <td>{{ item.value }}</td>
-                <td class="count">{{ item.count }}</td>
-              </tr>
+              <template v-if="getContainerCategories.length > 0">
+                <tr class="section-header">
+                  <th colspan="3">From</th>
+                </tr>
+                <tr>
+                  <th>Remove</th>
+                  <th>Filter</th>
+                  <th>Available</th>
+                </tr>
+                <tr
+                  v-for="item in getContainerCategories"
+                  :key="'container_' + item.value"
+                  :class="{ remove: item.checked, 'auto-empty': getAutoEmptyCategories.has(item.value) }"
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      :value="item.value"
+                      :disabled="getAutoEmptyCategories.has(item.value)"
+                      @change="
+                        event => {
+                          filterCheckboxChecked(event, getAllCategories.indexOf(item));
+                        }
+                      "
+                      v-model="item.checked"
+                    />
+                  </td>
+                  <td>{{ item.value }}</td>
+                  <td class="count">{{ item.count }}</td>
+                </tr>
+              </template>
+              <template v-if="getTypeCategories.length > 0">
+                <tr class="section-header">
+                  <th colspan="3">Type</th>
+                </tr>
+                <tr>
+                  <th>Remove</th>
+                  <th>Filter</th>
+                  <th>Available</th>
+                </tr>
+                <tr
+                  v-for="item in getTypeCategories"
+                  :key="'type_' + item.value"
+                  :class="{ remove: item.checked, 'auto-empty': getAutoEmptyCategories.has(item.value) }"
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      :value="item.value"
+                      :disabled="getAutoEmptyCategories.has(item.value)"
+                      @change="
+                        event => {
+                          filterCheckboxChecked(event, getAllCategories.indexOf(item));
+                        }
+                      "
+                      v-model="item.checked"
+                    />
+                  </td>
+                  <td>{{ item.value }}</td>
+                  <td class="count">{{ item.count }}</td>
+                </tr>
+              </template>
             </table>
           </div>
           <div class="button-container" :class="{ fixed: fixedScrolling }">
@@ -605,6 +641,30 @@ export default {
       if (tab && tab.categories && tab.categories.all)
         return tab.categories.all;
       return [];
+    },
+    getContainerCategories() {
+      return this.getAllCategories.filter(item => item.isContainer);
+    },
+    getTypeCategories() {
+      return this.getAllCategories.filter(item => !item.isContainer);
+    },
+    getAutoEmptyCategories() {
+      if (!this.game) return new Set();
+      const chars = this.game.tabs[this.selectedCharacterTabIndex].characters;
+      const result = new Set();
+      this.getAllCategories.forEach(item => {
+        if (item.checked) return;
+        const filterValues = item.value.split("/");
+        const hasAvailable = chars.some(char => {
+          if (char.remove !== false) return false;
+          return (
+            intersection(filterValues, char.type.split("/")).length > 0 ||
+            intersection(filterValues, char.container.split("/")).length > 0
+          );
+        });
+        if (!hasAvailable) result.add(item.value);
+      });
+      return result;
     },
     tabData() {
       return this.game ? this.game.tabs : [];
@@ -1324,6 +1384,16 @@ h1 {
       td {
         /*padding: 0 20px 0 10px;*/
       }
+      tr.section-header th {
+        padding-top: 10px;
+        padding-bottom: 4px;
+        text-align: center;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #aaa;
+        border-bottom: 1px solid #444;
+      }
     }
 
     img.tumbnail {
@@ -1375,6 +1445,11 @@ tr.remove td {
   text-decoration: line-through;
   background: grey;
   color: #ccc;
+}
+tr.auto-empty td {
+  opacity: 0.35;
+  font-style: italic;
+  pointer-events: none;
 }
 tr.current td {
   animation: pulse 1s infinite;

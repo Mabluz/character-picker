@@ -78,7 +78,7 @@ const splitUpGameData = game => {
         })
       ),
       function(value) {
-        return { value: value, count: countAllTypes(value) };
+        return { value: value, count: countAllTypes(value), isContainer: true };
       }
     );
     container.categories.all = union(
