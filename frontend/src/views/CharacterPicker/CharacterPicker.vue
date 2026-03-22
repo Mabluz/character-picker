@@ -103,6 +103,16 @@
             <span v-else>Close filter</span>
           </div>
           <div class="filter-slider" :class="{ active: showFilter }">
+            <div class="filter-mode-toggle">
+              <button
+                :class="{ active: filterMode === 'exclude' }"
+                @click="triggerFilterMode('exclude')"
+              >Remove selected</button>
+              <button
+                :class="{ active: filterMode === 'include' }"
+                @click="triggerFilterMode('include')"
+              >Add selected</button>
+            </div>
             <table id="filter-table">
               <tr>
                 <th colspan="3">Total available characters</th>
@@ -117,20 +127,24 @@
                   <th colspan="3">From</th>
                 </tr>
                 <tr>
-                  <th>Remove</th>
+                  <th>{{ filterMode === 'include' ? 'Add' : 'Remove' }}</th>
                   <th>Filter</th>
                   <th>Available</th>
                 </tr>
                 <tr
                   v-for="item in getContainerCategories"
                   :key="'container_' + item.value"
-                  :class="{ remove: item.checked, 'auto-empty': getAutoEmptyCategories.has(item.value) }"
+                  :class="{
+                    remove: filterMode === 'exclude' && item.checked,
+                    include: filterMode === 'include' && item.checked,
+                    'auto-empty': getAutoEmptyCategories.has(item.value)
+                  }"
                 >
                   <td>
                     <input
                       type="checkbox"
                       :value="item.value"
-                      :disabled="getAutoEmptyCategories.has(item.value)"
+                      :disabled="filterMode === 'exclude' && getAutoEmptyCategories.has(item.value)"
                       @change="
                         event => {
                           filterCheckboxChecked(event, getAllCategories.indexOf(item));
@@ -148,20 +162,24 @@
                   <th colspan="3">Type</th>
                 </tr>
                 <tr>
-                  <th>Remove</th>
+                  <th>{{ filterMode === 'include' ? 'Add' : 'Remove' }}</th>
                   <th>Filter</th>
                   <th>Available</th>
                 </tr>
                 <tr
                   v-for="item in getTypeCategories"
                   :key="'type_' + item.value"
-                  :class="{ remove: item.checked, 'auto-empty': getAutoEmptyCategories.has(item.value) }"
+                  :class="{
+                    remove: filterMode === 'exclude' && item.checked,
+                    include: filterMode === 'include' && item.checked,
+                    'auto-empty': getAutoEmptyCategories.has(item.value)
+                  }"
                 >
                   <td>
                     <input
                       type="checkbox"
                       :value="item.value"
-                      :disabled="getAutoEmptyCategories.has(item.value)"
+                      :disabled="filterMode === 'exclude' && getAutoEmptyCategories.has(item.value)"
                       @change="
                         event => {
                           filterCheckboxChecked(event, getAllCategories.indexOf(item));
@@ -176,7 +194,7 @@
               </template>
             </table>
           </div>
-          <div class="button-container" :class="{ fixed: fixedScrolling }">
+          <div class="button-container" ref="buttonContainer" :class="{ fixed: fixedScrolling }">
             <char-button
               class="draw"
               :color="'orange'"
@@ -194,7 +212,7 @@
               <span>Pick next</span>
             </char-button>
 
-            <div class="buttons-row">
+            <div class="buttons-row" ref="buttonsRow">
               <char-button
                 class="draw filter"
                 :color="'black'"
@@ -210,9 +228,16 @@
                 v-if="!startPicking"
                 @click="triggerToggleSelection"
               >
-                <span v-if="toggleAllOff">Add all</span>
+                <span v-if="filterMode === 'include' ? !toggleAllOff : toggleAllOff">Add all</span>
                 <span v-else>Remove all</span>
               </char-button>
+            </div>
+
+            <div class="filter-hint" v-if="showFilterHint && !startPicking && !fixedScrolling">
+              <span class="filter-hint__text">
+                Use the filter to <strong>remove</strong> characters from the list, or switch to <strong>add selected</strong> in the filter to pick what to use.
+              </span>
+              <button class="filter-hint__close" @click="showFilterHint = false">&#x2715;</button>
             </div>
 
             <div class="usergame-container">
@@ -544,6 +569,8 @@ let blankState = () => {
     animateDown: false,
     fixedScrolling: false,
     showFilter: false,
+    showFilterHint: true,
+    filterMode: "exclude",
     newAvailable: false,
     pictureOpacity: 0,
     pictureImg: "",
@@ -804,6 +831,10 @@ export default {
       return value.replace(/\//g, " / <wbr>");
     },
     filterCheckboxChecked(event, index) {
+      if (this.filterMode === "include") {
+        this.applyIncludeFilters();
+        return;
+      }
       let self = this;
       let target = event.target;
       let targetValue = target ? target.value : event;
@@ -957,6 +988,41 @@ export default {
         "px";
       if (this.isMobile) this.thumbnailCssLeft = "1%";
       this.thumbnailHide = false;
+    },
+    triggerFilterMode(mode) {
+      if (this.filterMode === mode) return;
+      this.filterMode = mode;
+      // Reset all filter checkboxes and char remove state
+      let tab = this.game.tabs[this.selectedCharacterTabIndex];
+      tab.categories.all.forEach(cat => {
+        cat.checked = false;
+      });
+      tab.characters.forEach(char => {
+        char.skipp = false;
+        char.remove = mode === "include";
+      });
+      this.removingPreformed = false;
+      this.toggleAllOff = false;
+      this.reCountAllFilters();
+    },
+    applyIncludeFilters() {
+      let tab = this.game.tabs[this.selectedCharacterTabIndex];
+      let checkedItems = tab.categories.all.filter(c => c.checked);
+      tab.characters.forEach(char => {
+        if (char.skipp) {
+          char.remove = true;
+          return;
+        }
+        let matchesAny = checkedItems.some(item => {
+          let vals = item.value.split("/");
+          return (
+            intersection(vals, char.type.split("/")).length > 0 ||
+            intersection(vals, char.container.split("/")).length > 0
+          );
+        });
+        char.remove = !matchesAny;
+      });
+      this.reCountAllFilters();
     },
     triggerShowFilter() {
       this.showFilter = this.showFilter ? false : true;
@@ -1143,11 +1209,13 @@ export default {
         this.reCountAllFilters(true);
         this.autoSave();
 
+        const buttonsRow = self.$refs.buttonsRow;
+        const fixedThreshold = buttonsRow
+          ? buttonsRow.offsetTop
+          : 130;
+
         document.addEventListener("scroll", () => {
-          var scrollTop =
-            (window.pageYOffset || document.scrollTop) -
-            (document.clientTop || 0);
-          self.fixedScrolling = scrollTop > 130;
+          self.fixedScrolling = window.pageYOffset > fixedThreshold;
 
           if (self.$refs.affiliateSentinel) {
             const rect = self.$refs.affiliateSentinel.getBoundingClientRect();
@@ -1395,6 +1463,72 @@ h1 {
         border-bottom: 1px solid #444;
       }
     }
+    .filter-hint {
+      display: inline-block;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #ffffff;
+      border: 2px solid #000;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #000;
+      line-height: 1.4;
+      position: relative;
+      &__text {
+        flex: 1;
+        strong {
+          color: #ff7b00;
+        }
+      }
+      &__close {
+        flex-shrink: 0;
+        color: #555;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0;
+        position: absolute;
+        background: white;
+        border: 2px solid black;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        top: -10px;
+        right: -10px;
+        &:hover {
+          color: #000;
+        }
+      }
+    }
+    .filter-mode-toggle {
+      display: flex;
+      margin-bottom: 8px;
+      overflow: hidden;
+      border: 1px solid #444;
+      button {
+        flex: 1;
+        padding: 6px 8px;
+        font-size: 12px;
+        background: #2a2a2a;
+        color: #aaa;
+        border: none;
+        cursor: pointer;
+        &:first-child {
+          border-right: 1px solid #444;
+        }
+        &.active {
+          background: #f76331;
+          color: #fff;
+          font-weight: bold;
+        }
+        &:hover:not(.active) {
+          background: #393835;
+          color: #fff;
+        }
+      }
+    }
 
     img.tumbnail {
       position: absolute;
@@ -1446,10 +1580,13 @@ tr.remove td {
   background: grey;
   color: #ccc;
 }
+tr.include td {
+  background: #1a3a1a;
+  color: #ccc;
+}
 tr.auto-empty td {
   opacity: 0.35;
   font-style: italic;
-  pointer-events: none;
 }
 tr.current td {
   animation: pulse 1s infinite;
