@@ -127,7 +127,7 @@ export default {
       return [...this.users].sort((a, b) => {
         if (a.isBlocked !== b.isBlocked) return a.isBlocked ? 1 : -1;
         if (a.isAdmin !== b.isAdmin) return a.isAdmin ? -1 : 1;
-        return a.email.localeCompare(b.email);
+        return (a.email || '').localeCompare(b.email || '');
       });
     },
     totalGames() {
