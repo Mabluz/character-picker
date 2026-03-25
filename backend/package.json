@@ -10,13 +10,15 @@
     "fetch-affiliate": "node script/fetch-affiliate.js",
     "compress-images": "node script/compress-images.js",
     "tts-import": "node script/tts-import.js",
-    "build-lastmod": "node script/build-lastmod.js"
+    "build-lastmod": "node script/build-lastmod.js",
+    "ocr-image": "node script/ocr-image.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "puppeteer": "^24.0.0",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.0",
+    "tesseract.js": "^5.1.1"
   },
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
