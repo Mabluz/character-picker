@@ -21,6 +21,7 @@ const splitUpGameData = game => {
       if (tab.characters[0].constructor === String) {
         let content = setupGameData(tab.characters);
         content.title = tab.title;
+        if (tab.hint) content.hint = tab.hint;
         return content;
       } else {
         return tab;

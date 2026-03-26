@@ -317,6 +317,12 @@
             </tr>
           </table>
 
+          <div
+            v-if="getActiveTabHint"
+            class="tab-hint"
+            v-html="getActiveTabHint"
+          ></div>
+
           <button class="report-btn-inline" @click="reportOpen = true">
             &#9888; Report wrong data
           </button>
@@ -705,6 +711,10 @@ export default {
       return this.game
         ? this.game.tabs[this.selectedCharacterTabIndex].characters
         : [];
+    },
+    getActiveTabHint() {
+      if (!this.game) return null;
+      return this.game.tabs[this.selectedCharacterTabIndex].hint || null;
     },
     getOwnerName() {
       return this.game.settings && this.game.settings.contentOwnerName
@@ -2175,6 +2185,18 @@ h3 {
   @media (max-width: 990px) {
     display: none;
   }
+}
+
+.tab-hint {
+  margin-top: 16px;
+  padding: 12px 16px;
+  display: inline-block;
+  background: white;
+  color: black;
+  border: 2px solid black;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .report-btn-inline {
