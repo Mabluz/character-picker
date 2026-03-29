@@ -19,7 +19,9 @@
     "db:down": "docker compose down",
     "lint": "npm -w frontend run lint",
     "format": "prettier --write \"**/*.{js,vue,json,css,less,html}\"",
-    "format:check": "prettier --check \"**/*.{js,vue,json,css,less,html}\""
+    "format:check": "prettier --check \"**/*.{js,vue,json,css,less,html}\"",
+    "scrape:ks": "npm -w backend run scrape:ks",
+    "scrape:ks-images": "npm -w backend run scrape:ks-images"
   },
   "engines": {
     "node": ">=18.0.0"

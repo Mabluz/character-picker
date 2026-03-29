@@ -1,5 +1,8 @@
 /backend/games/
 
+/ks-scrape*
+/ks-images*
+
 # Dependencies
 node_modules
 

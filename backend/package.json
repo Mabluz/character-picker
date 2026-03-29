@@ -10,8 +10,11 @@
     "fetch-affiliate": "node script/fetch-affiliate.js",
     "compress-images": "node script/compress-images.js",
     "tts-import": "node script/tts-import.js",
+    "ocr-image": "node script/ocr-image.js",
+
     "build-lastmod": "node script/build-lastmod.js",
-    "ocr-image": "node script/ocr-image.js"
+    "scrape:ks": "node script/scrape-ks.js",
+    "scrape:ks-images": "node script/scrape-ks-images.js"
   },
   "author": "",
   "license": "ISC",
